@@ -1,0 +1,27 @@
+package com.dxc.tenantservice.domain.model.tenant;
+
+import com.dxc.tenantservice.domain.model.enums.Language;
+import com.dxc.tenantservice.domain.model.enums.Theme;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserPreference {
+    private UUID id;
+    private UUID tenantId;
+    private UUID userId;
+    private Language language;
+    private String timezone;
+    private Theme theme;
+    private LocalDateTime updatedAt;
+}
