@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,7 +36,6 @@ public class TenantUser {
     private LocalDateTime deletedAt;
     
     private UserPreference userPreference;
-    private List<UserRole> userRoles;
 
     public void validate() {
         if (email == null || !email.contains("@")) {

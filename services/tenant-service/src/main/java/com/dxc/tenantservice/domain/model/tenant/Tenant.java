@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,12 +16,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tenant {
     private UUID id;
+    private UUID keycloakGroupId;
     private String name;
     private String email;
     private String website;
@@ -30,7 +29,6 @@ public class Tenant {
     private LocalDate foundedDate;
     private String description;
     private String logo;
-    private String slug;
 
     private Address address;
     
@@ -48,6 +46,9 @@ public class Tenant {
     public void validate() {
         if (name == null || name.trim().isEmpty()) {
             throw new TenantValidationException("Tenant name cannot be empty");
+        }
+        if (keycloakGroupId == null || name.trim().isEmpty()) {
+            throw new TenantValidationException("Keycloak group ID cannot be empty");
         }
         if (email == null || !email.contains("@")) {
             throw new TenantValidationException("Invalid email format");
