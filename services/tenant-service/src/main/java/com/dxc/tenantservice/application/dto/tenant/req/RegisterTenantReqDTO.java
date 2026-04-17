@@ -31,6 +31,4 @@ public class RegisterTenantReqDTO {
 
     @NotBlank(message = "Password is required")
     private String password;
-
-
 }

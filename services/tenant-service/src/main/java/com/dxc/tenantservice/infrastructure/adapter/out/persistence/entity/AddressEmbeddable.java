@@ -18,6 +18,7 @@ public class AddressEmbeddable {
     private String street;
     private String city;
     private String state;
+
     @Column(name = "zip_code")
     private String zipCode;
     private String country;

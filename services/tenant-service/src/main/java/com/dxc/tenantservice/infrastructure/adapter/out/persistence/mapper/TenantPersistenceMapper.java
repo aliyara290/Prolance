@@ -6,8 +6,6 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring", uses = {TenantUserPersistenceMapper.class})
 public interface TenantPersistenceMapper {
-
     TenantEntity domainToEntity(Tenant tenant);
-
     Tenant entityToDomain(TenantEntity tenantEntity);
 }

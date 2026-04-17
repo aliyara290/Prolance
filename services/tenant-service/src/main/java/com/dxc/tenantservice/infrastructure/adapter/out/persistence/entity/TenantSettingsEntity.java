@@ -1,12 +1,17 @@
 package com.dxc.tenantservice.infrastructure.adapter.out.persistence.entity;
 
+import com.dxc.tenantservice.domain.model.enums.PlanStatus;
+import com.dxc.tenantservice.domain.model.enums.PlanType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -17,14 +22,51 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TenantSettingsEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToOne(mappedBy = "settings")
-    private TenantEntity tenantEntity;
-
+    @Column(name = "tenant_id", nullable = false, updatable = false)
     private UUID tenantId;
-    private String logo;
-    private String primaryColor;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PlanType plan;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "plan_status", nullable = false)
+    private PlanStatus planStatus;
+
+    @Column(name = "max_users", nullable = false)
+    private int maxUsers;
+
+    @Column(name = "max_projects", nullable = false)
+    private int maxProjects;
+
+    @Column(name = "max_tasks_per_project", nullable = false)
+    private int maxTasksPerProject;
+
+    @Column(name = "enable_notifications", nullable = false)
+    private boolean enableNotifications;
+
+    @Column(name = "two_factor_required", nullable = false)
+    private boolean twoFactorRequired;
+
+    @Column(length = 50)
+    private String timezone;
+
+    @Column(length = 10)
+    private String language;
+
+    @Column(name = "date_format", length = 20)
+    private String dateFormat;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreatedDate
+    private Instant createdAt;
+
+    @Column(name = "updated_at")
+    @LastModifiedDate
+    private Instant updatedAt;
 }
