@@ -9,9 +9,11 @@ import com.dxc.tenantservice.application.port.in.TenantUseCase;
 import com.dxc.tenantservice.application.port.out.TenantLogRepository;
 import com.dxc.tenantservice.application.port.out.TenantRepository;
 import com.dxc.tenantservice.application.port.out.TenantUserRepository;
+import com.dxc.tenantservice.application.saga.RegistrationSaga;
 import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.client.KeycloakUserClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,9 +29,11 @@ public class TenantService implements TenantUseCase {
     private final TenantLogRepository tenantLogRepository;
     private final TenantDtoMapper tenantDtoMapper;
     private final TenantUserDtoMapper tenantUserDtoMapper;
+    private final ApplicationContext ctx;
 
     @Override
     public TenantResDTO registerTenant(RegisterTenantReqDTO registerTenantReqDTO) {
+        RegistrationSaga saga = ctx.getBean(RegistrationSaga.class);
         UUID tenantId = UUID.randomUUID();
         UUID keycloakUserId = null;
 

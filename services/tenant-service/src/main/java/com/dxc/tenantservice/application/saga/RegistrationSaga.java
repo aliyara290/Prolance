@@ -12,16 +12,16 @@ import java.util.Deque;
 @Scope("prototype")
 public class RegistrationSaga {
 
-    private final Deque<Runnable> compensations = new ArrayDeque<>();
+    private final Deque<CompensationAction> compensations = new ArrayDeque<>();
 
-    public void register(Runnable compensation) {
+    public void register(CompensationAction compensation) {
         compensations.push(compensation);
     }
 
     public void rollback() {
         compensations.forEach(action -> {
             try {
-                action.run();
+                action.compensate();
             } catch (Exception e) {
                 log.error("Compensation failed, manual cleanup required", e);
             }

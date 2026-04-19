@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @FeignClient(
         name = "keycloak-admin-api",
@@ -26,10 +27,10 @@ public interface KeycloakUserClient {
     void deleteUser(@PathVariable("userId") String userId);
 
     @PutMapping("/admin/realms/${keycloak.realm}/users/{userId}/groups/{groupId}")
-    void addUserToGroup(@PathVariable("userId") String userId, @PathVariable("groupId") String groupId);
+    void addUserToGroup(@PathVariable("userId") String userId, @PathVariable("groupId") UUID groupId);
 
     @DeleteMapping("/admin/realms/${keycloak.realm}/users/{userId}/groups/{groupId}")
-    void removeUserFromGroup(@PathVariable("userId") String userId, @PathVariable("groupId") String groupId);
+    void removeUserFromGroup(@PathVariable("userId") String userId, @PathVariable("groupId") UUID groupId);
 
     @PutMapping("/admin/realms/${keycloak.realm}/users/{userId}/execute-actions-email")
     void executeActionsEmail(@PathVariable("userId") String userId, @RequestParam(value = "client_id", required = false) String clientId, @RequestParam(value = "lifespan", required = false) Integer lifespan, @RequestBody List<String> actions);

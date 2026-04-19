@@ -31,6 +31,9 @@ public class TenantUserEntity {
     @Column(name = "keycloak_user_id", nullable = false, unique = true)
     private UUID keycloakUserId;
 
+    @Column(name = "keycloak_group_id", nullable = false, unique = true)
+    private UUID keycloakGroupId;
+
     @Column(nullable = false)
     private String email;
 

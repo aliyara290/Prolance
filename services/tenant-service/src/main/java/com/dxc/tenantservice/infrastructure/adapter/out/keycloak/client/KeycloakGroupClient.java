@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @FeignClient(
         name = "keycloak-admin-api",
@@ -28,14 +29,14 @@ public interface KeycloakGroupClient {
                                  @RequestParam(value = "briefRepresentation", defaultValue = "false") boolean briefRepresentation);
 
     @PostMapping("/admin/realms/${keycloak.realm}/groups/{groupId}/children")
-    ResponseEntity<Void> createSubgroup(@PathVariable("groupId") String groupId,
+    ResponseEntity<Void> createSubgroup(@PathVariable("groupId") UUID groupId,
                                         @RequestBody CreateKeycloakGroupReqDTO subgroup);
 
     @GetMapping("/admin/realms/${keycloak.realm}/groups/{groupId}/members")
     List<KeycloakUserResDTO> getGroupMembers(@PathVariable("groupId") String groupId);
 
     @GetMapping("/admin/realms/${keycloak.realm}/groups/{groupId}/children")
-    List<KeycloakGroupResDTO> getGroupChildren(@PathVariable("groupId") String groupId);
+    List<KeycloakGroupResDTO> getGroupChildren(@PathVariable("groupId") UUID groupId);
 
     @GetMapping("/admin/realms/${keycloak.realm}/roles/{name}")
     KeycloakRoleResDTO getRealmRole(@PathVariable String name);

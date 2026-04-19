@@ -21,6 +21,7 @@ public class TenantUser {
     private UUID id;
     private UUID tenantId;
     private UUID keycloakUserId;
+    private UUID keycloakGroupId;
     
     private String email;
     private String firstName;
