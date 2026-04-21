@@ -18,29 +18,29 @@ import java.util.stream.Collectors;
 public class TenantRepositoryAdapter implements TenantRepository {
 
     private final TenantRepositoryJpa repository;
-    private final TenantPersistenceMapper mapper;
+    private final TenantPersistenceMapper tenantMapper;
 
     @Override
     public Tenant save(Tenant tenant) {
-        TenantEntity entity = mapper.domainToEntity(tenant);
+        TenantEntity entity = tenantMapper.domainToEntity(tenant);
         TenantEntity saved = repository.save(entity);
-        return mapper.entityToDomain(saved);
+        return tenantMapper.entityToDomain(saved);
     }
 
     @Override
     public Optional<Tenant> findById(UUID id) {
-        return repository.findById(id).map(mapper::entityToDomain);
+        return repository.findById(id).map(tenantMapper::entityToDomain);
     }
 
     @Override
     public Optional<Tenant> findByEmail(String email) {
-        return repository.findByEmail(email).map(mapper::entityToDomain);
+        return repository.findByEmail(email).map(tenantMapper::entityToDomain);
     }
 
     @Override
     public List<Tenant> findAll() {
         return repository.findAll().stream()
-                .map(mapper::entityToDomain)
+                .map(tenantMapper::entityToDomain)
                 .collect(Collectors.toList());
     }
 

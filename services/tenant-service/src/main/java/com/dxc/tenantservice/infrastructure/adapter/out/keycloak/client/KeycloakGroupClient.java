@@ -43,4 +43,7 @@ public interface KeycloakGroupClient {
 
     @PostMapping("/admin/realms/${keycloak.realm}/groups/{groupId}/role-mappings/realm")
     ResponseEntity<Void> attachRoleToGroup(@PathVariable String groupId, @RequestBody List<KeycloakRoleReqDTO> roles);
+
+    @DeleteMapping("/admin/realms/${keycloak.realm}/groups/{groupId}")
+    void deleteGroup(@PathVariable("groupId") String groupId);
 }

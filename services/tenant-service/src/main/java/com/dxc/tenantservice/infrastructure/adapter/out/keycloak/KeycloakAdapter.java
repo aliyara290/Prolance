@@ -35,28 +35,10 @@ public class KeycloakAdapter implements KeycloakPort {
     @Value("${keycloak.admin.client-id}")
     private String clientId;
 
-    @Value("${keycloak.admin.client-secret}")
-    private String clientSecret;
-
     @Override
     public String createUser(KeycloakUserReqDTO userDto, UUID tenantId) {
         try {
             log.info("Creating user in Keycloak: email={}, tenantId={}", userDto.getEmail(), tenantId);
-
-//            KeycloakUserReqDTO user = KeycloakUserReqDTO.builder()
-//                    .username(email)
-//                    .email(email)
-//                    .firstName(firstName)
-//                    .lastName(lastName)
-//                    .enabled(true)
-//                    .emailVerified(true)
-//                    .attributes(Map.of(
-//                            "tenantId", List.of(tenantId.toString())
-//                    )).build();
-
-//            KeycloakUserReqDTO.KeycloakCredential credential =
-//                    new KeycloakUserRepresentation.KeycloakCredentialRepresentation("password", password, false);
-//            user.setCredentials(List.of(credential));
 
             log.debug("Sending user creation request to Keycloak");
             ResponseEntity<Void> response = userClient.createUser(userDto);
@@ -160,12 +142,13 @@ public class KeycloakAdapter implements KeycloakPort {
     }
 
     @Override
-    public void assignUserToGroup(String keycloakUserId, UUID tenantId, String role) {
+    public UUID assignUserToGroup(String keycloakUserId, UUID tenantId, String role) {
         try {
             log.info("Assigning user to group: userId={}, tenantId={}, role={}", keycloakUserId, tenantId, role);
             UUID roleGroupId = findRoleGroupId(tenantId, role);
             userClient.addUserToGroup(keycloakUserId, roleGroupId);
             log.info("User assigned to group successfully: userId={}, groupId={}", keycloakUserId, roleGroupId);
+            return roleGroupId;
         } catch (Exception e) {
             log.error("Error assigning user to group: userId={}, tenantId={}, role={}, error={}",
                     keycloakUserId, tenantId, role, e.getMessage(), e);
@@ -222,6 +205,18 @@ public class KeycloakAdapter implements KeycloakPort {
         } catch (Exception e) {
             log.error("Error deleting user: userId={}, error={}", keycloakUserId, e.getMessage(), e);
             throw new KeycloakIntegrationException("Failed to delete user in Keycloak: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void deleteGroup(UUID groupId) {
+        try {
+            log.info("Deleting group from Keycloak: groupId={}", groupId);
+            groupClient.deleteGroup(groupId.toString());
+            log.info("Group deleted successfully: groupId={}", groupId);
+        } catch (Exception e) {
+            log.error("Error deleting group: groupId={}, error={}", groupId, e.getMessage(), e);
+            throw new KeycloakIntegrationException("Failed to delete group in Keycloak: " + e.getMessage(), e);
         }
     }
 

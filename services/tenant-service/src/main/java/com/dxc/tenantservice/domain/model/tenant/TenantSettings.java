@@ -1,23 +1,18 @@
 package com.dxc.tenantservice.domain.model.tenant;
 
+import com.dxc.tenantservice.domain.model.enums.Language;
 import com.dxc.tenantservice.domain.model.enums.PlanStatus;
 import com.dxc.tenantservice.domain.model.enums.PlanType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.dxc.tenantservice.domain.model.record.PlanDefaults;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.util.UUID;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class TenantSettings {
 
-    private UUID id;
+    private final UUID id;
+    private final UUID tenantId;
 
-    private UUID tenantId;
     private PlanType plan;
     private PlanStatus planStatus;
 
@@ -26,32 +21,76 @@ public class TenantSettings {
     private int maxTasksPerProject;
 
     private boolean enableNotifications;
-
     private boolean twoFactorRequired;
 
     private String timezone;
-    private String language;
+    private Language language;
     private String dateFormat;
 
+    private TenantSettings(
+            UUID id,
+            UUID tenantId,
+            PlanType plan,
+            PlanStatus planStatus,
+            int maxUsers,
+            int maxProjects,
+            int maxTasksPerProject,
+            boolean enableNotifications,
+            boolean twoFactorRequired,
+            String timezone,
+            Language language,
+            String dateFormat
+    ) {
+        validate(tenantId, plan, planStatus);
+        this.id = id;
+        this.tenantId = tenantId;
+        this.plan = plan;
+        this.planStatus = planStatus;
+        this.maxUsers = maxUsers;
+        this.maxProjects = maxProjects;
+        this.maxTasksPerProject = maxTasksPerProject;
+        this.enableNotifications = enableNotifications;
+        this.twoFactorRequired = twoFactorRequired;
+        this.timezone = timezone;
+        this.language = language;
+        this.dateFormat = dateFormat;
+    }
+
     public static TenantSettings createDefault(UUID tenantId) {
-        TenantSettings settings = new TenantSettings();
+        return createForPlan(tenantId, PlanType.FREE);
+    }
 
-        settings.tenantId = tenantId;
-        settings.plan = PlanType.FREE;
-        settings.planStatus = PlanStatus.ACTIVE;
+    public static TenantSettings createForPlan(UUID tenantId, PlanType plan) {
+        PlanDefaults defaults = PlanDefaults.from(plan);
 
-        settings.maxUsers = 5;
-        settings.maxProjects = 10;
-        settings.maxTasksPerProject = 100;
+        return new TenantSettings(
+                UUID.randomUUID(),
+                tenantId,
+                plan,
+                PlanStatus.ACTIVE,
+                defaults.maxUsers(),
+                defaults.maxProjects(),
+                defaults.maxTasksPerProject(),
+                true,
+                false,
+                "UTC",
+                Language.EN,
+                "yyyy-MM-dd"
+        );
+    }
 
-        settings.enableNotifications = true;
+    public void upgradePlan(PlanType newPlan) {
+        PlanDefaults defaults = PlanDefaults.from(newPlan);
 
-        settings.twoFactorRequired = false;
+        this.plan = newPlan;
+        this.maxUsers = defaults.maxUsers();
+        this.maxProjects = defaults.maxProjects();
+        this.maxTasksPerProject = defaults.maxTasksPerProject();
+    }
 
-        settings.timezone = "UTC";
-        settings.language = "en";
-        settings.dateFormat = "yyyy-MM-dd";
-
-        return settings;
+    private void validate(UUID tenantId, PlanType plan, PlanStatus status) {
+        if (tenantId == null) throw new IllegalArgumentException("tenantId is required");
+        if (plan == null) throw new IllegalArgumentException("plan is required");
+        if (status == null) throw new IllegalArgumentException("planStatus is required");
     }
 }

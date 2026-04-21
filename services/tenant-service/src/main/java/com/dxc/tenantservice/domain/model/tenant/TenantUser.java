@@ -3,67 +3,131 @@ package com.dxc.tenantservice.domain.model.tenant;
 import com.dxc.tenantservice.domain.exception.UserStateException;
 import com.dxc.tenantservice.domain.exception.UserValidationException;
 import com.dxc.tenantservice.domain.model.enums.UserStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class TenantUser {
-    private UUID id;
-    private UUID tenantId;
+
+    private final UUID id;
+    private final UUID tenantId;
+
     private UUID keycloakUserId;
     private UUID keycloakGroupId;
-    
+
     private String email;
     private String firstName;
     private String lastName;
     private String jobTitle;
     private String department;
-    
-    private UserStatus status;
-    
-    private LocalDateTime lastLoginAt;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
-    
-    private UserPreference userPreference;
 
-    public void validate() {
-        if (email == null || !email.contains("@")) {
-            throw new UserValidationException("Invalid user email format");
+    private UserStatus status;
+
+    private LocalDateTime lastLoginAt;
+
+    private TenantUser(
+            UUID id,
+            UUID tenantId,
+            String email,
+            String firstName,
+            String lastName
+    ) {
+        validate(tenantId, email, firstName);
+
+        this.id = id;
+        this.tenantId = tenantId;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.status = UserStatus.PENDING; // important
+    }
+
+    public static TenantUser create(
+            UUID tenantId,
+            String email,
+            String firstName,
+            String lastName
+    ) {
+        return new TenantUser(
+                UUID.randomUUID(),
+                tenantId,
+                email,
+                firstName,
+                lastName
+        );
+    }
+
+    public void assignKeycloakUser(UUID keycloakUserId) {
+        if (keycloakUserId == null) {
+            throw new UserValidationException("Keycloak userId cannot be null");
         }
-        if (firstName == null || firstName.trim().isEmpty()) {
-            throw new UserValidationException("User first name cannot be empty");
+        if (this.keycloakUserId != null) {
+            throw new UserStateException("Keycloak user already assigned");
         }
+        this.keycloakUserId = keycloakUserId;
+    }
+
+    public void assignToGroup(UUID groupId) {
+        if (groupId == null) {
+            throw new UserValidationException("GroupId cannot be null");
+        }
+        this.keycloakGroupId = groupId;
     }
 
     public void activate() {
-        if (this.status == UserStatus.ACTIVE) {
-            throw new UserStateException("User is already active");
+        if (this.status != UserStatus.PENDING && this.status != UserStatus.SUSPENDED) {
+            throw new UserStateException("User cannot be activated from state: " + status);
         }
         this.status = UserStatus.ACTIVE;
-        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void suspend() {
+        if (this.status != UserStatus.ACTIVE) {
+            throw new UserStateException("Only active users can be suspended");
+        }
+        this.status = UserStatus.SUSPENDED;
     }
 
     public void ban() {
         if (this.status == UserStatus.BANNED) {
-            throw new UserStateException("User is already banned");
+            throw new UserStateException("User already banned");
         }
         this.status = UserStatus.BANNED;
-        this.updatedAt = LocalDateTime.now();
     }
 
-    public void updateLastLogin() {
+    public void updateProfile(
+            String firstName,
+            String lastName,
+            String jobTitle,
+            String department
+    ) {
+        if (firstName == null || firstName.isBlank()) {
+            throw new UserValidationException("First name is required");
+        }
+
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.jobTitle = jobTitle;
+        this.department = department;
+    }
+
+    public void recordLogin() {
         this.lastLoginAt = LocalDateTime.now();
+    }
+
+    private void validate(UUID tenantId, String email, String firstName) {
+        if (tenantId == null) {
+            throw new UserValidationException("tenantId is required");
+        }
+
+        if (email == null || !email.contains("@")) {
+            throw new UserValidationException("Invalid email");
+        }
+
+        if (firstName == null || firstName.isBlank()) {
+            throw new UserValidationException("First name is required");
+        }
     }
 }

@@ -4,17 +4,19 @@ server:
 spring:
   profiles:
     active: dev
-
   application:
     name: api-gateway
-
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:8080/realms/your-realm
   config:
-    import: "optional:configserver:"
+    import: "optional:configserver:http://localhost:8888"
   cloud:
     config:
       uri: http://localhost:8888
+
+#test: 1230
+logging:
+  level:
+    root: INFO
+    com.dxc.apigateway: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.cloud.gateway: DEBUG

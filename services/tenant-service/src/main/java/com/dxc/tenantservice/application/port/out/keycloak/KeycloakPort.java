@@ -10,10 +10,12 @@ public interface KeycloakPort {
     String createUserWithEmailVerification(KeycloakUserReqDTO userDto, UUID tenantId);
     UUID createCompanyGroup(UUID tenantId);
     void createCompanySubGroup(UUID parentGroupId, String subGroupName);
-    void assignUserToGroup(String keycloakUserId, UUID tenantId, String role);
+    UUID assignUserToGroup(String keycloakUserId, UUID tenantId, String role);
     void changeUserRole(String keycloakUserId, UUID tenantId, UUID oldRoleGroupId, String newRole);
     void removeUserFromGroup(String keycloakUserId, UUID tenantId, String role);
     void deleteUser(String keycloakUserId);
+    void deleteGroup(UUID groupId);
     KeycloakTokenResDTO getUserAccessToken(String email, String password);
 }
+
 

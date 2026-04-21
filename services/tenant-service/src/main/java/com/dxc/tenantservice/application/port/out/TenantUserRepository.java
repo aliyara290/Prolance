@@ -1,13 +1,14 @@
 package com.dxc.tenantservice.application.port.out;
 
 import com.dxc.tenantservice.domain.model.tenant.TenantUser;
+import com.dxc.tenantservice.domain.model.tenant.UserPreference;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface TenantUserRepository {
-    TenantUser save(TenantUser user);
+    TenantUser save(TenantUser user, UserPreference userPreference);
     Optional<TenantUser> findById(UUID id);
     Optional<TenantUser> findByKeycloakUserId(UUID keycloakUserId);
     Optional<TenantUser> findByEmailAndTenantId(String email, UUID tenantId);

@@ -2,6 +2,7 @@ package com.dxc.tenantservice.infrastructure.adapter.out.persistence;
 
 import com.dxc.tenantservice.application.port.out.TenantUserRepository;
 import com.dxc.tenantservice.domain.model.tenant.TenantUser;
+import com.dxc.tenantservice.domain.model.tenant.UserPreference;
 import com.dxc.tenantservice.infrastructure.adapter.out.persistence.entity.TenantUserEntity;
 import com.dxc.tenantservice.infrastructure.adapter.out.persistence.jpa.TenantUserRepositoryJpa;
 import com.dxc.tenantservice.infrastructure.adapter.out.persistence.mapper.TenantUserPersistenceMapper;
@@ -21,11 +22,12 @@ public class TenantUserRepositoryAdapter implements TenantUserRepository {
     private final TenantUserPersistenceMapper mapper;
 
     @Override
-    public TenantUser save(TenantUser user) {
+    public TenantUser save(TenantUser user, UserPreference userPreference) {
         TenantUserEntity entity = mapper.domainToEntity(user);
         TenantUserEntity saved = repository.save(entity);
         return mapper.entityToDomain(saved);
     }
+
 
     @Override
     public Optional<TenantUser> findById(UUID id) {
