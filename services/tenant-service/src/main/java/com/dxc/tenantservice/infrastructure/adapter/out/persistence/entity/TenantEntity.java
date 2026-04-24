@@ -24,7 +24,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TenantEntity {
+public class TenantEntity extends BaseAuditingEntity {
     @Id
     private UUID id;
 
@@ -55,18 +55,10 @@ public class TenantEntity {
     @Column(nullable = false)
     private TenantStatus status;
 
-    @Column(name = "created_at")
-    @CreatedDate
-    private Instant createdAt;
-
-    @Column(name = "updated_at")
-    @LastModifiedDate
-    private Instant updatedAt;
-
     @Column(name = "deleted_at")
     private Instant deletedAt;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "settings_id")
     private TenantSettingsEntity settings;
 }

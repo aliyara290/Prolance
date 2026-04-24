@@ -8,16 +8,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "tenant_logs")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
-//@Setter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,24 +29,26 @@ public class TenantLogEntity {
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    @Column(name = "entity_type")
+    @Column(name = "entity_type", nullable = false)
     private String entityType;
 
-    @Column(name = "entity_id")
+    @Column(name = "entity_id", nullable = false)
     private UUID entityId;
 
     @Column(name = "ip_address")
-    private String IPAddress;
+    private String ipAddress;
 
     @Column(name = "user_agent")
     private String userAgent;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TenantLogAction action;
 
     @CreatedDate
+    @Column(nullable = false, updatable = false)
     private Instant timestamp;
 }

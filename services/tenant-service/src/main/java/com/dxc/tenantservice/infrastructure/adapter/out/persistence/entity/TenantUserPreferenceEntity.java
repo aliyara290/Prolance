@@ -20,7 +20,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TenantUserPreferenceEntity {
+public class TenantUserPreferenceEntity extends BaseAuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -41,8 +41,4 @@ public class TenantUserPreferenceEntity {
 
     @Enumerated(EnumType.STRING)
     private Theme theme;
-
-    @Column(name = "updated_at")
-    @LastModifiedDate
-    private Instant updatedAt;
 }

@@ -7,11 +7,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -21,7 +20,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TenantUserEntity {
+public class TenantUserEntity extends BaseAuditingEntity {
     @Id
     private UUID id;
 
@@ -31,8 +30,14 @@ public class TenantUserEntity {
     @Column(name = "keycloak_user_id", nullable = false, unique = true)
     private UUID keycloakUserId;
 
-    @Column(name = "keycloak_group_id", nullable = false, unique = true)
-    private UUID keycloakGroupId;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "tenant_user_role_groups",
+            joinColumns = @JoinColumn(name = "tenant_user_id")
+    )
+    @Column(name = "keycloak_role_group_id")
+    @Builder.Default
+    private Set<UUID> keycloakRoleGroupIds = new HashSet<>();
 
     @Column(nullable = false)
     private String email;
@@ -52,18 +57,7 @@ public class TenantUserEntity {
     private UserStatus status;
 
     @Column(name = "last_login_at")
-    private Instant lastLoginAt;
-
-    @Column(name = "created_at")
-    @CreatedDate
-    private Instant createdAt;
-
-    @Column(name = "updated_at")
-    @LastModifiedDate
-    private Instant updatedAt;
-
-    @Column(name = "deleted_at")
-    private Instant deletedAt;
+    private LocalDateTime lastLoginAt;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_preference_id")

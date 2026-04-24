@@ -21,7 +21,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TenantSettingsEntity {
+public class TenantSettingsEntity extends BaseAuditingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -62,11 +62,4 @@ public class TenantSettingsEntity {
     @Column(name = "date_format", length = 20)
     private String dateFormat;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    @CreatedDate
-    private Instant createdAt;
-
-    @Column(name = "updated_at")
-    @LastModifiedDate
-    private Instant updatedAt;
 }
