@@ -4,9 +4,14 @@ server:
 spring:
   cloud:
     config:
+      config:
+        import: "optional:configserver:http://localhost:8888"
       server:
         git:
-          uri: https://github.com/aliyara290/Prolance-Config-Repo
-          search-paths: '{application}'
+          uri: ${HOME}/Documents/DXC/Prolance-Config-Repo
+#          uri: https://github.com/aliyara290/Prolance-Config-Repo
+#          default-label: master
+          search-paths: "{application}"
+
   application:
     name: config-server

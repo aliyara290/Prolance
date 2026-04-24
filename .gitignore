@@ -9,6 +9,7 @@ target/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/*
 *.iws
 *.iml
 *.ipr
@@ -41,3 +42,8 @@ build/
 **/.env.*
 ### Mac OS ###
 .DS_Store
+
+#logs
+api-gateway/logs/
+*.log
+*.log.*

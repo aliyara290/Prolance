@@ -16,6 +16,7 @@
     <name>api-gateway</name>
     <description>API Gateway Service</description>
 
+    <packaging>jar</packaging>
     <dependencies>
 
         <!-- Gateway -->

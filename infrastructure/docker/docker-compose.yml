@@ -122,7 +122,16 @@ services:
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HTTP_PORT: 8080
+
+#      KC_SPI_EMAIL_SMTP_HOST: ${KC_SPI_EMAIL_SMTP_HOST:-smtp.gmail.com}
+#      KC_SPI_EMAIL_SMTP_PORT: ${KC_SPI_EMAIL_SMTP_PORT:-587}
+#      KC_SPI_EMAIL_SMTP_USER: ${KC_SPI_EMAIL_SMTP_USER:-ali.yara.fr@gmail.com}
+#      KC_SPI_EMAIL_SMTP_PASSWORD: ${KC_SPI_EMAIL_SMTP_PASSWORD}
+#      KC_SPI_EMAIL_SMTP_STARTTLS: true
+#      KC_SPI_EMAIL_SMTP_AUTH: true
+#      KC_SPI_EMAIL_FROM: ${KC_SPI_EMAIL_FROM:-ali.yara.fr@gmail.com}
+#      KC_HTTP_PORT: 8080
+
     ports:
       - "8079:8080"
     #    volumes:
@@ -133,6 +142,22 @@ services:
     networks:
       - prolance-network
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: prolance-pgadmin
+    profiles: ["default", "all"]
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - prolance-network
+    depends_on:
+      - tenant-db
+      - keycloak-db
 #  zookeeper:
 #    image: confluentinc/cp-zookeeper:7.6.0
 #    container_name: zookeeper
@@ -182,3 +207,4 @@ networks:
 volumes:
   prolance-keycloak-data:
   tenant-data:
+  pgadmin-data:
