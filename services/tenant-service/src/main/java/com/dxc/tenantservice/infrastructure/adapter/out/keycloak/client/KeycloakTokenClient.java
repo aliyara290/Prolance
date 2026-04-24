@@ -22,14 +22,4 @@ public interface KeycloakTokenClient {
             @Param("client_id") String clientId,
             @Param("client_secret") String clientSecret
     );
-
-    @RequestLine("POST /realms/{realm}/protocol/openid-connect/token")
-    @Headers("Content-Type: application/x-www-form-urlencoded")
-    KeycloakTokenResDTO getUserToken(
-            @Param("realm") String realm,
-            @Param("grant_type") String grantType,
-            @Param("username") String username,
-            @Param("password") String password,
-            @Param("client_id") String clientId
-    );
 }

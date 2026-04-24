@@ -1,11 +1,12 @@
 package com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.keycloak;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class KeycloakTokenResDTO {
     @JsonProperty("access_token")

@@ -39,10 +39,10 @@ public interface KeycloakGroupClient {
     List<KeycloakGroupResDTO> getGroupChildren(@PathVariable("groupId") UUID groupId);
 
     @GetMapping("/admin/realms/${keycloak.realm}/roles/{name}")
-    KeycloakRoleResDTO getRealmRole(@PathVariable String name);
+    KeycloakRoleResDTO getRealmRole(@PathVariable("name") String name);
 
     @PostMapping("/admin/realms/${keycloak.realm}/groups/{groupId}/role-mappings/realm")
-    ResponseEntity<Void> attachRoleToGroup(@PathVariable String groupId, @RequestBody List<KeycloakRoleReqDTO> roles);
+    ResponseEntity<Void> attachRoleToGroup(@PathVariable("groupId") String groupId, @RequestBody List<KeycloakRoleReqDTO> roles);
 
     @DeleteMapping("/admin/realms/${keycloak.realm}/groups/{groupId}")
     void deleteGroup(@PathVariable("groupId") String groupId);

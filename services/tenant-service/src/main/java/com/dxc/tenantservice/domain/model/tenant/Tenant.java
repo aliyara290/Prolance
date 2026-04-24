@@ -31,19 +31,36 @@ public class Tenant {
 
     private TenantSettings tenantSettings;
 
-    private Tenant(
+    public Tenant(
             UUID id,
+            UUID keycloakGroupId,
             String name,
             String email,
-            TenantIndustry industry
+            String website,
+            int size,
+            LocalDate foundedDate,
+            String description,
+            String logo,
+            Address address,
+            TenantIndustry industry,
+            TenantStatus status,
+            TenantSettings tenantSettings
     ) {
         validate(name, email, industry);
 
         this.id = id;
+        this.keycloakGroupId = keycloakGroupId;
         this.name = name;
         this.email = email;
+        this.website = website;
+        this.size = size;
+        this.foundedDate = foundedDate;
+        this.description = description;
+        this.logo = logo;
+        this.address = address;
         this.industry = industry;
-        this.status = TenantStatus.PENDING;
+        this.status = status != null ? status : TenantStatus.PENDING;
+        this.tenantSettings = tenantSettings;
     }
 
     public static Tenant create(
@@ -54,13 +71,25 @@ public class Tenant {
     ) {
         return new Tenant(
                 id,
+                null, // keycloakGroupId
                 name,
                 email,
-                industry
+                null, // website
+                0,    // size
+                null, // foundedDate
+                null, // description
+                null, // logo
+                null, // address
+                industry,
+                TenantStatus.PENDING,
+                null  // tenantSettings
         );
     }
 
     public void addSettings(TenantSettings settings) {
+        if(this.tenantSettings != null) {
+            throw new TenantStateException("Settings already exists");
+        }
         if(settings == null) {
             throw new TenantValidationException("Settings cannot be null!");
         }

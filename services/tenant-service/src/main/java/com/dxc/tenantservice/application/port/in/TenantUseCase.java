@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TenantUseCase {
-    TenantTokenResDTO registerTenant(RegisterTenantReqDTO registerTenantReqDTO);
+    String registerTenant(RegisterTenantReqDTO registerTenantReqDTO);
     TenantResDTO updateTenant(UUID tenantId, UpdateTenantReqDTO updateTenantReqDTO);
     void deleteTenant(UUID tenantId);
     TenantResDTO getTenant(UUID tenantId);

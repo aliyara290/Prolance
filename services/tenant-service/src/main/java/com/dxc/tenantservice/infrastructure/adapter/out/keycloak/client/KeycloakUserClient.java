@@ -21,7 +21,7 @@ public interface KeycloakUserClient {
     ResponseEntity<Void> createUser(@RequestBody KeycloakUserReqDTO user);
 
     @GetMapping("/admin/realms/${keycloak.realm}/users/{userId}")
-    KeycloakUserResDTO getUser(@PathVariable("userId") String userId);
+    KeycloakUserResDTO getUser(@PathVariable("userId") UUID userId);
 
     @DeleteMapping("/admin/realms/${keycloak.realm}/users/{userId}")
     void deleteUser(@PathVariable("userId") String userId);
@@ -34,4 +34,13 @@ public interface KeycloakUserClient {
 
     @PutMapping("/admin/realms/${keycloak.realm}/users/{userId}/execute-actions-email")
     void executeActionsEmail(@PathVariable("userId") String userId, @RequestParam(value = "client_id", required = false) String clientId, @RequestParam(value = "lifespan", required = false) Integer lifespan, @RequestBody List<String> actions);
+
+    @PostMapping("/admin/realms/${keycloak.realm}/users/{userId}/logout")
+    void logOutUser(@PathVariable("userId") UUID keycloakUserId);
+
+    @PutMapping("/admin/realms/${keycloak.realm}/users/{userId}")
+    void deactivateUser(@PathVariable("userId") UUID keycloakUserId, @RequestBody KeycloakUserResDTO user);
+
+    @PutMapping("/admin/realms/${keycloak.realm}/users/{userId}")
+    void activateUser(@PathVariable("userId") UUID keycloakUserId, @RequestBody KeycloakUserResDTO user);
 }

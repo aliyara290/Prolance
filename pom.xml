@@ -15,13 +15,14 @@
         <module>infrastructure/config-server</module>
         <module>infrastructure/discovery-service</module>
         <module>services/tenant-service</module>
+        <module>services/crm-service</module>
     </modules>
 
     <properties>
         <java.version>17</java.version>
 
         <!-- MUST BE ALIGNED WITH SPRING CLOUD -->
-        <spring.boot.version>3.3.5</spring.boot.version>
+        <spring.boot.version>3.3.6</spring.boot.version>
         <spring.cloud.version>2023.0.4</spring.cloud.version>
     </properties>
 

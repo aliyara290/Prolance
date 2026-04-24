@@ -2,11 +2,12 @@ package com.dxc.tenantservice.application.dto.tenant.req;
 
 import com.dxc.tenantservice.domain.model.enums.TenantIndustry;
 import jakarta.validation.constraints.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class RegisterTenantReqDTO {
 

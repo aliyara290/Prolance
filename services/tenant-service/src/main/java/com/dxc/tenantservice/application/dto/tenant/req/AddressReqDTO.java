@@ -1,10 +1,12 @@
 package com.dxc.tenantservice.application.dto.tenant.req;
 
 import jakarta.validation.constraints.*;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class AddressReqDTO {
 

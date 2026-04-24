@@ -1,7 +1,9 @@
 package com.dxc.tenantservice.infrastructure.adapter.out.persistence;
 
 import com.dxc.tenantservice.application.port.out.TenantRepository;
+import com.dxc.tenantservice.domain.exception.TenantStateException;
 import com.dxc.tenantservice.domain.model.tenant.Tenant;
+import com.dxc.tenantservice.domain.model.tenant.TenantSettings;
 import com.dxc.tenantservice.infrastructure.adapter.out.persistence.entity.TenantEntity;
 import com.dxc.tenantservice.infrastructure.adapter.out.persistence.jpa.TenantRepositoryJpa;
 import com.dxc.tenantservice.infrastructure.adapter.out.persistence.mapper.TenantPersistenceMapper;
@@ -53,4 +55,5 @@ public class TenantRepositoryAdapter implements TenantRepository {
     public void deleteById(UUID id) {
         repository.deleteById(id);
     }
+
 }

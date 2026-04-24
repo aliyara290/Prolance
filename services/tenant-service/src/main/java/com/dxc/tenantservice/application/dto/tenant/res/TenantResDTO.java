@@ -4,6 +4,7 @@ import com.dxc.tenantservice.domain.model.enums.TenantIndustry;
 import com.dxc.tenantservice.domain.model.enums.TenantStatus;
 import lombok.Builder;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Builder
@@ -13,7 +14,7 @@ public record TenantResDTO(
         String email,
         String website,
         Integer size,
-        java.time.LocalDate foundedDate,
+        LocalDate foundedDate,
         String description,
         String logo,
         TenantIndustry industry,

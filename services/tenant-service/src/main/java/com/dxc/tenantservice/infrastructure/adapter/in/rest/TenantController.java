@@ -22,11 +22,11 @@ public class TenantController {
 
     private final TenantUseCase tenantUseCase;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<TenantTokenResDTO>> registerTenant(
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<String>> registerTenant(
             @Valid @RequestBody RegisterTenantReqDTO request
     ) {
-        TenantTokenResDTO response = tenantUseCase.registerTenant(request);
+        String response = tenantUseCase.registerTenant(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response));
@@ -42,13 +42,13 @@ public class TenantController {
     }
 
     @DeleteMapping("/{tenantId}")
-    public ResponseEntity<ApiResponse<Void>> deleteTenant(@PathVariable UUID tenantId) {
+    public ResponseEntity<ApiResponse<Void>> deleteTenant(@PathVariable("tenantId") UUID tenantId) {
         tenantUseCase.deleteTenant(tenantId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @GetMapping("/{tenantId}")
-    public ResponseEntity<ApiResponse<TenantResDTO>> getTenant(@PathVariable UUID tenantId) {
+    public ResponseEntity<ApiResponse<TenantResDTO>> getTenant(@PathVariable("tenantId") UUID tenantId) {
         TenantResDTO response = tenantUseCase.getTenant(tenantId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }

@@ -1,12 +1,10 @@
 package com.dxc.tenantservice.infrastructure.adapter.out.keycloak;
 
-import com.dxc.tenantservice.application.dto.user.req.CreateUserReqDTO;
 import com.dxc.tenantservice.application.port.out.keycloak.KeycloakPort;
 import com.dxc.tenantservice.domain.exception.KeycloakIntegrationException;
 import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.client.*;
 import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.groups.CreateKeycloakGroupReqDTO;
 import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.groups.KeycloakGroupResDTO;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.keycloak.KeycloakTokenResDTO;
 import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.role.KeycloakRoleReqDTO;
 import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.role.KeycloakRoleResDTO;
 import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserReqDTO;
@@ -18,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -32,7 +29,7 @@ public class KeycloakAdapter implements KeycloakPort {
     @Value("${keycloak.realm}")
     private String realm;
 
-    @Value("${keycloak.admin.client-id}")
+    @Value("${keycloak.user.client-id}")
     private String clientId;
 
     @Override
@@ -41,6 +38,7 @@ public class KeycloakAdapter implements KeycloakPort {
             log.info("Creating user in Keycloak: email={}, tenantId={}", userDto.getEmail(), tenantId);
 
             log.debug("Sending user creation request to Keycloak");
+
             ResponseEntity<Void> response = userClient.createUser(userDto);
 
             if (response.getStatusCode().is2xxSuccessful()) {
@@ -59,39 +57,12 @@ public class KeycloakAdapter implements KeycloakPort {
         }
     }
 
-
     @Override
-    public String createUserWithEmailVerification(KeycloakUserReqDTO userDto, UUID tenantId) {
-        try {
-            log.info("Creating user with email verification in Keycloak: email={}, tenantId={}", userDto.getEmail(), tenantId);
-
-
-            log.debug("Sending user creation request to Keycloak");
-            ResponseEntity<Void> response = userClient.createUser(userDto);
-
-            if (response.getStatusCode().is2xxSuccessful()) {
-                String location = response.getHeaders().getLocation().getPath();
-                String userId = location.substring(location.lastIndexOf('/') + 1);
-                log.info("User created successfully in Keycloak: userId={}", userId);
-
-                try {
-                    log.info("Sending email verification with UPDATE_PASSWORD action to user: {}", userDto.getEmail());
-                    userClient.executeActionsEmail(userId, clientId, 43200, List.of("UPDATE_PASSWORD", "VERIFY_EMAIL"));
-                    log.info("Email verification sent successfully to user: {}", userDto.getEmail());
-                } catch (Exception emailException) {
-                    log.warn("Failed to send email verification to user: {}. User created successfully but email not sent. Error: {}",
-                            userDto.getEmail(), emailException.getMessage());
-                    log.warn("Please ensure Keycloak SMTP is configured or manually send verification email from Keycloak admin console.");
-                }
-
-                return userId;
-            } else {
-                log.error("Keycloak user creation failed with status: {}", response.getStatusCode());
-                throw new KeycloakIntegrationException("Failed to create user in Keycloak: " + response.getStatusCode());
-            }
+    public void sendEmailVerificationToUser(String keycloakUserId, List<String> actions) {
+        try{
+            userClient.executeActionsEmail(keycloakUserId, clientId, 43200, actions);
         } catch (Exception e) {
-            log.error("Error creating user with email verification in Keycloak: email={}, error={}", userDto.getEmail(), e.getMessage(), e);
-            throw new KeycloakIntegrationException("Failed to create user with email verification in Keycloak: " + e.getMessage(), e);
+            log.error("Error sending email verification to user in Keycloak: userId={}, error={}", keycloakUserId, e.getMessage(), e);
         }
     }
 
@@ -221,25 +192,19 @@ public class KeycloakAdapter implements KeycloakPort {
     }
 
     @Override
-    public KeycloakTokenResDTO getUserAccessToken(String email, String password) {
+    public void logOutUser(UUID keycloakUserId) {
         try {
-            log.info("Obtaining user access token: email={}", email);
-            KeycloakTokenResDTO response = tokenClient.getUserToken(
-                    realm,
-                    "password",
-                    email,
-                    password,
-                    clientId
-            );
-            log.info("User access token obtained successfully: email={}", email);
-            return response;
+            log.info("Logging out user: userId={}", keycloakUserId);
+            userClient.logOutUser(keycloakUserId);
+            log.info("User logged out successfully: userId={}", keycloakUserId);
         } catch (Exception e) {
-            log.error("Error obtaining user access token: email={}, error={}", email, e.getMessage(), e);
-            throw new KeycloakIntegrationException("Failed to obtain user access token: " + e.getMessage(), e);
+            log.error("Error logging out user: userId={}, error={}", keycloakUserId, e.getMessage(), e);
+            throw new KeycloakIntegrationException("Failed to log out user in Keycloak: " + e.getMessage(), e);
         }
     }
 
-    private UUID findRoleGroupId(UUID parentGroupId, String roleGroupName) {
+    @Override
+    public UUID findRoleGroupId(UUID parentGroupId, String roleGroupName) {
         log.debug("Finding role group: tenantId={}, role={}", parentGroupId, roleGroupName);
 
         List<KeycloakGroupResDTO> subGroups = groupClient.getGroupChildren(parentGroupId);
@@ -264,5 +229,42 @@ public class KeycloakAdapter implements KeycloakPort {
 
         log.debug("Found role group: role={}, groupId={}", roleGroupName, roleGroupId);
         return roleGroupId;
+    }
+
+    @Override
+    public KeycloakUserResDTO getUser(UUID keycloakUserId) {
+        try {
+            log.info("Getting user from Keycloak: userId={}", keycloakUserId);
+            KeycloakUserResDTO user = userClient.getUser(keycloakUserId);
+            log.info("User retrieved successfully: userId={}", keycloakUserId);
+            return user;
+        } catch (Exception e) {
+            log.error("Error getting user: userId={}, error={}", keycloakUserId, e.getMessage(), e);
+            throw new KeycloakIntegrationException("Failed to get user in Keycloak: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void deactivateUser(UUID keycloakUserId, KeycloakUserResDTO user) {
+        try {
+            log.info("Banning user in Keycloak: userId={}", keycloakUserId);
+            userClient.deactivateUser(keycloakUserId, user);
+            log.info("User banned successfully: userId={}", keycloakUserId);
+        } catch (Exception e) {
+            log.error("Error banning user: userId={}, error={}", keycloakUserId, e.getMessage(), e);
+            throw new KeycloakIntegrationException("Failed to ban user in Keycloak: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void activateUser(UUID keycloakUserId, KeycloakUserResDTO user) {
+        try {
+            log.info("Activating user in Keycloak: userId={}", keycloakUserId);
+            userClient.activateUser(keycloakUserId, user);
+            log.info("User activated successfully: userId={}", keycloakUserId);
+        } catch (Exception e) {
+            log.error("Error activating user: userId={}, error={}", keycloakUserId, e.getMessage(), e);
+            throw new KeycloakIntegrationException("Failed to activate user in Keycloak: " + e.getMessage(), e);
+        }
     }
 }

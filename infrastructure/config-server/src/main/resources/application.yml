@@ -8,8 +8,8 @@ spring:
         import: "optional:configserver:http://localhost:8888"
       server:
         git:
-#          uri: ${HOME}/Documents/DXC/Prolance-Config-Repo
-          uri: https://github.com/aliyara290/Prolance-Config-Repo
+          uri: ${HOME}/Documents/DXC/Prolance-Config-Repo
+#          uri: https://github.com/aliyara290/Prolance-Config-Repo
 #          default-label: master
           search-paths: "{application}"
 

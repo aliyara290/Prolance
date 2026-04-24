@@ -3,12 +3,14 @@ package com.dxc.tenantservice.application.dto.tenant.req;
 import com.dxc.tenantservice.domain.model.valueobjects.Address;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class UpdateTenantReqDTO {
 

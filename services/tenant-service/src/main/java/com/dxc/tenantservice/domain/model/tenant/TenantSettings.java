@@ -27,7 +27,7 @@ public class TenantSettings {
     private Language language;
     private String dateFormat;
 
-    private TenantSettings(
+    public TenantSettings(
             UUID id,
             UUID tenantId,
             PlanType plan,

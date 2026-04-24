@@ -24,7 +24,7 @@ public class TenantLog {
 
     private final LocalDateTime createdAt;
 
-    private TenantLog(
+    public TenantLog(
             UUID id,
             UUID tenantId,
             UUID userId,

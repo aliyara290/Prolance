@@ -16,7 +16,7 @@ public class UserPreference {
     private String timezone;
     private Theme theme;
 
-    private UserPreference(
+    public UserPreference(
             UUID id,
             UUID tenantId,
             UUID userId,
