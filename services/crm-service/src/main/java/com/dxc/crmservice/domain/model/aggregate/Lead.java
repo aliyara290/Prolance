@@ -1,0 +1,204 @@
+package com.dxc.crmservice.domain.model.aggregate;
+
+import com.dxc.crmservice.domain.exception.BusinessRuleViolationException;
+import com.dxc.crmservice.domain.exception.InvalidStateTransitionException;
+import com.dxc.crmservice.domain.exception.ValidationException;
+import com.dxc.crmservice.domain.model.valueobject.LeadPriority;
+import com.dxc.crmservice.domain.model.valueobject.LeadStatus;
+import com.dxc.crmservice.domain.model.valueobject.Source;
+import lombok.Getter;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.UUID;
+
+@Getter
+public class Lead {
+
+    private final UUID id;
+    private final UUID tenantId;
+
+    private UUID clientId;
+    private UUID contactId;
+
+    private String title;
+    private String description;
+
+    private Source source;
+    private LeadStatus status;
+    private int score;
+    private LeadPriority priority;
+
+    private UUID assignedTo;
+
+    private LocalDateTime firstContactedAt;
+    private LocalDateTime lastActivityAt;
+    private String unqualifiedReason;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    private Lead(UUID id,
+                 UUID tenantId,
+                 String title,
+                 String description,
+                 Source source,
+                 LeadPriority priority) {
+
+        this.id = id == null ? UUID.randomUUID() : id;
+        this.tenantId = requireNonNull(tenantId, "tenantId");
+
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = this.createdAt;
+
+        this.status = LeadStatus.NEW;
+        this.score = 0;
+
+        updateDetails(title, description, source, priority);
+    }
+
+    public static Lead create(UUID tenantId,
+                              String title,
+                              String description,
+                              Source source,
+                              LeadPriority priority) {
+
+        return new Lead(null, tenantId, title, description, source, priority);
+    }
+
+    public static Lead rehydrate(
+            UUID id,
+            UUID tenantId,
+            UUID clientId,
+            UUID contactId,
+            String title,
+            String description,
+            Source source,
+            LeadStatus status,
+            int score,
+            LeadPriority priority,
+            UUID assignedTo,
+            LocalDateTime firstContactedAt,
+            LocalDateTime lastActivityAt,
+            String unqualifiedReason,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
+    ) {
+
+        Lead lead = new Lead(id, tenantId, title, description, source, priority);
+
+        lead.clientId = clientId;
+        lead.contactId = contactId;
+        lead.status = requireNonNull(status, "status");
+        lead.score = score;
+        lead.assignedTo = assignedTo;
+        lead.firstContactedAt = firstContactedAt;
+        lead.lastActivityAt = lastActivityAt;
+        lead.unqualifiedReason = unqualifiedReason;
+        lead.createdAt = requireNonNull(createdAt, "createdAt");
+        lead.updatedAt = requireNonNull(updatedAt, "updatedAt");
+
+        return lead;
+    }
+
+
+    public void updateDetails(String title,
+                              String description,
+                              Source source,
+                              LeadPriority priority) {
+
+        ensureNotClosed();
+
+        this.title = validateTitle(title);
+        this.description = description;
+        this.source = source;
+        this.priority = priority;
+
+        touch();
+    }
+
+    public void updateScore(int newScore) {
+        ensureNotClosed();
+
+        if (newScore < 0) {
+            throw new ValidationException("Score cannot be negative");
+        }
+
+        this.score = newScore;
+        touch();
+    }
+
+    public void assignTo(UUID userId) {
+        ensureNotClosed();
+
+        this.assignedTo = requireNonNull(userId, "assignedTo");
+        touch();
+    }
+
+    public void markAsContacted() {
+        ensureStatus(LeadStatus.NEW);
+
+        this.status = LeadStatus.CONTACTED;
+        this.firstContactedAt = LocalDateTime.now();
+        this.lastActivityAt = this.firstContactedAt;
+
+        touch();
+    }
+
+    public void qualify() {
+        ensureStatus(LeadStatus.CONTACTED);
+
+        this.status = LeadStatus.QUALIFIED;
+        touch();
+    }
+
+    public void markAsQualified() {
+        ensureStatus(LeadStatus.QUALIFIED);
+
+        this.status = LeadStatus.QUALIFIED;
+        touch();
+    }
+
+    public void markAsUnqualified(String reason) {
+        ensureNotClosed();
+
+        if (reason == null || reason.trim().isEmpty()) {
+            throw new ValidationException("Unqualified reason is required");
+        }
+
+        this.status = LeadStatus.UNQUALIFIED;
+        this.unqualifiedReason = reason;
+        touch();
+    }
+
+
+    private void ensureNotClosed() {
+        if (status == LeadStatus.QUALIFIED || status == LeadStatus.UNQUALIFIED) {
+            throw new BusinessRuleViolationException("Cannot modify a closed lead");
+        }
+    }
+
+    private void ensureStatus(LeadStatus expected) {
+        if (this.status != expected) {
+            throw new InvalidStateTransitionException(
+                    "Invalid status transition: expected " + expected + " but was " + status
+            );
+        }
+    }
+
+    private String validateTitle(String title) {
+        if (title == null || title.trim().isEmpty()) {
+            throw new ValidationException("Lead title cannot be empty");
+        }
+        return title.trim();
+    }
+
+    private static <T> T requireNonNull(T value, String field) {
+        return Objects.requireNonNull(value, field + " cannot be null");
+    }
+
+    private void touch() {
+        this.updatedAt = LocalDateTime.now();
+    }
+    
+}
