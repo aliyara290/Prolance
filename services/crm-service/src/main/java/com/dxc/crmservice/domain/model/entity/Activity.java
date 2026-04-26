@@ -16,9 +16,6 @@ public class Activity {
     private final UUID id;
     private final UUID tenantId;
 
-    private final UUID entityId;
-    private final EntityType entityType;
-
     private final ActivityType type;
 
     private String subject;
@@ -34,8 +31,6 @@ public class Activity {
 
     private Activity(UUID id,
                      UUID tenantId,
-                     UUID entityId,
-                     EntityType entityType,
                      ActivityType type,
                      String subject,
                      String description,
@@ -44,9 +39,6 @@ public class Activity {
 
         this.id = id == null ? UUID.randomUUID() : id;
         this.tenantId = requireNonNull(tenantId, "tenantId");
-
-        this.entityId = requireNonNull(entityId, "entityId");
-        this.entityType = requireNonNull(entityType, "entityType");
 
         this.type = requireNonNull(type, "type");
         this.userId = requireNonNull(userId, "userId");
@@ -62,8 +54,7 @@ public class Activity {
     }
 
     public static Activity create(UUID tenantId,
-                                  UUID entityId,
-                                  EntityType entityType,
+
                                   ActivityType type,
                                   String subject,
                                   String description,
@@ -73,8 +64,6 @@ public class Activity {
         return new Activity(
                 null,
                 tenantId,
-                entityId,
-                entityType,
                 type,
                 subject,
                 description,
@@ -85,8 +74,6 @@ public class Activity {
 
     public static Activity rehydrate(UUID id,
                                      UUID tenantId,
-                                     UUID entityId,
-                                     EntityType entityType,
                                      ActivityType type,
                                      String subject,
                                      String description,
@@ -99,8 +86,6 @@ public class Activity {
         Activity activity = new Activity(
                 id,
                 tenantId,
-                entityId,
-                entityType,
                 type,
                 subject,
                 description,

@@ -23,7 +23,6 @@ public class Client {
     private String website;
     private String phone;
     private Address address;
-    private String country;
 
     private ClientStatus status;
     private final ClientType type;
@@ -39,7 +38,6 @@ public class Client {
                    String website,
                    String phone,
                    Address address,
-                   String country,
                    ClientType type,
                    Source source) {
 
@@ -52,7 +50,7 @@ public class Client {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = this.createdAt;
 
-        updateProfile(name, industry, website, phone, address, country);
+        updateProfile(name, industry, website, phone, address);
 
         this.status = ClientStatus.ACTIVE;
     }
@@ -63,7 +61,6 @@ public class Client {
                                 String website,
                                 String phone,
                                 Address address,
-                                String country,
                                 ClientType type,
                                 Source source) {
 
@@ -75,7 +72,6 @@ public class Client {
                 website,
                 phone,
                 address,
-                country,
                 type,
                 source
         );
@@ -89,7 +85,6 @@ public class Client {
             String website,
             String phone,
             Address address,
-            String country,
             ClientStatus status,
             ClientType type,
             Source source,
@@ -105,7 +100,6 @@ public class Client {
                 website,
                 phone,
                 address,
-                country,
                 type,
                 source
         );
@@ -121,8 +115,7 @@ public class Client {
                               String industry,
                               String website,
                               String phone,
-                              Address address,
-                              String country) {
+                              Address address) {
 
         ensureNotArchived();
 
@@ -131,7 +124,6 @@ public class Client {
         this.website = website;
         this.phone = phone;
         this.address = address;
-        this.country = country;
 
         touch();
     }
