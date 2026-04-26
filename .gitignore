@@ -40,10 +40,14 @@ build/
 .env.*
 **/.env
 **/.env.*
+
 ### Mac OS ###
 .DS_Store
 
 #logs
 api-gateway/logs/
 *.log
+*.tmp
 *.log.*
+
+
