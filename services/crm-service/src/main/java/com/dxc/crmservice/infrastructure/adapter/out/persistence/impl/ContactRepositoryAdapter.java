@@ -7,6 +7,8 @@ import com.dxc.crmservice.infrastructure.adapter.out.persistence.jpa.ContactRepo
 import com.dxc.crmservice.infrastructure.adapter.out.persistence.mapper.ContactPersistenceMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,31 +24,33 @@ public class ContactRepositoryAdapter implements ContactRepository {
 
     @Override
     public Contact save(Contact contact) {
-        ContactEntity entity = contactPersistenceMapper.toEntity(contact);
-        return contactPersistenceMapper.toDomain(contactRepositoryJpa.save(entity));
+        ContactEntity contactEntity = contactPersistenceMapper.toEntity(contact);
+        ContactEntity savedContactEntity = contactRepositoryJpa.save(contactEntity);
+        return contactPersistenceMapper.toDomain(savedContactEntity);
     }
 
     @Override
-    public Contact findById(UUID id) {
-        return contactRepositoryJpa.findById(id)
+    public Contact findById(UUID id, UUID tenantId) {
+        return contactRepositoryJpa.findByIdAndTenantId(id, tenantId)
                 .map(contactPersistenceMapper::toDomain)
                 .orElse(null);
     }
 
     @Override
     public Contact update(Contact contact) {
-        return save(contact);
+        ContactEntity contactEntity = contactPersistenceMapper.toEntity(contact);
+        ContactEntity updatedContactEntity = contactRepositoryJpa.save(contactEntity);
+        return contactPersistenceMapper.toDomain(updatedContactEntity);
     }
 
     @Override
     public void delete(UUID id, UUID tenantId) {
-        contactRepositoryJpa.findByIdAndTenantId(id, tenantId).ifPresent(contactRepositoryJpa::delete);
+        contactRepositoryJpa.findByIdAndTenantId(id, tenantId)
+                .ifPresent(contactRepositoryJpa::delete);
     }
 
     @Override
-    public List<Contact> findAll(UUID tenantId) {
-        return contactRepositoryJpa.findByTenantId(tenantId).stream()
-                .map(contactPersistenceMapper::toDomain)
-                .toList();
-    }
-}
+    public Page<Contact> findAll(UUID tenantId, Pageable pageable) {
+        Page<ContactEntity> contactEntities = contactRepositoryJpa.findByTenantId(tenantId, pageable);
+        return contactEntities.map(contactPersistenceMapper::toDomain);
+    }}

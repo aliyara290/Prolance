@@ -1,6 +1,6 @@
 package com.dxc.crmservice.application.dto.lead.req;
 
-import com.dxc.crmservice.domain.model.valueobject.LeadPriority;
+import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.LeadStatus;
 import com.dxc.crmservice.domain.model.valueobject.Source;
 import jakarta.validation.constraints.*;
@@ -36,7 +36,7 @@ public class CreateLeadReqDTO {
     private int score;
 
     @NotNull(message = "priority is required")
-    private LeadPriority priority;
+    private Priority priority;
 
     @NotNull(message = "assignedTo is required")
     private UUID assignedTo;

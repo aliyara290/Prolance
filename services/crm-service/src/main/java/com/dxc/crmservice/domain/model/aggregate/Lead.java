@@ -3,8 +3,8 @@ package com.dxc.crmservice.domain.model.aggregate;
 import com.dxc.crmservice.domain.exception.BusinessRuleViolationException;
 import com.dxc.crmservice.domain.exception.InvalidStateTransitionException;
 import com.dxc.crmservice.domain.exception.ValidationException;
-import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.LeadStatus;
+import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.Source;
 import lombok.Getter;
 
@@ -168,10 +168,16 @@ public class Lead {
         touch();
     }
 
-    public void assignClient() {
+    public void assignClient(UUID clientId) {
         ensureNotClosed();
 
         this.clientId = requireNonNull(clientId, "clientId");
+        touch();
+    }
+
+    public void addContact(UUID contactId) {
+        ensureNotClosed();
+        this.contactId = requireNonNull(contactId, "contactId");
         touch();
     }
 

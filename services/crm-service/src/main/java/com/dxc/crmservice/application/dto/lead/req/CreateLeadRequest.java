@@ -19,5 +19,8 @@ public record CreateLeadRequest(
 
         UUID clientId,
 
-        UUID contactId) {
+        UUID contactId,
+
+        @NotNull(message = "Assigned to is required")  UUID assignedTo
+) {
 }

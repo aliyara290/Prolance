@@ -7,9 +7,11 @@ import com.dxc.crmservice.infrastructure.adapter.out.persistence.jpa.LeadReposit
 import com.dxc.crmservice.infrastructure.adapter.out.persistence.mapper.LeadPersistenceMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -20,22 +22,25 @@ public class LeadRepositoryAdapter implements LeadRepository {
     private final LeadRepositoryJpa leadRepositoryJpa;
     private final LeadPersistenceMapper leadPersistenceMapper;
 
+
     @Override
     public Lead save(Lead lead) {
-        LeadEntity entity = leadPersistenceMapper.toEntity(lead);
-        return leadPersistenceMapper.toDomain(leadRepositoryJpa.save(entity));
+        LeadEntity leadEntity = leadPersistenceMapper.toEntity(lead);
+        LeadEntity savedLeadEntity = leadRepositoryJpa.save(leadEntity);
+        return leadPersistenceMapper.toDomain(savedLeadEntity);
     }
 
     @Override
-    public Lead findById(UUID id) {
-        return leadRepositoryJpa.findById(id)
-                .map(leadPersistenceMapper::toDomain)
-                .orElse(null);
+    public Lead findById(UUID id, UUID tenantId) {
+        Optional<LeadEntity> leadEntity = leadRepositoryJpa.findByIdAndTenantId(id, tenantId);
+        return leadEntity.map(leadPersistenceMapper::toDomain).orElse(null);
     }
 
     @Override
     public Lead update(Lead lead) {
-        return save(lead);
+        LeadEntity leadEntity = leadPersistenceMapper.toEntity(lead);
+        LeadEntity updatedLeadEntity = leadRepositoryJpa.save(leadEntity);
+        return leadPersistenceMapper.toDomain(updatedLeadEntity);
     }
 
     @Override
@@ -44,9 +49,8 @@ public class LeadRepositoryAdapter implements LeadRepository {
     }
 
     @Override
-    public List<Lead> findAll(UUID tenantId) {
-        return leadRepositoryJpa.findByTenantId(tenantId).stream()
-                .map(leadPersistenceMapper::toDomain)
-                .toList();
+    public Page<Lead> findAll(UUID tenantId, Pageable pageable) {
+        Page<LeadEntity> leadEntities = leadRepositoryJpa.findByTenantId(tenantId, pageable);
+        return leadEntities.map(leadPersistenceMapper::toDomain);
     }
 }

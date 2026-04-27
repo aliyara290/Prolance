@@ -15,38 +15,10 @@ import java.util.UUID;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class OpportunityRepositoryAdapter implements OpportunityRepository {
+public class OpportunityRepositoryAdapter {
 
     private final OpportunityRepositoryJpa opportunityRepositoryJpa;
     private final OpportunityPersistenceMapper opportunityPersistenceMapper;
 
-    @Override
-    public Opportunity save(Opportunity opportunity) {
-        OpportunityEntity entity = opportunityPersistenceMapper.toEntity(opportunity);
-        return opportunityPersistenceMapper.toDomain(opportunityRepositoryJpa.save(entity));
-    }
 
-    @Override
-    public Opportunity findById(UUID id) {
-        return opportunityRepositoryJpa.findById(id)
-                .map(opportunityPersistenceMapper::toDomain)
-                .orElse(null);
-    }
-
-    @Override
-    public Opportunity update(Opportunity opportunity) {
-        return save(opportunity);
-    }
-
-    @Override
-    public void delete(UUID id, UUID tenantId) {
-        opportunityRepositoryJpa.findByIdAndTenantId(id, tenantId).ifPresent(opportunityRepositoryJpa::delete);
-    }
-
-    @Override
-    public List<Opportunity> findAll(UUID tenantId) {
-        return opportunityRepositoryJpa.findByTenantId(tenantId).stream()
-                .map(opportunityPersistenceMapper::toDomain)
-                .toList();
-    }
 }

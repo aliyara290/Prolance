@@ -4,7 +4,6 @@ import com.dxc.crmservice.application.dto.activity.req.CreateActivityRequest;
 import com.dxc.crmservice.application.dto.activity.res.ActivityResponse;
 import com.dxc.crmservice.domain.model.entity.Activity;
 import org.mapstruct.Mapper;
-
 import java.util.UUID;
 
 @Mapper(componentModel = "spring")

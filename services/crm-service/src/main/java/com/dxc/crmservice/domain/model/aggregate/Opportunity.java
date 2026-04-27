@@ -3,6 +3,7 @@ package com.dxc.crmservice.domain.model.aggregate;
 import com.dxc.crmservice.domain.exception.BusinessRuleViolationException;
 import com.dxc.crmservice.domain.exception.InvalidStateTransitionException;
 import com.dxc.crmservice.domain.exception.ValidationException;
+import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.Stage;
 import lombok.Getter;
 

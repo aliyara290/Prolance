@@ -6,7 +6,6 @@ import com.dxc.crmservice.application.dto.client.res.ClientResponse;
 import com.dxc.crmservice.domain.model.aggregate.Client;
 import com.dxc.crmservice.domain.model.valueobject.Address;
 import org.mapstruct.Mapper;
-
 import java.util.UUID;
 
 @Mapper(componentModel = "spring")
