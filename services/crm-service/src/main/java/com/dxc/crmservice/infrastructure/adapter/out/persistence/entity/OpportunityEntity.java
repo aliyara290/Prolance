@@ -1,5 +1,6 @@
 package com.dxc.crmservice.infrastructure.adapter.out.persistence.entity;
 
+import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.Stage;
 import jakarta.persistence.*;
 import lombok.*;
@@ -49,6 +50,9 @@ public class OpportunityEntity extends BaseAuditingEntity {
 
     @Column(name = "next_follow_up_at")
     private LocalDateTime nextFollowUpAt;
+
+    @Enumerated(EnumType.STRING)
+    private Priority priority;
 
     @Column(name = "lost_reason", nullable = false)
     private String lostReason;

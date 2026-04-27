@@ -21,6 +21,7 @@ public class OpportunityPersistenceMapper {
                 .expectedEndDate(domain.getExpectedEndDate())
                 .closingDate(domain.getClosingDate())
                 .stage(domain.getStage())
+                .priority(domain.getPriority())
                 .lastActivityAt(domain.getLastActivityAt())
                 .nextFollowUpAt(domain.getNextFollowUpAt())
                 .lostReason(domain.getLostReason())
@@ -44,6 +45,7 @@ public class OpportunityPersistenceMapper {
                 entity.getEstimatedBudget(),
                 entity.getExpectedRevenue(),
                 entity.getProbability(),
+                entity.getPriority(),
                 entity.getExpectedStartDate(),
                 entity.getExpectedEndDate(),
                 entity.getClosingDate(),

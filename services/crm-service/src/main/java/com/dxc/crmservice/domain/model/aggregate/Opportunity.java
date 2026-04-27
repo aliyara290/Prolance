@@ -35,12 +35,13 @@ public class Opportunity {
     private LocalDateTime lastActivityAt;
     private LocalDateTime nextFollowUpAt;
 
+    private Priority priority;
     private String lostReason;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private Opportunity(UUID id, UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Stage stage) {
+    private Opportunity(UUID id, UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Stage stage, Priority priority) {
 
         this.id = id == null ? UUID.randomUUID() : id;
         this.tenantId = requireNonNull(tenantId, "tenantId");
@@ -50,21 +51,21 @@ public class Opportunity {
         this.updatedAt = this.createdAt;
 
         this.stage = requireNonNull(stage, "stage");
+        this.priority = priority;
 
         updateDetails(title, description, estimatedBudget, expectedRevenue, probability, null, null);
     }
 
 
     // factory
-    public static Opportunity create(UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Stage stage) {
+    public static Opportunity create(UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Stage stage, Priority priority) {
 
-        return new Opportunity(null, tenantId, clientId, title, description, estimatedBudget, expectedRevenue, probability, stage);
+        return new Opportunity(null, tenantId, clientId, title, description, estimatedBudget, expectedRevenue, probability, stage, priority);
     }
 
-    // method for rehydrating from database
-    public static Opportunity rehydrate(UUID id, UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, LocalDateTime expectedStartDate, LocalDateTime expectedEndDate, LocalDateTime closingDate, Stage stage, LocalDateTime lastActivityAt, LocalDateTime nextFollowUpAt, String lostReason, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public static Opportunity rehydrate(UUID id, UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Priority priority, LocalDateTime expectedStartDate, LocalDateTime expectedEndDate, LocalDateTime closingDate, Stage stage, LocalDateTime lastActivityAt, LocalDateTime nextFollowUpAt, String lostReason, LocalDateTime createdAt, LocalDateTime updatedAt) {
 
-        Opportunity opp = new Opportunity(id, tenantId, clientId, title, description, estimatedBudget, expectedRevenue, probability, stage);
+        Opportunity opp = new Opportunity(id, tenantId, clientId, title, description, estimatedBudget, expectedRevenue, probability, stage, priority);
 
         opp.expectedStartDate = expectedStartDate;
         opp.expectedEndDate = expectedEndDate;

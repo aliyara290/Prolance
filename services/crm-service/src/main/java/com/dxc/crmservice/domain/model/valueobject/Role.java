@@ -1,9 +1,8 @@
 package com.dxc.crmservice.domain.model.valueobject;
 
 public enum Role {
-    DECISION_MAKER,
+    CEO,
     INFLUENCER,
-    CHAMPION,
-    BUYER,
-    END_USER
+    DIRECTOR,
+    BUYER
 }

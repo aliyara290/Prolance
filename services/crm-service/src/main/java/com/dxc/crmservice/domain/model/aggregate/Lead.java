@@ -3,7 +3,7 @@ package com.dxc.crmservice.domain.model.aggregate;
 import com.dxc.crmservice.domain.exception.BusinessRuleViolationException;
 import com.dxc.crmservice.domain.exception.InvalidStateTransitionException;
 import com.dxc.crmservice.domain.exception.ValidationException;
-import com.dxc.crmservice.domain.model.valueobject.LeadPriority;
+import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.LeadStatus;
 import com.dxc.crmservice.domain.model.valueobject.Source;
 import lombok.Getter;
@@ -14,7 +14,6 @@ import java.util.UUID;
 
 @Getter
 public class Lead {
-
     private final UUID id;
     private final UUID tenantId;
 
@@ -27,7 +26,7 @@ public class Lead {
     private Source source;
     private LeadStatus status;
     private int score;
-    private LeadPriority priority;
+    private Priority priority;
 
     private UUID assignedTo;
 
@@ -39,11 +38,11 @@ public class Lead {
     private LocalDateTime updatedAt;
 
     private Lead(UUID id,
-                 UUID tenantId,
-                 String title,
-                 String description,
-                 Source source,
-                 LeadPriority priority) {
+            UUID tenantId,
+            String title,
+            String description,
+            Source source,
+            Priority priority) {
 
         this.id = id == null ? UUID.randomUUID() : id;
         this.tenantId = requireNonNull(tenantId, "tenantId");
@@ -58,10 +57,10 @@ public class Lead {
     }
 
     public static Lead create(UUID tenantId,
-                              String title,
-                              String description,
-                              Source source,
-                              LeadPriority priority) {
+            String title,
+            String description,
+            Source source,
+            Priority priority) {
 
         return new Lead(null, tenantId, title, description, source, priority);
     }
@@ -76,14 +75,13 @@ public class Lead {
             Source source,
             LeadStatus status,
             int score,
-            LeadPriority priority,
+            Priority priority,
             UUID assignedTo,
             LocalDateTime firstContactedAt,
             LocalDateTime lastActivityAt,
             String unqualifiedReason,
             LocalDateTime createdAt,
-            LocalDateTime updatedAt
-    ) {
+            LocalDateTime updatedAt) {
 
         Lead lead = new Lead(id, tenantId, title, description, source, priority);
 
@@ -101,11 +99,10 @@ public class Lead {
         return lead;
     }
 
-
     public void updateDetails(String title,
-                              String description,
-                              Source source,
-                              LeadPriority priority) {
+            String description,
+            Source source,
+            Priority priority) {
 
         ensureNotClosed();
 
@@ -171,6 +168,12 @@ public class Lead {
         touch();
     }
 
+    public void assignClient() {
+        ensureNotClosed();
+
+        this.clientId = requireNonNull(clientId, "clientId");
+        touch();
+    }
 
     private void ensureNotClosed() {
         if (status == LeadStatus.QUALIFIED || status == LeadStatus.UNQUALIFIED) {
@@ -181,8 +184,7 @@ public class Lead {
     private void ensureStatus(LeadStatus expected) {
         if (this.status != expected) {
             throw new InvalidStateTransitionException(
-                    "Invalid status transition: expected " + expected + " but was " + status
-            );
+                    "Invalid status transition: expected " + expected + " but was " + status);
         }
     }
 
@@ -200,5 +202,5 @@ public class Lead {
     private void touch() {
         this.updatedAt = LocalDateTime.now();
     }
-    
+
 }

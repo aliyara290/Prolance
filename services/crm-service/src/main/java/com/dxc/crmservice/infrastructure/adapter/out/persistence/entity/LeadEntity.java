@@ -1,6 +1,6 @@
 package com.dxc.crmservice.infrastructure.adapter.out.persistence.entity;
 
-import com.dxc.crmservice.domain.model.valueobject.LeadPriority;
+import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.LeadStatus;
 import com.dxc.crmservice.domain.model.valueobject.Source;
 import jakarta.persistence.*;
@@ -39,7 +39,7 @@ public class LeadEntity extends BaseAuditingEntity {
     private int score;
 
     @Enumerated(EnumType.STRING)
-    private LeadPriority priority;
+    private Priority priority;
 
     @Column(name = "assigned_to")
     private UUID assignedTo;
