@@ -5,6 +5,7 @@ import com.dxc.crmservice.application.dto.lead.req.UpdateLeadRequest;
 import com.dxc.crmservice.application.dto.lead.res.LeadResponse;
 import com.dxc.crmservice.application.port.in.LeadUseCase;
 import com.dxc.crmservice.infrastructure.adapter.in.rest.response.ApiResponse;
+import com.dxc.crmservice.infrastructure.adapter.in.rest.response.PageMeta;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -46,9 +49,19 @@ public class LeadController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<LeadResponse>>> getAllLeads(Pageable pageable) {
+    public ResponseEntity<ApiResponse<List<LeadResponse>>> getAllLeads(Pageable pageable) {
         Page<LeadResponse> leads = leadUseCase.getAllLeads(pageable);
-        return ResponseEntity.ok(ApiResponse.success(leads));
+
+        PageMeta meta = PageMeta.builder()
+                .page(pageable.getPageNumber())
+                .size(pageable.getPageSize())
+                .hasNext(leads.hasNext())
+                .hasPrevious(leads.hasPrevious())
+                .totalPages(leads.getTotalPages())
+                .totalElements(leads.getTotalElements())
+                .build();
+
+        return ResponseEntity.ok(ApiResponse.success(leads.getContent(), meta));
     }
 
 }
