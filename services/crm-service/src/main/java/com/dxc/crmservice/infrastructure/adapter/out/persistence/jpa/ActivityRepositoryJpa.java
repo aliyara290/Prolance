@@ -12,4 +12,6 @@ import java.util.UUID;
 public interface ActivityRepositoryJpa extends JpaRepository<ActivityEntity, UUID> {
     List<ActivityEntity> findByTenantId(UUID tenantId);
     Optional<ActivityEntity> findByIdAndTenantId(UUID id, UUID tenantId);
+    boolean existsByIdAndTenantId(UUID id, UUID tenantId);
+    org.springframework.data.domain.Page<ActivityEntity> findAllByTenantId(UUID tenantId, org.springframework.data.domain.Pageable pageable);
 }

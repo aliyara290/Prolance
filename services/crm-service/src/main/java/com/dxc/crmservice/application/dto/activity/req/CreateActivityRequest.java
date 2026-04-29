@@ -23,5 +23,11 @@ public record CreateActivityRequest(
     LocalDateTime scheduledAt,
 
     @NotNull(message = "User ID is required")
-    UUID userId
+    UUID userId,
+
+    @NotNull(message = "Entity ID is required")
+    UUID entityId,
+
+    @NotNull(message = "Entity Type is required")
+    com.dxc.crmservice.domain.model.valueobject.EntityType entityType
 ) {}

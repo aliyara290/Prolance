@@ -13,6 +13,8 @@ public record ActivityResponse(
     LocalDateTime scheduledAt,
     LocalDateTime completedAt,
     UUID userId,
+    UUID entityId,
+    com.dxc.crmservice.domain.model.valueobject.EntityType entityType,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {}
