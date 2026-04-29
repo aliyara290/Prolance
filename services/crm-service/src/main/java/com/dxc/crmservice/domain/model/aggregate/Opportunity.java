@@ -7,6 +7,7 @@ import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.Stage;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -22,12 +23,12 @@ public class Opportunity {
     private String description;
 
     private Double estimatedBudget;
-    private Double expectedRevenue;
+        private Double expectedRevenue;
 
     private int probability;
 
-    private LocalDateTime expectedStartDate;
-    private LocalDateTime expectedEndDate;
+    private LocalDate expectedStartDate;
+    private LocalDate expectedEndDate;
 
     private LocalDateTime closingDate;
 
@@ -57,14 +58,13 @@ public class Opportunity {
         updateDetails(title, description, estimatedBudget, expectedRevenue, probability, null, null);
     }
 
-
     // factory
     public static Opportunity create(UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Stage stage, Priority priority) {
 
         return new Opportunity(null, tenantId, clientId, title, description, estimatedBudget, expectedRevenue, probability, stage, priority);
     }
 
-    public static Opportunity rehydrate(UUID id, UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Priority priority, LocalDateTime expectedStartDate, LocalDateTime expectedEndDate, LocalDateTime closingDate, Stage stage, LocalDateTime lastActivityAt, LocalDateTime nextFollowUpAt, String lostReason, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public static Opportunity rehydrate(UUID id, UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Priority priority, LocalDate expectedStartDate, LocalDate expectedEndDate, LocalDateTime closingDate, Stage stage, LocalDateTime lastActivityAt, LocalDateTime nextFollowUpAt, String lostReason, LocalDateTime createdAt, LocalDateTime updatedAt) {
 
         Opportunity opp = new Opportunity(id, tenantId, clientId, title, description, estimatedBudget, expectedRevenue, probability, stage, priority);
 
@@ -82,7 +82,7 @@ public class Opportunity {
         return opp;
     }
 
-    public void updateDetails(String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, LocalDateTime expectedStartDate, LocalDateTime expectedEndDate) {
+    public void updateDetails(String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, LocalDate expectedStartDate, LocalDate expectedEndDate) {
 
         ensureNotClosed();
 
@@ -189,7 +189,7 @@ public class Opportunity {
         return value;
     }
 
-    private void validateDates(LocalDateTime start, LocalDateTime end) {
+    private void validateDates(LocalDate start, LocalDate end) {
         if (start != null && end != null && end.isBefore(start)) {
             throw new BusinessRuleViolationException("End date cannot be before start date");
         }

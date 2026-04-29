@@ -5,6 +5,7 @@ import com.dxc.crmservice.domain.model.valueobject.Stage;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -22,10 +23,11 @@ public class OpportunityEntity extends BaseAuditingEntity {
     @Column(name = "client_id", nullable = false)
     private UUID clientId;
 
+    @Column(nullable = false)
     private String title;
     private String description;
 
-    @Column(name = "estimated_budget", nullable = false)
+    @Column(name = "estimated_budget")
     private Double estimatedBudget;
 
     @Column(name = "expected_revenue")
@@ -34,15 +36,16 @@ public class OpportunityEntity extends BaseAuditingEntity {
     private int probability;
 
     @Column(name = "expected_start_date")
-    private LocalDateTime expectedStartDate;
+    private LocalDate expectedStartDate;
 
     @Column(name = "expected_end_date")
-    private LocalDateTime expectedEndDate;
+    private LocalDate expectedEndDate;
 
     @Column(name = "closing_date")
     private LocalDateTime closingDate;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Stage stage;
 
     @Column(name = "last_activity_at")
@@ -52,8 +55,9 @@ public class OpportunityEntity extends BaseAuditingEntity {
     private LocalDateTime nextFollowUpAt;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Priority priority;
 
-    @Column(name = "lost_reason", nullable = false)
+    @Column(name = "lost_reason")
     private String lostReason;
 }
