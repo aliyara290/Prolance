@@ -24,10 +24,7 @@ import java.util.UUID;
 public class KeycloakAdapter implements KeycloakPort {
     private final KeycloakUserClient userClient;
     private final KeycloakGroupClient groupClient;
-    private final KeycloakTokenClient tokenClient;
 
-    @Value("${keycloak.realm}")
-    private String realm;
 
     @Value("${keycloak.user.client-id}")
     private String clientId;

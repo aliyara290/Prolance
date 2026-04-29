@@ -19,6 +19,12 @@ public class GatewayConfig {
                                 .rewritePath("/tenant/(?<segment>.*)", "/${segment}")
                         )
                         .uri("lb://TENANT-SERVICE"))
+                .route("crm-service", r -> r
+                        .path("/crm/**")
+                        .filters(f -> f
+                                .rewritePath("/crm/(?<segment>.*)", "/${segment}")
+                        )
+                        .uri("lb://CRM-SERVICE"))
                 .build();
     }
 }

@@ -90,6 +90,26 @@ services:
       timeout: 5s
       retries: 5
 
+  crm-db:
+    image: postgres:15-alpine
+    container_name: crm-db
+    profiles: [ "default", "all" ]
+    environment:
+      POSTGRES_DB: crm_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5434:5432"
+    volumes:
+      - crm-data:/var/lib/postgresql/data
+    networks:
+      - prolance-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U aliyara29" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   keycloak-db:
     image: postgres:15-alpine
     container_name: keycloak-db
@@ -207,4 +227,5 @@ networks:
 volumes:
   prolance-keycloak-data:
   tenant-data:
+  crm-data:
   pgadmin-data:

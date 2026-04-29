@@ -1,0 +1,18 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: crm-service
+  config:
+    import: "optional:configserver:http://localhost:8888"
+  cloud:
+    config:
+      uri: http://localhost:8888`
+  profiles:
+    active: dev
+
+services:
+  tenant-service:
+    url: http://localhost:8081/api/v1/
+    base-url: http://localhost:8081/
