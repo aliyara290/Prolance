@@ -7,9 +7,10 @@ import com.dxc.crmservice.infrastructure.adapter.out.persistence.jpa.Opportunity
 import com.dxc.crmservice.infrastructure.adapter.out.persistence.mapper.OpportunityPersistenceMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -21,32 +22,41 @@ public class OpportunityRepositoryAdapter implements OpportunityRepository {
     private final OpportunityPersistenceMapper opportunityPersistenceMapper;
 
     @Override
-    public Opportunity save(Opportunity opportunity) {
-        OpportunityEntity entity = opportunityPersistenceMapper.toEntity(opportunity);
-        return opportunityPersistenceMapper.toDomain(opportunityRepositoryJpa.save(entity));
+    public Opportunity save(Opportunity domain) {
+        OpportunityEntity entity = opportunityPersistenceMapper.toEntity(domain);
+        OpportunityEntity saved = opportunityRepositoryJpa.save(entity);
+        return opportunityPersistenceMapper.toDomain(saved);
     }
 
     @Override
-    public Opportunity findById(UUID id) {
-        return opportunityRepositoryJpa.findById(id)
+    public Opportunity findById(UUID id, UUID tenantId) {
+        return opportunityRepositoryJpa.findByIdAndTenantId(id, tenantId)
                 .map(opportunityPersistenceMapper::toDomain)
                 .orElse(null);
     }
 
     @Override
-    public Opportunity update(Opportunity opportunity) {
-        return save(opportunity);
+    public Opportunity update(Opportunity domain) {
+        if (!opportunityRepositoryJpa.existsById(domain.getId())) {
+            throw new IllegalArgumentException("Opportunity with ID " + domain.getId() + " does not exist");
+        }
+        OpportunityEntity entity = opportunityPersistenceMapper.toEntity(domain);
+        OpportunityEntity updated = opportunityRepositoryJpa.save(entity);
+        return opportunityPersistenceMapper.toDomain(updated);
     }
 
     @Override
     public void delete(UUID id, UUID tenantId) {
-        opportunityRepositoryJpa.findByIdAndTenantId(id, tenantId).ifPresent(opportunityRepositoryJpa::delete);
+        if (opportunityRepositoryJpa.existsByIdAndTenantId(id, tenantId)) {
+            opportunityRepositoryJpa.deleteById(id);
+        } else {
+            throw new IllegalArgumentException("Opportunity with ID " + id + " does not exist for the given tenant");
+        }
     }
 
     @Override
-    public List<Opportunity> findAll(UUID tenantId) {
-        return opportunityRepositoryJpa.findByTenantId(tenantId).stream()
-                .map(opportunityPersistenceMapper::toDomain)
-                .toList();
+    public Page<Opportunity> findAll(UUID tenantId, Pageable pageable) {
+        return opportunityRepositoryJpa.findAllByTenantId(tenantId, pageable)
+                .map(opportunityPersistenceMapper::toDomain);
     }
 }

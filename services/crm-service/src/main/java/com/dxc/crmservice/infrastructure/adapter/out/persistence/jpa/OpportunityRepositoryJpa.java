@@ -12,4 +12,6 @@ import java.util.UUID;
 public interface OpportunityRepositoryJpa extends JpaRepository<OpportunityEntity, UUID> {
     List<OpportunityEntity> findByTenantId(UUID tenantId);
     Optional<OpportunityEntity> findByIdAndTenantId(UUID id, UUID tenantId);
+    boolean existsByIdAndTenantId(UUID id, UUID tenantId);
+    org.springframework.data.domain.Page<OpportunityEntity> findAllByTenantId(UUID tenantId, org.springframework.data.domain.Pageable pageable);
 }

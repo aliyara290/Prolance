@@ -3,8 +3,8 @@ package com.dxc.crmservice.domain.model.aggregate;
 import com.dxc.crmservice.domain.exception.BusinessRuleViolationException;
 import com.dxc.crmservice.domain.exception.InvalidStateTransitionException;
 import com.dxc.crmservice.domain.exception.ValidationException;
-import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.LeadStatus;
+import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.Source;
 import lombok.Getter;
 
@@ -42,7 +42,8 @@ public class Lead {
             String title,
             String description,
             Source source,
-            Priority priority) {
+            Priority priority
+    ) {
 
         this.id = id == null ? UUID.randomUUID() : id;
         this.tenantId = requireNonNull(tenantId, "tenantId");
@@ -60,7 +61,8 @@ public class Lead {
             String title,
             String description,
             Source source,
-            Priority priority) {
+            Priority priority
+    ) {
 
         return new Lead(null, tenantId, title, description, source, priority);
     }
@@ -168,10 +170,16 @@ public class Lead {
         touch();
     }
 
-    public void assignClient() {
+    public void assignClient(UUID clientId) {
         ensureNotClosed();
 
         this.clientId = requireNonNull(clientId, "clientId");
+        touch();
+    }
+
+    public void addContact(UUID contactId) {
+        ensureNotClosed();
+        this.contactId = requireNonNull(contactId, "contactId");
         touch();
     }
 
@@ -184,7 +192,7 @@ public class Lead {
     private void ensureStatus(LeadStatus expected) {
         if (this.status != expected) {
             throw new InvalidStateTransitionException(
-                    "Invalid status transition: expected " + expected + " but was " + status);
+                    "Invalid status transition: expected" + expected + " but was " + status);
         }
     }
 

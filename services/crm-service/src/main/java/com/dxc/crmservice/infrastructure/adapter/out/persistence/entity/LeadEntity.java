@@ -1,7 +1,7 @@
 package com.dxc.crmservice.infrastructure.adapter.out.persistence.entity;
 
-import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.LeadStatus;
+import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.Source;
 import jakarta.persistence.*;
 import lombok.*;

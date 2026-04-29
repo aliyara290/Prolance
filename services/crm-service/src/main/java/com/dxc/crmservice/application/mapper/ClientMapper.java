@@ -6,7 +6,6 @@ import com.dxc.crmservice.application.dto.client.res.ClientResponse;
 import com.dxc.crmservice.domain.model.aggregate.Client;
 import com.dxc.crmservice.domain.model.valueobject.Address;
 import org.mapstruct.Mapper;
-
 import java.util.UUID;
 
 @Mapper(componentModel = "spring")
@@ -35,6 +34,7 @@ public interface ClientMapper {
                 .city(dto.city())
                 .state(dto.state())
                 .zipCode(dto.zipCode())
+                .country(dto.country())
                 .build();
     }
 
@@ -44,7 +44,8 @@ public interface ClientMapper {
                 address.getStreet(),
                 address.getCity(),
                 address.getState(),
-                address.getZipCode()
+                address.getZipCode(),
+                address.getCountry()
         );
     }
 }

@@ -7,6 +7,8 @@ import com.dxc.crmservice.infrastructure.adapter.out.persistence.jpa.ClientRepos
 import com.dxc.crmservice.infrastructure.adapter.out.persistence.mapper.ClientPersistenceMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,31 +24,33 @@ public class ClientRepositoryAdapter implements ClientRepository {
 
     @Override
     public Client save(Client client) {
-        ClientEntity entity = clientPersistenceMapper.toEntity(client);
-        return clientPersistenceMapper.toDomain(clientRepositoryJpa.save(entity));
+        ClientEntity clientEntity = clientPersistenceMapper.toEntity(client);
+        ClientEntity savedClientEntity = clientRepositoryJpa.save(clientEntity);
+        return clientPersistenceMapper.toDomain(savedClientEntity);
     }
 
     @Override
-    public Client findById(UUID id) {
-        return clientRepositoryJpa.findById(id)
+    public Client findById(UUID id, UUID tenantId) {
+        return clientRepositoryJpa.findByIdAndTenantId(id, tenantId)
                 .map(clientPersistenceMapper::toDomain)
                 .orElse(null);
     }
 
     @Override
     public Client update(Client client) {
-        return save(client);
+        ClientEntity clientEntity = clientPersistenceMapper.toEntity(client);
+        ClientEntity updatedClientEntity = clientRepositoryJpa.save(clientEntity);
+        return clientPersistenceMapper.toDomain(updatedClientEntity);
     }
 
     @Override
     public void delete(UUID id, UUID tenantId) {
-        clientRepositoryJpa.findByIdAndTenantId(id, tenantId).ifPresent(clientRepositoryJpa::delete);
+        clientRepositoryJpa.findByIdAndTenantId(id, tenantId)
+                .ifPresent(clientRepositoryJpa::delete);
     }
 
     @Override
-    public List<Client> findAll(UUID tenantId) {
-        return clientRepositoryJpa.findByTenantId(tenantId).stream()
-                .map(clientPersistenceMapper::toDomain)
-                .toList();
-    }
-}
+    public Page<Client> findAll(UUID tenantId, Pageable pageable) {
+        Page<ClientEntity> clientEntities = clientRepositoryJpa.findByTenantId(tenantId, pageable);
+        return clientEntities.map(clientPersistenceMapper::toDomain);
+    }}

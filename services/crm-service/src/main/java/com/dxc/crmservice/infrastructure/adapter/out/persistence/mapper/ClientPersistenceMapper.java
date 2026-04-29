@@ -55,6 +55,7 @@ public class ClientPersistenceMapper {
                 .city(address.getCity())
                 .state(address.getState())
                 .zipCode(address.getZipCode())
+                .country(address.getCountry())
                 .build();
     }
 
@@ -65,6 +66,7 @@ public class ClientPersistenceMapper {
                 .city(embeddable.getCity())
                 .state(embeddable.getState())
                 .zipCode(embeddable.getZipCode())
+                .country(embeddable.getCountry())
                 .build();
     }
 }

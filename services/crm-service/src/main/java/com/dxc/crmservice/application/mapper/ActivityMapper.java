@@ -4,7 +4,6 @@ import com.dxc.crmservice.application.dto.activity.req.CreateActivityRequest;
 import com.dxc.crmservice.application.dto.activity.res.ActivityResponse;
 import com.dxc.crmservice.domain.model.entity.Activity;
 import org.mapstruct.Mapper;
-
 import java.util.UUID;
 
 @Mapper(componentModel = "spring")
@@ -18,9 +17,26 @@ public interface ActivityMapper {
                 request.subject(),
                 request.description(),
                 request.scheduledAt(),
-                request.userId()
+                request.userId(),
+                request.entityId(),
+                request.entityType()
         );
     }
 
-    ActivityResponse toResponse(Activity activity);
+    default ActivityResponse toResponse(Activity activity) {
+        if (activity == null) return null;
+        return new ActivityResponse(
+                activity.getId(),
+                activity.getType(),
+                activity.getSubject(),
+                activity.getDescription(),
+                activity.getScheduledAt(),
+                activity.getCompletedAt(),
+                activity.getUserId(),
+                activity.getEntityId(),
+                activity.getEntityType(),
+                activity.getCreatedAt(),
+                activity.getUpdatedAt()
+        );
+    }
 }

@@ -13,20 +13,46 @@ public interface OpportunityMapper {
     default Opportunity toDomain(CreateOpportunityRequest request, UUID tenantId) {
         if (request == null) return null;
         
-        Double budget = request.amount() != null ? request.amount().doubleValue() : null;
-        
+        Double budget = request.estimatedBudget() != null ? request.estimatedBudget().doubleValue() : null;
+
         return Opportunity.create(
                 tenantId,
                 request.clientId(),
-                request.name(),
+                request.title(),
                 "", // description
                 budget,
-                0.0, // expectedRevenue
-                0,   // probability
+                request.expectedRevenue() != null ? request.expectedRevenue() : null, // expectedRevenue
+                request.probability() > 0 ? request.probability() : 0,  // probability
                 request.stage(),
                 request.priority()
         );
     }
 
-    OpportunityResponse toResponse(Opportunity opportunity);
+    default OpportunityResponse toResponse(Opportunity opportunity) {
+        if (opportunity == null) return null;
+        
+        java.math.BigDecimal amount = opportunity.getEstimatedBudget() != null 
+            ? java.math.BigDecimal.valueOf(opportunity.getEstimatedBudget()) 
+            : null;
+
+        return new OpportunityResponse(
+                opportunity.getId(),
+                opportunity.getClientId(),
+                opportunity.getTitle(),
+                amount,
+                opportunity.getStage(),
+                opportunity.getPriority(),
+                opportunity.getEstimatedBudget(),
+                opportunity.getExpectedRevenue(),
+                opportunity.getProbability(),
+                opportunity.getExpectedStartDate(),
+                opportunity.getExpectedEndDate(),
+                opportunity.getLastActivityAt(),
+                opportunity.getNextFollowUpAt(),
+                opportunity.getClosingDate(),
+                opportunity.getLostReason(),
+                opportunity.getCreatedAt(),
+                opportunity.getUpdatedAt()
+        );
+    }
 }
