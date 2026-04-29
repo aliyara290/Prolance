@@ -42,7 +42,8 @@ public class Lead {
             String title,
             String description,
             Source source,
-            Priority priority) {
+            Priority priority
+    ) {
 
         this.id = id == null ? UUID.randomUUID() : id;
         this.tenantId = requireNonNull(tenantId, "tenantId");
@@ -60,7 +61,8 @@ public class Lead {
             String title,
             String description,
             Source source,
-            Priority priority) {
+            Priority priority
+    ) {
 
         return new Lead(null, tenantId, title, description, source, priority);
     }
@@ -190,7 +192,7 @@ public class Lead {
     private void ensureStatus(LeadStatus expected) {
         if (this.status != expected) {
             throw new InvalidStateTransitionException(
-                    "Invalid status transition: expected " + expected + " but was " + status);
+                    "Invalid status transition: expected" + expected + " but was " + status);
         }
     }
 
