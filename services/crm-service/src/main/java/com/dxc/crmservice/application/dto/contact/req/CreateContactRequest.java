@@ -6,9 +6,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
 import java.util.UUID;
 
+@Builder
 public record CreateContactRequest(
     @NotBlank(message = "First name is required")
     @Size(max = 100)
@@ -28,6 +30,7 @@ public record CreateContactRequest(
 
     Role role,
 
+    @NotNull(message = "Influence level is required")
     InfluenceLevel influenceLevel,
 
     boolean primary,
