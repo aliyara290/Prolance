@@ -1,6 +1,7 @@
 package com.dxc.crmservice.infrastructure.adapter.in.rest;
 
 import com.dxc.crmservice.domain.exception.InvalidStateTransitionException;
+import com.dxc.crmservice.domain.exception.RecordNotFoundException;
 import com.dxc.crmservice.domain.exception.ServiceLogicException;
 import com.dxc.crmservice.domain.exception.ValidationException;
 import com.dxc.crmservice.infrastructure.adapter.in.rest.response.ErrorResponse;
@@ -29,6 +30,13 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest()
                 .body(ErrorResponse.of("VALIDATION_ERROR", "Invalid request data", details));
+    }
+
+    @ExceptionHandler(RecordNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleRecordNotFound(RecordNotFoundException ex) {
+        log.warn("Record not found : {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of("RECORD_NOT_FOUND", ex.getMessage(), null));
     }
 
     @ExceptionHandler(ValidationException.class)
