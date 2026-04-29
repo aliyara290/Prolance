@@ -5,6 +5,7 @@ public enum UserRole {
     MEMBER,
     VIEWER,
     PROJECT_MANAGER,
-    ACCOUNTANT
+    ACCOUNTANT,
+    SALES
 }
 
