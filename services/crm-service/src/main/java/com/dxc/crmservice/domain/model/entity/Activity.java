@@ -26,6 +26,9 @@ public class Activity {
 
     private final UUID userId;
 
+    private final UUID entityId;
+    private final EntityType entityType;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -35,13 +38,18 @@ public class Activity {
                      String subject,
                      String description,
                      LocalDateTime scheduledAt,
-                     UUID userId) {
+                     UUID userId,
+                     UUID entityId,
+                     EntityType entityType) {
 
         this.id = id == null ? UUID.randomUUID() : id;
         this.tenantId = requireNonNull(tenantId, "tenantId");
 
         this.type = requireNonNull(type, "type");
         this.userId = requireNonNull(userId, "userId");
+        
+        this.entityId = requireNonNull(entityId, "entityId");
+        this.entityType = requireNonNull(entityType, "entityType");
 
         this.createdAt = LocalDateTime.now();
         this.updatedAt = this.createdAt;
@@ -59,7 +67,9 @@ public class Activity {
                                   String subject,
                                   String description,
                                   LocalDateTime scheduledAt,
-                                  UUID userId) {
+                                  UUID userId,
+                                  UUID entityId,
+                                  EntityType entityType) {
 
         return new Activity(
                 null,
@@ -68,7 +78,9 @@ public class Activity {
                 subject,
                 description,
                 scheduledAt,
-                userId
+                userId,
+                entityId,
+                entityType
         );
     }
 
@@ -80,6 +92,8 @@ public class Activity {
                                      LocalDateTime scheduledAt,
                                      LocalDateTime completedAt,
                                      UUID userId,
+                                     UUID entityId,
+                                     EntityType entityType,
                                      LocalDateTime createdAt,
                                      LocalDateTime updatedAt) {
 
@@ -90,7 +104,9 @@ public class Activity {
                 subject,
                 description,
                 scheduledAt,
-                userId
+                userId,
+                entityId,
+                entityType
         );
 
         activity.completedAt = completedAt;

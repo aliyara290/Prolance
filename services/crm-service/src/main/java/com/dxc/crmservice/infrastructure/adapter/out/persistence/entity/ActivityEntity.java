@@ -32,4 +32,11 @@ public class ActivityEntity extends BaseAuditingEntity {
     private LocalDateTime completedAt;
 
     private UUID userId;
+
+    @Column(name = "entity_id", nullable = false)
+    private UUID entityId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "entity_type", nullable = false)
+    private EntityType entityType;
 }

@@ -17,6 +17,8 @@ public class ActivityPersistenceMapper {
                 .scheduledAt(domain.getScheduledAt())
                 .completedAt(domain.getCompletedAt())
                 .userId(domain.getUserId())
+                .entityId(domain.getEntityId())
+                .entityType(domain.getEntityType())
                 .build();
         
         entity.setTenantId(domain.getTenantId());
@@ -37,6 +39,8 @@ public class ActivityPersistenceMapper {
                 entity.getScheduledAt(),
                 entity.getCompletedAt(),
                 entity.getUserId(),
+                entity.getEntityId(),
+                entity.getEntityType(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );
