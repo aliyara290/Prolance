@@ -24,7 +24,7 @@ public class ClientEntity extends BaseAuditingEntity {
     @Column(nullable = false)
     private String industry;
     private String website;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String phone;
 
     @Embedded

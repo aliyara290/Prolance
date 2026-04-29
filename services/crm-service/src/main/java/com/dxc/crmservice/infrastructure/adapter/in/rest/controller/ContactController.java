@@ -31,13 +31,13 @@ public class ContactController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ContactResponse>> updateContact(@PathVariable UUID id, @Valid @RequestBody UpdateContactRequest request) {
+    public ResponseEntity<ApiResponse<ContactResponse>> updateContact(@PathVariable("id") UUID id, @Valid @RequestBody UpdateContactRequest request) {
         ContactResponse contactResponse = contactUseCase.updateContact(id, request);
         return ResponseEntity.ok(ApiResponse.success(contactResponse));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ContactResponse>> getContact(@PathVariable UUID id) {
+    public ResponseEntity<ApiResponse<ContactResponse>> getContact(@PathVariable("id") UUID id) {
         ContactResponse contactResponse = contactUseCase.getContact(id);
         return ResponseEntity.ok(ApiResponse.success(contactResponse));
     }
@@ -58,8 +58,8 @@ public class ContactController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteContact(@PathVariable UUID id) {
+    public ResponseEntity<ApiResponse<Void>> deleteContact(@PathVariable("id") UUID id) {
         contactUseCase.deleteContact(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body(ApiResponse.success(null));
     }
 }

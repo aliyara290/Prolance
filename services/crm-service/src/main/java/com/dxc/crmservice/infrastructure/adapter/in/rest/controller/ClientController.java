@@ -31,13 +31,13 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ClientResponse>> updateClient(@PathVariable UUID id, @Valid @RequestBody UpdateClientRequest request) {
+    public ResponseEntity<ApiResponse<ClientResponse>> updateClient(@PathVariable("id") UUID id, @Valid @RequestBody UpdateClientRequest request) {
         ClientResponse clientResponse = clientUseCase.updateClient(id, request);
         return ResponseEntity.ok(ApiResponse.success(clientResponse));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ClientResponse>> getClient(@PathVariable UUID id) {
+    public ResponseEntity<ApiResponse<ClientResponse>> getClient(@PathVariable("id") UUID id) {
         ClientResponse clientResponse = clientUseCase.getClient(id);
         return ResponseEntity.ok(ApiResponse.success(clientResponse));
     }
@@ -58,8 +58,8 @@ public class ClientController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteClient(@PathVariable UUID id) {
+    public ResponseEntity<ApiResponse<Void>> deleteClient(@PathVariable("id") UUID id) {
         clientUseCase.deleteClient(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body(ApiResponse.success(null));
     }
 }
