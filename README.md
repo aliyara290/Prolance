@@ -47,17 +47,13 @@ Chaque microservice est conçu selon l’architecture hexagonale, permettant de 
 
 ## Architecture Hexagonale
 
-```md
-![Architecture Hexagonale](./docs/diagrams/Hexagonal-Architecture.png)
-```
+![Architecture Hexagonale](docs/diagrams/Hexagonal-Architecture.png)
 
 ---
 
 ## Diagramme des Microservices
 
-```md
-![Architecture Microservices](./docs/diagrams/Prolance-Microservices-Architecture.gif)
-```
+![Architecture Microservices](docs/diagrams/Prolance-Microservices-Architecture.gif)
 
 ---
 
