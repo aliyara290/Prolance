@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,24 +26,28 @@ public class ContactController {
     private final ContactUseCase contactUseCase;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'SALES')")
     public ResponseEntity<ApiResponse<ContactResponse>> createContact(@Valid @RequestBody CreateContactRequest request) {
         ContactResponse contactResponse = contactUseCase.createContact(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(contactResponse));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SALES')")
     public ResponseEntity<ApiResponse<ContactResponse>> updateContact(@PathVariable("id") UUID id, @Valid @RequestBody UpdateContactRequest request) {
         ContactResponse contactResponse = contactUseCase.updateContact(id, request);
         return ResponseEntity.ok(ApiResponse.success(contactResponse));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SALES', 'USER')")
     public ResponseEntity<ApiResponse<ContactResponse>> getContact(@PathVariable("id") UUID id) {
         ContactResponse contactResponse = contactUseCase.getContact(id);
         return ResponseEntity.ok(ApiResponse.success(contactResponse));
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'SALES', 'USER')")
     public ResponseEntity<ApiResponse<List<ContactResponse>>> getAllContacts(Pageable pageable) {
         Page<ContactResponse> contacts = contactUseCase.getAllContacts(pageable);
 
@@ -58,6 +63,7 @@ public class ContactController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteContact(@PathVariable("id") UUID id) {
         contactUseCase.deleteContact(id);
         return ResponseEntity.ok().body(ApiResponse.success(null));
