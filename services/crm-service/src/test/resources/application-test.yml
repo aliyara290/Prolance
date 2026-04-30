@@ -1,0 +1,23 @@
+spring:
+  config:
+    import: "" # Disable importing from Config Server
+  cloud:
+    config:
+      enabled: false # disable Spring Cloud Config Client
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password: 
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update # For tests, update the schema based on entities
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+eureka:
+  client:
+    enabled: false # Disable Eureka registration during tests
