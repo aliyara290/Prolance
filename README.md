@@ -1,6 +1,6 @@
-# 🚀 Prolance — Plateforme SaaS Multi-Tenant de Gestion de Projets
+# Prolance — Plateforme SaaS Multi-Tenant de Gestion de Projets
 
-## 📌 Présentation
+## Présentation
 
 **Prolance** est une plateforme SaaS multi-tenant conçue pour permettre aux entreprises de gérer efficacement leurs clients, projets, tâches, équipes et facturation dans un environnement centralisé, sécurisé et évolutif.
 
@@ -10,9 +10,9 @@ Le système est construit en utilisant une **architecture microservices** combin
 
 ---
 
-# 🏗️ Architecture
+# Architecture
 
-## 🔹 Architecture Microservices
+## Architecture Microservices
 
 Le système est découpé en plusieurs services indépendants, chacun responsable d’un domaine métier spécifique.
 
@@ -26,7 +26,7 @@ Le système est découpé en plusieurs services indépendants, chacun responsabl
 
 ---
 
-## 🔹 Architecture Hexagonale (Ports & Adapters)
+## Architecture Hexagonale (Ports & Adapters)
 
 Chaque microservice est conçu selon l’architecture hexagonale, permettant de séparer :
 
@@ -43,7 +43,7 @@ Chaque microservice est conçu selon l’architecture hexagonale, permettant de 
 
 ---
 
-# 🧩 Diagrammes d’architecture
+# Diagrammes d’architecture
 
 ## Architecture Hexagonale
 
@@ -57,7 +57,7 @@ Chaque microservice est conçu selon l’architecture hexagonale, permettant de 
 
 ---
 
-# ⚙️ Technologies utilisées
+# Technologies utilisées
 
 ## Backend
 
@@ -85,7 +85,7 @@ Chaque microservice est conçu selon l’architecture hexagonale, permettant de 
     * Rate Limiter
     * Time Limiter
 
-👉 Utilisé pour :
+Utilisé pour :
 
 * protéger les appels inter-services
 * éviter les cascades de pannes
@@ -111,7 +111,7 @@ Chaque microservice est conçu selon l’architecture hexagonale, permettant de 
 
 ---
 
-# 🏢 Multi-Tenancy
+# Multi-Tenancy
 
 Prolance est conçu comme une application **multi-tenant**, ce qui signifie que :
 
@@ -128,7 +128,7 @@ L’isolation est assurée par :
 
 ---
 
-# 🔐 Authentification & Autorisation
+# Authentification & Autorisation
 
 Le système utilise **Keycloak** pour :
 
@@ -139,9 +139,9 @@ Le système utilise **Keycloak** pour :
 
 ---
 
-# 🧱 Services du système
+# Services du système
 
-## 🔹 Company Service
+## Company Service
 
 Responsable de la gestion des entreprises (tenants).
 
@@ -155,7 +155,7 @@ Responsable de la gestion des entreprises (tenants).
 
 ---
 
-## 🔹 CRM Service
+## CRM Service
 
 Responsable de la gestion des relations clients et du processus commercial.
 
@@ -173,7 +173,7 @@ Lead → Opportunité → Gagnée / Perdue
 
 ---
 
-## 🔹 Project Service
+## Project Service
 
 Responsable de la gestion du cycle de vie des projets.
 
@@ -190,7 +190,7 @@ Création → Planification → Actif → Terminé
 
 ---
 
-## 🔹 Task Service
+## Task Service
 
 Responsable de l’exécution opérationnelle.
 
@@ -208,7 +208,7 @@ Responsable de l’exécution opérationnelle.
 
 ---
 
-## 🔹 Billing Service
+## Billing Service
 
 Responsable de la gestion de la facturation.
 
@@ -219,11 +219,11 @@ Responsable de la gestion de la facturation.
 * Suivi des factures
 * Association aux projets
 
-> ⚠️ Le paiement n’est pas inclus dans cette version.
+️ Le paiement n’est pas inclus dans cette version.
 
 ---
 
-## 🔹 Notification Service
+## Notification Service
 
 Responsable de la communication interne.
 
@@ -235,7 +235,7 @@ Responsable de la communication interne.
 
 ---
 
-# 📡 Communication entre services
+# Communication entre services
 
 Les services communiquent via :
 
@@ -244,29 +244,29 @@ Les services communiquent via :
 
 ---
 
-# 🔄 Gestion des transactions distribuées
+# Gestion des transactions distribuées
 
 Prolance implémente le **pattern Saga** pour gérer les transactions distribuées entre microservices.
 
 ## Approches utilisées :
 
-### 🔹 Chorégraphie
+### Chorégraphie
 
 * Les services réagissent à des événements
 * Pas de coordinateur central
 * Faible couplage
 
-### 🔹 Orchestration
+### Orchestration
 
 * Un service orchestre le workflow
 * Contrôle explicite des étapes
 * Meilleure visibilité du flux
 
-👉 Le choix entre chorégraphie et orchestration dépend du **contexte métier et de la complexité du workflow**.
+Le choix entre chorégraphie et orchestration dépend du **contexte métier et de la complexité du workflow**.
 
 ---
 
-# 🎯 Objectifs du projet
+# Objectifs du projet
 
 * Construire une plateforme SaaS scalable
 * Assurer une isolation complète des tenants
@@ -276,7 +276,7 @@ Prolance implémente le **pattern Saga** pour gérer les transactions distribué
 
 ---
 
-# 📂 Structure du projet
+# Structure du projet
 
 Chaque service suit :
 
@@ -289,7 +289,7 @@ src
 
 ---
 
-# 🔥 Améliorations futures
+# Améliorations futures
 
 * Intégration Kafka (Event Streaming)
 * Notifications en temps réel
@@ -300,7 +300,7 @@ src
 
 ---
 
-# 👨‍💻 Auteur
+# Auteur
 
 Projet développé par Ali Yara.
 
