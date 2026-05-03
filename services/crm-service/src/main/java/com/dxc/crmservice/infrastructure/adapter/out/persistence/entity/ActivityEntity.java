@@ -4,6 +4,8 @@ import com.dxc.crmservice.domain.model.valueobject.ActivityType;
 import com.dxc.crmservice.domain.model.valueobject.EntityType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -15,6 +17,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE activities SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class ActivityEntity extends BaseAuditingEntity {
     @Id
     private UUID id;
@@ -39,4 +43,8 @@ public class ActivityEntity extends BaseAuditingEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "entity_type", nullable = false)
     private EntityType entityType;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
 }

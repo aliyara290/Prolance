@@ -10,7 +10,6 @@ import com.dxc.crmservice.application.dto.lead.req.UpdateLeadRequest;
 import com.dxc.crmservice.application.dto.lead.res.LeadResponse;
 import com.dxc.crmservice.application.dto.opportunity.req.CreateOpportunityRequest;
 import com.dxc.crmservice.application.dto.opportunity.res.OpportunityResponse;
-import com.dxc.crmservice.application.mapper.ContactMapper;
 import com.dxc.crmservice.application.mapper.LeadMapper;
 import com.dxc.crmservice.application.port.in.ClientUseCase;
 import com.dxc.crmservice.application.port.in.ContactUseCase;
@@ -19,7 +18,8 @@ import com.dxc.crmservice.application.port.in.OpportunityUseCase;
 import com.dxc.crmservice.application.port.out.ClientRepository;
 import com.dxc.crmservice.application.port.out.ContactRepository;
 import com.dxc.crmservice.application.port.out.LeadRepository;
-import com.dxc.crmservice.application.port.out.feign.FeignPort;
+import com.dxc.crmservice.application.port.out.feign.UserFeignPort;
+import com.dxc.crmservice.application.security.TenantGuard;
 import com.dxc.crmservice.application.utils.Utils;
 import com.dxc.crmservice.domain.exception.RecordNotFoundException;
 import com.dxc.crmservice.domain.exception.ServiceLogicException;
@@ -46,6 +46,7 @@ import java.util.UUID;
 @Transactional
 public class LeadService implements LeadUseCase {
 
+    private final TenantGuard tenantGuard;
     private final LeadRepository leadRepository;
     private final ContactRepository contactRepository;
     private final ClientRepository clientRepository;
@@ -53,13 +54,13 @@ public class LeadService implements LeadUseCase {
     private final ContactUseCase contactUseCase;
     private final ClientUseCase clientUseCase;
     private final OpportunityUseCase opportunityUseCase;
-    private final FeignPort feignPort;
+    private final UserFeignPort userFeignPort;
 
 
     @Override
-    public OpportunityResponse qualifyAndConvert(UUID leadId) {
+    public OpportunityResponse  qualifyAndConvert(UUID leadId) {
         UUID tenantId = Utils.resolveTenantId();
-
+        tenantGuard.ensureTenantIsActive(tenantId);
         Lead lead = leadRepository.findById(leadId, tenantId);
         if (lead == null) {
             throw new RecordNotFoundException("Lead not found");
@@ -96,6 +97,7 @@ public class LeadService implements LeadUseCase {
     @Override
     public LeadResponse createLead(CreateLeadRequest request) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Lead lead = leadMapper.toDomain(request, tenantId);
 
@@ -140,7 +142,7 @@ public class LeadService implements LeadUseCase {
             if (request.assignedTo() == null) {
                 throw new ServiceLogicException("Lead must have an assigned user");
             }
-            ResponseWrapper<UserResponseDTO> user = feignPort.getUser(request.assignedTo());
+            ResponseWrapper<UserResponseDTO> user = userFeignPort.getUser(request.assignedTo());
             lead.assignTo(user.data().id());
 
             leadRepository.save(lead);
@@ -185,6 +187,7 @@ public class LeadService implements LeadUseCase {
     @Override
     public LeadResponse updateLead(UUID id, UpdateLeadRequest request) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Lead lead = leadRepository.findById(id, tenantId);
             if (lead == null) {
@@ -217,6 +220,7 @@ public class LeadService implements LeadUseCase {
     @Override
     public void deleteLead(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Lead lead = leadRepository.findById(id, tenantId);
             if (lead == null) {
@@ -233,6 +237,7 @@ public class LeadService implements LeadUseCase {
     @Transactional(readOnly = true)
     public LeadResponse getLead(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Lead lead = leadRepository.findById(id, tenantId);
         if (lead == null) {
             throw new RecordNotFoundException("Lead not found");
@@ -244,6 +249,7 @@ public class LeadService implements LeadUseCase {
     @Transactional(readOnly = true)
     public Page<LeadResponse> getAllLeads(Pageable pageable) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Page<Lead> leads = leadRepository.findAll(tenantId, pageable);
         return leads.map(leadMapper::toResponse);
     }

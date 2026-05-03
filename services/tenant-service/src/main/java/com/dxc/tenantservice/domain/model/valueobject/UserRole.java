@@ -1,4 +1,4 @@
-package com.dxc.tenantservice.domain.model.enums;
+package com.dxc.tenantservice.domain.model.valueobject;
 
 public enum UserRole {
     ADMIN,
@@ -8,4 +8,3 @@ public enum UserRole {
     ACCOUNTANT,
     SALES
 }
-

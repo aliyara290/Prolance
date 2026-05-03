@@ -3,21 +3,18 @@ package com.dxc.tenantservice.application.service;
 import com.dxc.tenantservice.application.dto.tenant.req.RegisterTenantReqDTO;
 import com.dxc.tenantservice.application.dto.tenant.req.UpdateTenantReqDTO;
 import com.dxc.tenantservice.application.dto.tenant.res.TenantResDTO;
-import com.dxc.tenantservice.application.dto.tenant.res.TenantTokenResDTO;
+import com.dxc.tenantservice.application.dto.tenant.res.TenantStatusRespDTO;
+import com.dxc.tenantservice.application.mapper.TenantAddressMapper;
 import com.dxc.tenantservice.application.mapper.TenantDtoMapper;
 import com.dxc.tenantservice.application.port.in.TenantUseCase;
 import com.dxc.tenantservice.application.port.out.TenantRepository;
-import com.dxc.tenantservice.application.port.out.TenantUserRepository;
 import com.dxc.tenantservice.application.saga.RegistrationSaga;
 import com.dxc.tenantservice.application.port.out.keycloak.KeycloakPort;
 import com.dxc.tenantservice.domain.exception.TenantStateException;
-import com.dxc.tenantservice.domain.model.enums.UserRole;
-import com.dxc.tenantservice.domain.model.tenant.UserPreference;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.keycloak.KeycloakTokenResDTO;
+import com.dxc.tenantservice.domain.model.valueobject.UserRole;
+import com.dxc.tenantservice.domain.model.valueobject.Address;
 import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserReqDTO;
 import com.dxc.tenantservice.domain.model.tenant.Tenant;
-import com.dxc.tenantservice.domain.model.tenant.TenantUser;
-import com.dxc.tenantservice.domain.model.tenant.TenantSettings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -36,11 +33,9 @@ public class TenantService implements TenantUseCase {
     private final TenantPersistenceService tenantPersistenceService;
     private final TenantRepository tenantRepository;
     private final TenantDtoMapper tenantDtoMapper;
+    private final TenantAddressMapper tenantAddressMapper;
     private final ApplicationContext ctx;
     private final KeycloakPort keycloakPort;
-
-//    private static final List<String> DEFAULT_ROLES =
-//            List.of("ADMIN", "MEMBER", "VIEWER", "PROJECT_MANAGER", "ACCOUNTANT");
 
     @Override
     public String registerTenant(RegisterTenantReqDTO reqDTO) {
@@ -83,18 +78,10 @@ public class TenantService implements TenantUseCase {
     @Override
     @Transactional
     public TenantResDTO updateTenant(UUID tenantId, UpdateTenantReqDTO reqDTO) {
-        Tenant tenant = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new TenantStateException("Tenant not found with ID: " + tenantId));
+        Tenant tenant = tenantRepository.findById(tenantId).orElseThrow(() -> new TenantStateException("Tenant not found with ID: " + tenantId));
 
-        tenant.updateProfile(
-                reqDTO.getName(),
-                reqDTO.getWebsite(),
-                reqDTO.getDescription(),
-                reqDTO.getLogo(),
-                reqDTO.getAddress(),
-                reqDTO.getSize(),
-                reqDTO.getFoundedDate()
-        );
+        Address address = tenantAddressMapper.toDomain(reqDTO.getAddress());
+        tenant.updateProfile(reqDTO.getName(), reqDTO.getWebsite(), reqDTO.getDescription(), reqDTO.getLogo(), address, reqDTO.getSize(), reqDTO.getFoundedDate());
 
         tenantRepository.save(tenant);
         return tenantDtoMapper.toDto(tenant);
@@ -103,36 +90,31 @@ public class TenantService implements TenantUseCase {
     @Override
     @Transactional
     public void deleteTenant(UUID tenantId) {
-        Tenant tenant = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new TenantStateException("Tenant not found with ID: " + tenantId));
+        Tenant tenant = tenantRepository.findById(tenantId).orElseThrow(() -> new TenantStateException("Tenant not found with ID: " + tenantId));
         tenant.delete();
         tenantRepository.save(tenant);
     }
 
     @Override
     public TenantResDTO getTenant(UUID tenantId) {
-        Tenant tenant = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new TenantStateException("Tenant not found with ID: " + tenantId));
+        Tenant tenant = tenantRepository.findById(tenantId).orElseThrow(() -> new TenantStateException("Tenant not found with ID: " + tenantId));
 
         return tenantDtoMapper.toDto(tenant);
     }
 
-    private KeycloakUserReqDTO buildKeycloakUser(RegisterTenantReqDTO reqDTO, UUID tenantId) {
-        return KeycloakUserReqDTO.builder()
-                .username(reqDTO.getEmail())
-                .email(reqDTO.getEmail())
-                .firstName(reqDTO.getFirstName())
-                .lastName(reqDTO.getLastName())
-                .enabled(true)
-                .emailVerified(false)
-                .attributes(Map.of("tenantId", List.of(tenantId.toString())))
-                .credentials(List.of(
-                        new KeycloakUserReqDTO.KeycloakCredentialRepresentation(
-                                "password",
-                                reqDTO.getPassword(),
-                                false
-                        )
-                ))
+    @Override
+    public TenantStatusRespDTO getTenantStatus(UUID tenantId) {
+        Tenant tenant = tenantRepository.findById(tenantId).orElseThrow(() -> new TenantStateException("Tenant not found with ID: " + tenantId));
+        return TenantStatusRespDTO.builder()
+                .tenantId(tenantId)
+                .status(tenant.getStatus().toString())
+                .active(tenant.getDeleted_at() == null)
+                .deletedAt(tenant.getDeleted_at())
                 .build();
+
+    }
+
+    private KeycloakUserReqDTO buildKeycloakUser(RegisterTenantReqDTO reqDTO, UUID tenantId) {
+        return KeycloakUserReqDTO.builder().username(reqDTO.getEmail()).email(reqDTO.getEmail()).firstName(reqDTO.getFirstName()).lastName(reqDTO.getLastName()).enabled(true).emailVerified(false).attributes(Map.of("tenantId", List.of(tenantId.toString()))).credentials(List.of(new KeycloakUserReqDTO.KeycloakCredentialRepresentation("password", reqDTO.getPassword(), false))).build();
     }
 }

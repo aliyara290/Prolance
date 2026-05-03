@@ -1,6 +1,6 @@
 package com.dxc.tenantservice.application.dto.tenant.req;
 
-import com.dxc.tenantservice.domain.model.enums.TenantIndustry;
+import com.dxc.tenantservice.domain.model.valueobject.TenantIndustry;
 import jakarta.validation.constraints.*;
 import lombok.*;
 

@@ -1,7 +1,7 @@
 package com.dxc.tenantservice.infrastructure.adapter.out.persistence.mapper;
 
 import com.dxc.tenantservice.domain.model.tenant.Tenant;
-import com.dxc.tenantservice.domain.model.valueobjects.Address;
+import com.dxc.tenantservice.domain.model.valueobject.Address;
 import com.dxc.tenantservice.infrastructure.adapter.out.persistence.entity.AddressEmbeddable;
 import com.dxc.tenantservice.infrastructure.adapter.out.persistence.entity.TenantEntity;
 import org.springframework.stereotype.Component;

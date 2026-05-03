@@ -1,7 +1,7 @@
 package com.dxc.tenantservice.domain.model.tenant;
 
-import com.dxc.tenantservice.domain.model.enums.EntityType;
-import com.dxc.tenantservice.domain.model.enums.TenantLogAction;
+import com.dxc.tenantservice.domain.model.valueobject.EntityType;
+import com.dxc.tenantservice.domain.model.valueobject.TenantLogAction;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

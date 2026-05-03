@@ -2,7 +2,7 @@ package com.dxc.tenantservice.domain.model.tenant;
 
 import com.dxc.tenantservice.domain.exception.UserStateException;
 import com.dxc.tenantservice.domain.exception.UserValidationException;
-import com.dxc.tenantservice.domain.model.enums.UserStatus;
+import com.dxc.tenantservice.domain.model.valueobject.UserStatus;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -18,7 +18,7 @@ public class TenantUser {
     private final UUID tenantId;
 
     private UUID keycloakUserId;
-    private final Set<UUID> keycloakRoleGroupIds;
+    private final Set<UUID>  keycloakRoleGroupIds;
 
     private String email;
     private String firstName;
@@ -30,6 +30,8 @@ public class TenantUser {
 
     private LocalDateTime lastLoginAt;
     private UserPreference userPreference;
+
+    private LocalDateTime deleted_at;
 
     public TenantUser(
             UUID id,

@@ -1,9 +1,9 @@
 package com.dxc.tenantservice.domain.model.tenant;
 
-import com.dxc.tenantservice.domain.model.enums.Language;
-import com.dxc.tenantservice.domain.model.enums.PlanStatus;
-import com.dxc.tenantservice.domain.model.enums.PlanType;
-import com.dxc.tenantservice.domain.model.record.PlanDefaults;
+import com.dxc.tenantservice.domain.model.valueobject.Language;
+import com.dxc.tenantservice.domain.model.valueobject.PlanStatus;
+import com.dxc.tenantservice.domain.model.valueobject.PlanType;
+import com.dxc.tenantservice.domain.model.valueobject.PlanDefaults;
 import lombok.Getter;
 import java.util.UUID;
 

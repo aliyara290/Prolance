@@ -4,7 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.util.Set;
-import com.dxc.tenantservice.domain.model.enums.UserRole;
+import com.dxc.tenantservice.domain.model.valueobject.UserRole;
 
 @Getter
 @Setter

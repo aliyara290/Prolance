@@ -1,6 +1,6 @@
 package com.dxc.tenantservice.application.dto.user.res;
 
-import com.dxc.tenantservice.domain.model.enums.UserStatus;
+import com.dxc.tenantservice.domain.model.valueobject.UserStatus;
 import lombok.Builder;
 
 import java.time.LocalDateTime;

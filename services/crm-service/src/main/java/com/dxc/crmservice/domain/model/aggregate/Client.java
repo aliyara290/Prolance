@@ -28,18 +28,12 @@ public class Client {
     private final ClientType type;
     private final Source source;
 
+    private LocalDateTime deletedAt;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private Client(UUID id,
-                   UUID tenantId,
-                   String name,
-                   String industry,
-                   String website,
-                   String phone,
-                   Address address,
-                   ClientType type,
-                   Source source) {
+    private Client(UUID id, UUID tenantId, String name, String industry, String website, String phone, Address address, ClientType type, Source source) {
 
         this.id = id == null ? UUID.randomUUID() : id;
         this.tenantId = requireNonNull(tenantId, "tenantId");
@@ -55,54 +49,14 @@ public class Client {
         this.status = ClientStatus.ACTIVE;
     }
 
-    public static Client create(UUID tenantId,
-                                String name,
-                                String industry,
-                                String website,
-                                String phone,
-                                Address address,
-                                ClientType type,
-                                Source source) {
+    public static Client create(UUID tenantId, String name, String industry, String website, String phone, Address address, ClientType type, Source source) {
 
-        return new Client(
-                null,
-                tenantId,
-                name,
-                industry,
-                website,
-                phone,
-                address,
-                type,
-                source
-        );
+        return new Client(null, tenantId, name, industry, website, phone, address, type, source);
     }
 
-    public static Client rehydrate(
-            UUID id,
-            UUID tenantId,
-            String name,
-            String industry,
-            String website,
-            String phone,
-            Address address,
-            ClientStatus status,
-            ClientType type,
-            Source source,
-            LocalDateTime createdAt,
-            LocalDateTime updatedAt
-    ) {
+    public static Client rehydrate(UUID id, UUID tenantId, String name, String industry, String website, String phone, Address address, ClientStatus status, ClientType type, Source source, LocalDateTime createdAt, LocalDateTime updatedAt) {
 
-        Client client = new Client(
-                id,
-                tenantId,
-                name,
-                industry,
-                website,
-                phone,
-                address,
-                type,
-                source
-        );
+        Client client = new Client(id, tenantId, name, industry, website, phone, address, type, source);
 
         client.status = requireNonNull(status, "status");
         client.createdAt = requireNonNull(createdAt, "createdAt");
@@ -111,11 +65,7 @@ public class Client {
         return client;
     }
 
-    public void updateProfile(String name,
-                              String industry,
-                              String website,
-                              String phone,
-                              Address address) {
+    public void updateProfile(String name, String industry, String website, String phone, Address address) {
 
         ensureNotArchived();
 
@@ -148,6 +98,7 @@ public class Client {
         touch();
     }
 
+
     private void ensureNotArchived() {
         if (this.status == ClientStatus.ARCHIVED) {
             throw new BusinessRuleViolationException("Cannot modify a archived client");
@@ -164,6 +115,8 @@ public class Client {
     private static <T> T requireNonNull(T value, String field) {
         return Objects.requireNonNull(value, field + " cannot be null");
     }
+
+
 
     private void touch() {
         this.updatedAt = LocalDateTime.now();

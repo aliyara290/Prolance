@@ -3,6 +3,7 @@ package com.dxc.crmservice.application.mapper;
 import com.dxc.crmservice.application.dto.opportunity.req.CreateOpportunityRequest;
 import com.dxc.crmservice.application.dto.opportunity.res.OpportunityResponse;
 import com.dxc.crmservice.domain.model.aggregate.Opportunity;
+import com.dxc.crmservice.domain.model.valueobject.Stage;
 import org.mapstruct.Mapper;
 
 import java.util.UUID;
@@ -23,7 +24,7 @@ public interface OpportunityMapper {
                 budget,
                 request.expectedRevenue() != null ? request.expectedRevenue() : null, // expectedRevenue
                 request.probability() > 0 ? request.probability() : 0,  // probability
-                request.stage(),
+                request.stage() != null ? request.stage() : Stage.PROPOSAL,
                 request.priority()
         );
     }

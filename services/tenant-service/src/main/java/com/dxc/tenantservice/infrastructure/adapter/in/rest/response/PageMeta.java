@@ -1,15 +1,13 @@
 package com.dxc.tenantservice.infrastructure.adapter.in.rest.response;
 
 import lombok.Builder;
-import lombok.Getter;
 
-@Getter
 @Builder
-public class PageMeta {
-    private int page;
-    private int size;
-    private long totalElements;
-    private int totalPages;
-    private boolean hasNext;
-    private boolean hasPrevious;
-}
+public record PageMeta(
+        int page,
+        int size,
+        long totalElements,
+        int totalPages,
+        boolean hasNext,
+        boolean hasPrevious
+) {}

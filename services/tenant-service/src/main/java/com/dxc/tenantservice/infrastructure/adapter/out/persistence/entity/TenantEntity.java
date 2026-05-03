@@ -1,20 +1,19 @@
 package com.dxc.tenantservice.infrastructure.adapter.out.persistence.entity;
 
-import com.dxc.tenantservice.domain.model.enums.TenantIndustry;
-import com.dxc.tenantservice.domain.model.enums.TenantStatus;
+import com.dxc.tenantservice.domain.model.valueobject.TenantIndustry;
+import com.dxc.tenantservice.domain.model.valueobject.TenantStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -24,6 +23,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE tenants SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class TenantEntity extends BaseAuditingEntity {
     @Id
     private UUID id;
@@ -53,10 +54,11 @@ public class TenantEntity extends BaseAuditingEntity {
     private TenantIndustry industry;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private TenantStatus status;
 
     @Column(name = "deleted_at")
-    private Instant deletedAt;
+    private LocalDateTime deletedAt;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "settings_id")

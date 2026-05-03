@@ -1,4 +1,4 @@
-package com.dxc.tenantservice.domain.model.enums;
+package com.dxc.tenantservice.domain.model.valueobject;
 
 public enum PlanType {
     FREE,

@@ -16,7 +16,7 @@ import com.dxc.tenantservice.domain.model.tenant.Tenant;
 import com.dxc.tenantservice.domain.model.tenant.TenantSettings;
 import com.dxc.tenantservice.domain.model.tenant.TenantUser;
 import com.dxc.tenantservice.domain.model.tenant.UserPreference;
-import com.dxc.tenantservice.domain.model.enums.UserRole;
+import com.dxc.tenantservice.domain.model.valueobject.UserRole;
 import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserReqDTO;
 import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserResDTO;
 import com.dxc.tenantservice.infrastructure.config.TenantContextHolder;
@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

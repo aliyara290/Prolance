@@ -4,6 +4,8 @@ import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.Stage;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +18,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE opportunities SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class OpportunityEntity extends BaseAuditingEntity {
     @Id
     private UUID id;
@@ -60,4 +64,7 @@ public class OpportunityEntity extends BaseAuditingEntity {
 
     @Column(name = "lost_reason")
     private String lostReason;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }

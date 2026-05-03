@@ -34,6 +34,7 @@ public class Lead {
     private LocalDateTime lastActivityAt;
     private String unqualifiedReason;
 
+    private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -151,13 +152,6 @@ public class Lead {
         touch();
     }
 
-    public void markAsQualified() {
-        ensureStatus(LeadStatus.QUALIFIED);
-
-        this.status = LeadStatus.QUALIFIED;
-        touch();
-    }
-
     public void markAsUnqualified(String reason) {
         ensureNotClosed();
 
@@ -182,6 +176,7 @@ public class Lead {
         this.contactId = requireNonNull(contactId, "contactId");
         touch();
     }
+
 
     private void ensureNotClosed() {
         if (status == LeadStatus.QUALIFIED || status == LeadStatus.UNQUALIFIED) {

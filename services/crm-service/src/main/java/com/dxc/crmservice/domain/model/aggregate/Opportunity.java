@@ -40,6 +40,7 @@ public class Opportunity {
     private Priority priority;
     private String lostReason;
 
+    private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

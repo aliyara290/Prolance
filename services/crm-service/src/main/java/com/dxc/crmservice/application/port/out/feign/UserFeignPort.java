@@ -5,6 +5,7 @@ import com.dxc.crmservice.infrastructure.adapter.out.feign.dto.UserResponseDTO;
 
 import java.util.UUID;
 
-public interface FeignPort {
+public interface UserFeignPort {
     ResponseWrapper<UserResponseDTO> getUser(UUID id);
 }
+

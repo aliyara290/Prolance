@@ -1,6 +1,7 @@
 package com.dxc.crmservice.infrastructure.adapter.out.persistence.impl;
 
 import com.dxc.crmservice.application.port.out.ClientRepository;
+import com.dxc.crmservice.domain.exception.RecordNotFoundException;
 import com.dxc.crmservice.domain.model.aggregate.Client;
 import com.dxc.crmservice.infrastructure.adapter.out.persistence.entity.ClientEntity;
 import com.dxc.crmservice.infrastructure.adapter.out.persistence.jpa.ClientRepositoryJpa;
@@ -45,8 +46,9 @@ public class ClientRepositoryAdapter implements ClientRepository {
 
     @Override
     public void delete(UUID id, UUID tenantId) {
-        clientRepositoryJpa.findByIdAndTenantId(id, tenantId)
-                .ifPresent(clientRepositoryJpa::delete);
+        log.info("Deleting client with id: {} and tenantId: {}", id, tenantId);
+        ClientEntity client = clientRepositoryJpa.findByIdAndTenantId(id, tenantId).orElseThrow( () -> new RecordNotFoundException("Client not found"));
+        clientRepositoryJpa.delete(client);
     }
 
     @Override

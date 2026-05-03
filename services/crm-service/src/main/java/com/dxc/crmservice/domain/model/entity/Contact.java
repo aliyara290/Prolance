@@ -25,6 +25,7 @@ public class Contact {
     private boolean primary;
     private LocalDateTime lastContactedAt;
     private String notes;
+    private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

@@ -1,10 +1,12 @@
-package com.dxc.tenantservice.domain.model.valueobjects;
+package com.dxc.tenantservice.domain.model.valueobject;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import static java.util.Objects.hash;
 
 @Getter
+@Setter
 public class Address {
 
     private final String street;

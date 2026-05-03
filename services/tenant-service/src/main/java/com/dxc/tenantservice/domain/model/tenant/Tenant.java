@@ -2,12 +2,13 @@ package com.dxc.tenantservice.domain.model.tenant;
 
 import com.dxc.tenantservice.domain.exception.TenantStateException;
 import com.dxc.tenantservice.domain.exception.TenantValidationException;
-import com.dxc.tenantservice.domain.model.enums.TenantIndustry;
-import com.dxc.tenantservice.domain.model.enums.TenantStatus;
-import com.dxc.tenantservice.domain.model.valueobjects.Address;
+import com.dxc.tenantservice.domain.model.valueobject.TenantIndustry;
+import com.dxc.tenantservice.domain.model.valueobject.TenantStatus;
+import com.dxc.tenantservice.domain.model.valueobject.Address;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -30,6 +31,8 @@ public class Tenant {
     private TenantStatus status;
 
     private TenantSettings tenantSettings;
+
+    private LocalDateTime deleted_at;
 
     public Tenant(
             UUID id,
@@ -59,7 +62,7 @@ public class Tenant {
         this.logo = logo;
         this.address = address;
         this.industry = industry;
-        this.status = status != null ? status : TenantStatus.PENDING;
+        this.status = status != null ? status : TenantStatus.ACTIVE;
         this.tenantSettings = tenantSettings;
     }
 

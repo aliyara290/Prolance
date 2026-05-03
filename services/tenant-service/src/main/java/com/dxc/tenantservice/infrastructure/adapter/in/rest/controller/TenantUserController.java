@@ -1,4 +1,4 @@
-package com.dxc.tenantservice.infrastructure.adapter.in.rest;
+package com.dxc.tenantservice.infrastructure.adapter.in.rest.controller;
 
 import com.dxc.tenantservice.application.dto.user.req.ChangeUserRoleReqDTO;
 import com.dxc.tenantservice.application.dto.user.req.CreateUserReqDTO;
@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class TenantUserController {
 
     private final TenantUserUseCase tenantUserUseCase;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER')")
     @PostMapping
     public ResponseEntity<ApiResponse<UserResDTO>> createUser(
             @Valid @RequestBody CreateUserReqDTO request
@@ -38,6 +40,7 @@ public class TenantUserController {
                 .body(ApiResponse.success(response));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER')")
     @PutMapping("/{userId}")
     public ResponseEntity<ApiResponse<UserResDTO>> updateUser(
             @PathVariable("userId") UUID userId,
@@ -48,6 +51,7 @@ public class TenantUserController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER')")
     @DeleteMapping("/{userId}/deactivate")
     public ResponseEntity<ApiResponse<Void>> deactivateUser(@PathVariable("userId") UUID userId) {
         log.info("DELETE /api/v1/tenants/users/{} — deactivating user", userId);
@@ -55,6 +59,7 @@ public class TenantUserController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER')")
     @PostMapping("{userId}/activate")
     public ResponseEntity<ApiResponse<Void>> reactivateUser(@PathVariable("userId") UUID userId) {
         log.info("POST /api/v1/tenants/users/{} — reactivating user", userId);
@@ -62,6 +67,7 @@ public class TenantUserController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+//    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER', 'MEMBER', 'VIEWER', 'ACCOUNTANT', 'SALES')")
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<UserResDTO>> getUser(@PathVariable("userId") UUID userId) {
         log.info("GET /api/v1/tenants/users/{}", userId);
@@ -69,6 +75,7 @@ public class TenantUserController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER', 'VIEWER')")
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserResDTO>>> getAllUsers(Pageable pageable) {
         log.info("GET /api/v1/tenants/users");
@@ -85,6 +92,7 @@ public class TenantUserController {
         return ResponseEntity.ok(ApiResponse.success(users.getContent(), meta));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER')")
     @PostMapping("/{userId}/roles")
     public ResponseEntity<ApiResponse<UserResDTO>> addUserRole(
             @PathVariable("userId") UUID userId,
@@ -95,6 +103,7 @@ public class TenantUserController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER')")
     @DeleteMapping("/{userId}/roles")
     public ResponseEntity<ApiResponse<UserResDTO>> removeUserRole(
             @PathVariable("userId") UUID userId,

@@ -1,11 +1,11 @@
-package com.dxc.tenantservice.domain.model.record;
+package com.dxc.tenantservice.domain.model.valueobject;
 
-import com.dxc.tenantservice.domain.model.enums.PlanType;
 
 public record PlanDefaults(
         int maxUsers,
         int maxProjects,
         int maxTasksPerProject
+
 ) {
     public static PlanDefaults from(PlanType plan) {
         return switch (plan) {
