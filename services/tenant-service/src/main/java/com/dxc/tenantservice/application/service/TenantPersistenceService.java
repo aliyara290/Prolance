@@ -30,7 +30,7 @@ public class TenantPersistenceService {
 
         try {
             // Persist Tenant
-            Tenant tenant = Tenant.create(tenantId, reqDTO.getName(), reqDTO.getEmail(), reqDTO.getIndustry());
+            Tenant tenant = Tenant.create(tenantId, reqDTO.getName(), reqDTO.getCompanyEmail(), reqDTO.getIndustry());
             tenant.assignKeycloakGroup(tenantGroupId);
             TenantSettings tenantSettings = TenantSettings.createDefault(tenantId);
             tenant.addSettings(tenantSettings);

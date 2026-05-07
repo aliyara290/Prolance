@@ -154,8 +154,8 @@ services:
 
     ports:
       - "8079:8080"
-    #    volumes:
-    #      - ./api-gateway/themes:/opt/keycloak/themes
+    volumes:
+      - ../keycloak/themes:/opt/keycloak/themes
     depends_on:
       keycloak-db:
         condition: service_healthy
