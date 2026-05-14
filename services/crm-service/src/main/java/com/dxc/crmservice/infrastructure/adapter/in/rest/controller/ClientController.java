@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,24 +26,28 @@ public class ClientController {
     private final ClientUseCase clientUseCase;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'SALES')")
     public ResponseEntity<ApiResponse<ClientResponse>> createClient(@Valid @RequestBody CreateClientRequest request) {
         ClientResponse clientResponse = clientUseCase.createClient(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(clientResponse));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SALES')")
     public ResponseEntity<ApiResponse<ClientResponse>> updateClient(@PathVariable("id") UUID id, @Valid @RequestBody UpdateClientRequest request) {
         ClientResponse clientResponse = clientUseCase.updateClient(id, request);
         return ResponseEntity.ok(ApiResponse.success(clientResponse));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SALES', 'USER')")
     public ResponseEntity<ApiResponse<ClientResponse>> getClient(@PathVariable("id") UUID id) {
         ClientResponse clientResponse = clientUseCase.getClient(id);
         return ResponseEntity.ok(ApiResponse.success(clientResponse));
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'SALES', 'USER')")
     public ResponseEntity<ApiResponse<List<ClientResponse>>> getAllClients(Pageable pageable) {
         Page<ClientResponse> clients = clientUseCase.getAllClients(pageable);
         PageMeta meta = PageMeta.builder()
@@ -58,6 +63,7 @@ public class ClientController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteClient(@PathVariable("id") UUID id) {
         clientUseCase.deleteClient(id);
         return ResponseEntity.ok().body(ApiResponse.success(null));
