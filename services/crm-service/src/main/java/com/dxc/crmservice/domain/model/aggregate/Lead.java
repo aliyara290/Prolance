@@ -3,6 +3,7 @@ package com.dxc.crmservice.domain.model.aggregate;
 import com.dxc.crmservice.domain.exception.BusinessRuleViolationException;
 import com.dxc.crmservice.domain.exception.InvalidStateTransitionException;
 import com.dxc.crmservice.domain.exception.ValidationException;
+import com.dxc.crmservice.domain.model.valueobject.Address;
 import com.dxc.crmservice.domain.model.valueobject.LeadStatus;
 import com.dxc.crmservice.domain.model.valueobject.Priority;
 import com.dxc.crmservice.domain.model.valueobject.Source;
@@ -34,7 +35,18 @@ public class Lead {
     private LocalDateTime lastActivityAt;
     private String unqualifiedReason;
 
-    private LocalDateTime deletedAt;
+    private String phone;
+    private String industry;
+    private Double annualRevenue;
+    private String company;
+    private String email;
+    private String website;
+    private Integer numberOfEmployees;
+    private Address address;
+
+    private UUID createdBy;
+    private UUID updatedBy;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -43,7 +55,16 @@ public class Lead {
             String title,
             String description,
             Source source,
-            Priority priority
+            Priority priority,
+            String phone,
+            String industry,
+            Double annualRevenue,
+            String company,
+            String email,
+            String website,
+            Integer numberOfEmployees,
+            Address address,
+            UUID createdBy
     ) {
 
         this.id = id == null ? UUID.randomUUID() : id;
@@ -55,17 +76,30 @@ public class Lead {
         this.status = LeadStatus.NEW;
         this.score = 0;
 
-        updateDetails(title, description, source, priority);
+        this.createdBy = createdBy;
+        this.updatedBy = createdBy;
+
+        updateDetails(title, description, source, priority, phone, industry, annualRevenue, company, email, website, numberOfEmployees, address);
     }
 
     public static Lead create(UUID tenantId,
             String title,
             String description,
             Source source,
-            Priority priority
+            Priority priority,
+            String phone,
+            String industry,
+            Double annualRevenue,
+            String company,
+            String email,
+            String website,
+            Integer numberOfEmployees,
+            Address address,
+            UUID createdBy
     ) {
 
-        return new Lead(null, tenantId, title, description, source, priority);
+        return new Lead(null, tenantId, title, description, source, priority,
+                phone, industry, annualRevenue, company, email, website, numberOfEmployees, address, createdBy);
     }
 
     public static Lead rehydrate(
@@ -83,10 +117,21 @@ public class Lead {
             LocalDateTime firstContactedAt,
             LocalDateTime lastActivityAt,
             String unqualifiedReason,
+            String phone,
+            String industry,
+            Double annualRevenue,
+            String company,
+            String email,
+            String website,
+            Integer numberOfEmployees,
+            Address address,
+            UUID createdBy,
+            UUID updatedBy,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
 
-        Lead lead = new Lead(id, tenantId, title, description, source, priority);
+        Lead lead = new Lead(id, tenantId, title, description, source, priority,
+                phone, industry, annualRevenue, company, email, website, numberOfEmployees, address, createdBy);
 
         lead.clientId = clientId;
         lead.contactId = contactId;
@@ -96,6 +141,7 @@ public class Lead {
         lead.firstContactedAt = firstContactedAt;
         lead.lastActivityAt = lastActivityAt;
         lead.unqualifiedReason = unqualifiedReason;
+        lead.updatedBy = updatedBy;
         lead.createdAt = requireNonNull(createdAt, "createdAt");
         lead.updatedAt = requireNonNull(updatedAt, "updatedAt");
 
@@ -105,7 +151,15 @@ public class Lead {
     public void updateDetails(String title,
             String description,
             Source source,
-            Priority priority) {
+            Priority priority,
+            String phone,
+            String industry,
+            Double annualRevenue,
+            String company,
+            String email,
+            String website,
+            Integer numberOfEmployees,
+            Address address) {
 
         ensureNotClosed();
 
@@ -113,6 +167,14 @@ public class Lead {
         this.description = description;
         this.source = source;
         this.priority = priority;
+        this.phone = phone;
+        this.industry = industry;
+        this.annualRevenue = annualRevenue;
+        this.company = company;
+        this.email = email;
+        this.website = website;
+        this.numberOfEmployees = numberOfEmployees;
+        this.address = address;
 
         touch();
     }
@@ -175,6 +237,10 @@ public class Lead {
         ensureNotClosed();
         this.contactId = requireNonNull(contactId, "contactId");
         touch();
+    }
+
+    public void createdBy(UUID createdBy) {
+        this.createdBy = requireNonNull(createdBy, "createdBy");
     }
 
 

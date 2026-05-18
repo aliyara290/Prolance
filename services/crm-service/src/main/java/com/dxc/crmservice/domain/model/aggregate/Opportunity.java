@@ -3,7 +3,9 @@ package com.dxc.crmservice.domain.model.aggregate;
 import com.dxc.crmservice.domain.exception.BusinessRuleViolationException;
 import com.dxc.crmservice.domain.exception.InvalidStateTransitionException;
 import com.dxc.crmservice.domain.exception.ValidationException;
+import com.dxc.crmservice.domain.model.valueobject.OpportunityType;
 import com.dxc.crmservice.domain.model.valueobject.Priority;
+import com.dxc.crmservice.domain.model.valueobject.Source;
 import com.dxc.crmservice.domain.model.valueobject.Stage;
 import lombok.Getter;
 
@@ -23,7 +25,7 @@ public class Opportunity {
     private String description;
 
     private Double estimatedBudget;
-        private Double expectedRevenue;
+    private Double expectedRevenue;
 
     private int probability;
 
@@ -40,11 +42,19 @@ public class Opportunity {
     private Priority priority;
     private String lostReason;
 
+    private OpportunityType type;
+    private Source source;
+
+    private UUID createdBy;
+    private UUID updatedBy;
+
     private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private Opportunity(UUID id, UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Stage stage, Priority priority) {
+
+    private Opportunity(UUID id, UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Stage stage, Priority priority,
+                        OpportunityType type, Source source, UUID createdBy) {
 
         this.id = id == null ? UUID.randomUUID() : id;
         this.tenantId = requireNonNull(tenantId, "tenantId");
@@ -56,18 +66,30 @@ public class Opportunity {
         this.stage = requireNonNull(stage, "stage");
         this.priority = priority;
 
+        this.type = type;
+        this.source = source;
+
+        this.createdBy = createdBy;
+        this.updatedBy = createdBy;
+
         updateDetails(title, description, estimatedBudget, expectedRevenue, probability, null, null);
     }
 
     // factory
-    public static Opportunity create(UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Stage stage, Priority priority) {
+    public static Opportunity create(UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Stage stage, Priority priority,
+                                     OpportunityType type, Source source, UUID createdBy) {
 
-        return new Opportunity(null, tenantId, clientId, title, description, estimatedBudget, expectedRevenue, probability, stage, priority);
+        return new Opportunity(null, tenantId, clientId, title, description, estimatedBudget, expectedRevenue, probability, stage, priority,
+                type, source, createdBy);
     }
 
-    public static Opportunity rehydrate(UUID id, UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Priority priority, LocalDate expectedStartDate, LocalDate expectedEndDate, LocalDateTime closingDate, Stage stage, LocalDateTime lastActivityAt, LocalDateTime nextFollowUpAt, String lostReason, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public static Opportunity rehydrate(UUID id, UUID tenantId, UUID clientId, String title, String description, Double estimatedBudget, Double expectedRevenue, int probability, Priority priority, LocalDate expectedStartDate, LocalDate expectedEndDate, LocalDateTime closingDate, Stage stage, LocalDateTime lastActivityAt, LocalDateTime nextFollowUpAt, String lostReason,
+                                        OpportunityType type, Source source,
+                                        UUID createdBy, UUID updatedBy,
+                                        LocalDateTime createdAt, LocalDateTime updatedAt) {
 
-        Opportunity opp = new Opportunity(id, tenantId, clientId, title, description, estimatedBudget, expectedRevenue, probability, stage, priority);
+        Opportunity opp = new Opportunity(id, tenantId, clientId, title, description, estimatedBudget, expectedRevenue, probability, stage, priority,
+                type, source, createdBy);
 
         opp.expectedStartDate = expectedStartDate;
         opp.expectedEndDate = expectedEndDate;
@@ -77,6 +99,7 @@ public class Opportunity {
         opp.nextFollowUpAt = nextFollowUpAt;
         opp.lostReason = lostReason;
 
+        opp.updatedBy = updatedBy;
         opp.createdAt = requireNonNull(createdAt, "createdAt");
         opp.updatedAt = requireNonNull(updatedAt, "updatedAt");
 

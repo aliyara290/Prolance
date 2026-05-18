@@ -1,6 +1,8 @@
 package com.dxc.crmservice.application.dto.opportunity.req;
 
+import com.dxc.crmservice.domain.model.valueobject.OpportunityType;
 import com.dxc.crmservice.domain.model.valueobject.Priority;
+import com.dxc.crmservice.domain.model.valueobject.Source;
 import com.dxc.crmservice.domain.model.valueobject.Stage;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
@@ -22,5 +24,9 @@ public record UpdateOpportunityRequest(
 
     LocalDateTime closingDate,
 
-    UUID clientId
+    UUID clientId,
+
+    OpportunityType type,
+
+    Source source
 ) {}

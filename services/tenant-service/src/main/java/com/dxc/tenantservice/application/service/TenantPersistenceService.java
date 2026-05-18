@@ -8,6 +8,7 @@ import com.dxc.tenantservice.domain.model.tenant.Tenant;
 import com.dxc.tenantservice.domain.model.tenant.TenantSettings;
 import com.dxc.tenantservice.domain.model.tenant.TenantUser;
 import com.dxc.tenantservice.domain.model.tenant.UserPreference;
+import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserResDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,8 @@ public class TenantPersistenceService {
     private final TenantUserRepository tenantUserRepository;
 
     @Transactional
-    protected void persist(UUID tenantId, UUID tenantGroupId, UUID roleGroupId, RegisterTenantReqDTO reqDTO, String keycloakUserIdStr) {
-        UUID keycloakUserId = UUID.fromString(keycloakUserIdStr);
+    protected void persist(UUID tenantId, UUID tenantGroupId, UUID roleGroupId, RegisterTenantReqDTO reqDTO, KeycloakUserResDTO keycloakUserResDTO) {
+        UUID keycloakUserId = keycloakUserResDTO.getId();
 
         try {
             // Persist Tenant
@@ -37,7 +38,7 @@ public class TenantPersistenceService {
             tenantRepository.save(tenant);
 
             // Persist Tenant Admin user
-            TenantUser user = TenantUser.create(tenantId, reqDTO.getEmail(), reqDTO.getFirstName(), reqDTO.getLastName());
+            TenantUser user = TenantUser.create(tenantId, keycloakUserResDTO.getEmail(), keycloakUserResDTO.getUsername(), keycloakUserResDTO.getFirstName(), keycloakUserResDTO.getLastName());
             user.assignKeycloakUser(keycloakUserId);
             user.addRoleGroup(roleGroupId);
             UserPreference userPreference = UserPreference.createDefault(tenantId, user.getId(), tenantSettings);

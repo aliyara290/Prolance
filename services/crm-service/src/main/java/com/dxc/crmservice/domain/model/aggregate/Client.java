@@ -6,6 +6,7 @@ import com.dxc.crmservice.domain.exception.ValidationException;
 import com.dxc.crmservice.domain.model.valueobject.Address;
 import com.dxc.crmservice.domain.model.valueobject.ClientStatus;
 import com.dxc.crmservice.domain.model.valueobject.ClientType;
+import com.dxc.crmservice.domain.model.valueobject.Ownership;
 import com.dxc.crmservice.domain.model.valueobject.Source;
 import lombok.Getter;
 
@@ -28,12 +29,23 @@ public class Client {
     private final ClientType type;
     private final Source source;
 
+    private Double annualRevenue;
+    private String fax;
+    private Ownership ownership;
+    private String sicCode;
+    private String description;
+
+    private UUID createdBy;
+    private UUID updatedBy;
+
     private LocalDateTime deletedAt;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private Client(UUID id, UUID tenantId, String name, String industry, String website, String phone, Address address, ClientType type, Source source) {
+    private Client(UUID id, UUID tenantId, String name, String industry, String website, String phone, Address address, ClientType type, Source source,
+                   Double annualRevenue, String fax, Ownership ownership, String sicCode, String description,
+                   UUID createdBy) {
 
         this.id = id == null ? UUID.randomUUID() : id;
         this.tenantId = requireNonNull(tenantId, "tenantId");
@@ -44,28 +56,40 @@ public class Client {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = this.createdAt;
 
-        updateProfile(name, industry, website, phone, address);
+        this.createdBy = createdBy;
+        this.updatedBy = createdBy;
+
+        updateProfile(name, industry, website, phone, address, annualRevenue, fax, ownership, sicCode, description);
 
         this.status = ClientStatus.ACTIVE;
     }
 
-    public static Client create(UUID tenantId, String name, String industry, String website, String phone, Address address, ClientType type, Source source) {
+    public static Client create(UUID tenantId, String name, String industry, String website, String phone, Address address, ClientType type, Source source,
+                                Double annualRevenue, String fax, Ownership ownership, String sicCode, String description,
+                                UUID createdBy) {
 
-        return new Client(null, tenantId, name, industry, website, phone, address, type, source);
+        return new Client(null, tenantId, name, industry, website, phone, address, type, source,
+                annualRevenue, fax, ownership, sicCode, description, createdBy);
     }
 
-    public static Client rehydrate(UUID id, UUID tenantId, String name, String industry, String website, String phone, Address address, ClientStatus status, ClientType type, Source source, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public static Client rehydrate(UUID id, UUID tenantId, String name, String industry, String website, String phone, Address address, ClientStatus status, ClientType type, Source source,
+                                   Double annualRevenue, String fax, Ownership ownership, String sicCode, String description,
+                                   UUID createdBy, UUID updatedBy,
+                                   LocalDateTime createdAt, LocalDateTime updatedAt) {
 
-        Client client = new Client(id, tenantId, name, industry, website, phone, address, type, source);
+        Client client = new Client(id, tenantId, name, industry, website, phone, address, type, source,
+                annualRevenue, fax, ownership, sicCode, description, createdBy);
 
         client.status = requireNonNull(status, "status");
+        client.updatedBy = updatedBy;
         client.createdAt = requireNonNull(createdAt, "createdAt");
         client.updatedAt = requireNonNull(updatedAt, "updatedAt");
 
         return client;
     }
 
-    public void updateProfile(String name, String industry, String website, String phone, Address address) {
+    public void updateProfile(String name, String industry, String website, String phone, Address address,
+                              Double annualRevenue, String fax, Ownership ownership, String sicCode, String description) {
 
         ensureNotArchived();
 
@@ -74,6 +98,11 @@ public class Client {
         this.website = website;
         this.phone = phone;
         this.address = address;
+        this.annualRevenue = annualRevenue;
+        this.fax = fax;
+        this.ownership = ownership;
+        this.sicCode = sicCode;
+        this.description = description;
 
         touch();
     }

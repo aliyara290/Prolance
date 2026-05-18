@@ -2,6 +2,8 @@ package com.dxc.tenantservice.infrastructure.adapter.in.rest.controller;
 
 import com.dxc.tenantservice.application.dto.tenant.req.RegisterTenantReqDTO;
 import com.dxc.tenantservice.application.dto.tenant.req.UpdateTenantReqDTO;
+import com.dxc.tenantservice.application.dto.tenant.res.RegisterTenantResDTO;
+import com.dxc.tenantservice.application.dto.tenant.res.TenantRegistrationResponseDTO;
 import com.dxc.tenantservice.application.dto.tenant.res.TenantResDTO;
 import com.dxc.tenantservice.application.dto.tenant.res.TenantStatusRespDTO;
 import com.dxc.tenantservice.application.port.in.TenantUseCase;
@@ -24,10 +26,10 @@ public class TenantController {
     private final TenantUseCase tenantUseCase;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<String>> registerTenant(
+    public ResponseEntity<ApiResponse<TenantRegistrationResponseDTO>> registerTenant(
             @Valid @RequestBody RegisterTenantReqDTO request
     ) {
-        String response = tenantUseCase.registerTenant(request);
+        TenantRegistrationResponseDTO response = tenantUseCase.registerTenant(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response));
@@ -36,6 +38,7 @@ public class TenantController {
     @GetMapping("/{tenantId}/status")
     public ResponseEntity<ApiResponse<TenantStatusRespDTO>> getTenantStatus(@PathVariable("tenantId") UUID tenantId) {
         TenantStatusRespDTO response = tenantUseCase.getTenantStatus(tenantId);
+        log.info("Tenant status 101010101: {}", response.toString());
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

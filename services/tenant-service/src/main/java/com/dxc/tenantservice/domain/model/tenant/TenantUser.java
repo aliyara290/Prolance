@@ -4,6 +4,7 @@ import com.dxc.tenantservice.domain.exception.UserStateException;
 import com.dxc.tenantservice.domain.exception.UserValidationException;
 import com.dxc.tenantservice.domain.model.valueobject.UserStatus;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -12,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Getter
+@Slf4j
 public class TenantUser {
 
     private final UUID id;
@@ -20,6 +22,7 @@ public class TenantUser {
     private UUID keycloakUserId;
     private final Set<UUID>  keycloakRoleGroupIds;
 
+    private String username;
     private String email;
     private String firstName;
     private String lastName;
@@ -39,6 +42,7 @@ public class TenantUser {
             UUID keycloakUserId,
             Set<UUID> keycloakRoleGroupIds,
             String email,
+            String username,
             String firstName,
             String lastName,
             String jobTitle,
@@ -53,6 +57,7 @@ public class TenantUser {
         this.tenantId = tenantId;
         this.keycloakUserId = keycloakUserId;
         this.email = email;
+        this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.jobTitle = jobTitle;
@@ -66,15 +71,18 @@ public class TenantUser {
     public static TenantUser create(
             UUID tenantId,
             String email,
+            String username,
             String firstName,
             String lastName
     ) {
+        log.info("user email |||||-----: {}", email);
         return new TenantUser(
                 UUID.randomUUID(),
                 tenantId,
                 null, // keycloakUserId
                 null, // keycloakRoleGroupIds
                 email,
+                username,
                 firstName,
                 lastName,
                 null, // jobTitle

@@ -30,6 +30,7 @@ import com.dxc.crmservice.domain.model.valueobject.LeadStatus;
 import com.dxc.crmservice.domain.model.valueobject.Stage;
 import com.dxc.crmservice.infrastructure.adapter.out.feign.dto.ResponseWrapper;
 import com.dxc.crmservice.infrastructure.adapter.out.feign.dto.UserResponseDTO;
+import com.dxc.crmservice.infrastructure.config.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -87,8 +88,9 @@ public class LeadService implements LeadUseCase {
                         Stage.PROSPECTING, // Default stage
                         null,
                         null,
-
-                        lead.getPriority()
+                        lead.getPriority(),
+                        null, // type
+                        lead.getSource() // source
                 );
 
         return opportunityUseCase.createOpportunity(oppReq);
@@ -144,7 +146,7 @@ public class LeadService implements LeadUseCase {
             }
             ResponseWrapper<UserResponseDTO> user = userFeignPort.getUser(request.assignedTo());
             lead.assignTo(user.data().id());
-
+            lead.createdBy(TenantContextHolder.getUserId());
             leadRepository.save(lead);
             return leadMapper.toResponse(lead);
         } catch (Exception e) {
@@ -159,13 +161,18 @@ public class LeadService implements LeadUseCase {
             CreateContactRequest contactRequest = CreateContactRequest.builder()
                     .email(request.email())
                     .phone(request.phone())
-                    .notes(request.email())
+                    .notes(request.notes())
                     .firstName(request.firstName())
                     .lastName(request.lastName())
                     .role(request.role())
                     .influenceLevel(request.influenceLevel())
                     .primary(request.primary())
                     .clientId(clientId)
+                    .department(request.department())
+                    .dateOfBirth(request.dateOfBirth())
+                    .secondaryEmail(request.secondaryEmail())
+                    .address(request.address())
+                    .description(request.description())
                     .build();
 
             return contactUseCase.createContact(contactRequest);
@@ -198,7 +205,15 @@ public class LeadService implements LeadUseCase {
                     request.title() != null ? request.title() : lead.getTitle(),
                     request.description() != null ? request.description() : lead.getDescription(),
                     request.source() != null ? request.source() : lead.getSource(),
-                    request.priority() != null ? request.priority() : lead.getPriority()
+                    request.priority() != null ? request.priority() : lead.getPriority(),
+                    request.phone() != null ? request.phone() : lead.getPhone(),
+                    request.industry() != null ? request.industry() : lead.getIndustry(),
+                    request.annualRevenue() != null ? request.annualRevenue() : lead.getAnnualRevenue(),
+                    request.company() != null ? request.company() : lead.getCompany(),
+                    request.email() != null ? request.email() : lead.getEmail(),
+                    request.website() != null ? request.website() : lead.getWebsite(),
+                    request.numberOfEmployees() != null ? request.numberOfEmployees() : lead.getNumberOfEmployees(),
+                    request.address() != null ? leadMapper.toAddress(request.address()) : lead.getAddress()
             );
 
             if (request.clientId() != null && !request.clientId().equals(lead.getClientId())) {

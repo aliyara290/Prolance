@@ -30,7 +30,7 @@ public class TenantUserController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER')")
     @PostMapping
-    public ResponseEntity<ApiResponse<UserResDTO>> createUser(
+    public ResponseEntity<ApiResponse<UserResDTO>> inviteUser(
             @Valid @RequestBody CreateUserReqDTO request
     ) {
         log.info("POST /api/v1/tenants/users — creating user: email={}", request.getEmail());
@@ -72,6 +72,14 @@ public class TenantUserController {
     public ResponseEntity<ApiResponse<UserResDTO>> getUser(@PathVariable("userId") UUID userId) {
         log.info("GET /api/v1/tenants/users/{}", userId);
         UserResDTO response = tenantUserUseCase.getUser(userId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER', 'VIEWER', 'ACCOUNTANT', 'SALES')")
+    @GetMapping("/byKeycloakId")
+    public ResponseEntity<ApiResponse<UserResDTO>> getUserByKeycloakId() {
+        UserResDTO response = tenantUserUseCase.getUserByKeycloakId();
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

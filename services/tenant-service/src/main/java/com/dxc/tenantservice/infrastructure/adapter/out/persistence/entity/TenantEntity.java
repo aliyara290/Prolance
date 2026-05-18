@@ -51,6 +51,8 @@ public class TenantEntity extends BaseAuditingEntity {
     @Embedded
     private AddressEmbeddable address;
 
+    @Column(name = "industry", nullable = false)
+    @Enumerated(EnumType.STRING)
     private TenantIndustry industry;
 
     @Column(nullable = false)

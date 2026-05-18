@@ -3,6 +3,7 @@ package com.dxc.crmservice.infrastructure.adapter.out.feign;
 import com.dxc.crmservice.application.port.out.feign.TenantFeignPort;
 import com.dxc.crmservice.domain.exception.RecordNotFoundException;
 import com.dxc.crmservice.infrastructure.adapter.out.feign.client.TenantClient;
+import com.dxc.crmservice.infrastructure.adapter.out.feign.dto.ResponseWrapper;
 import com.dxc.crmservice.infrastructure.adapter.out.feign.dto.TenantStatusResponseDTO;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +24,9 @@ public class TenantClientAdapter implements TenantFeignPort {
     public boolean isTenantActive(UUID id) {
         try {
         log.info("Get tenant status");
-        TenantStatusResponseDTO response = tenantClient.getTenantStatus(id);
-        log.info("Tenant status: {}", response);
+        ResponseWrapper<TenantStatusResponseDTO> wrapper = tenantClient.getTenantStatus(id);
+        TenantStatusResponseDTO response = wrapper.data();
+        log.info("Tenant status 88888-----: {}", response);
         return response.active()
                 && !response.deleted()
                 && "ACTIVE".equals(response.status());

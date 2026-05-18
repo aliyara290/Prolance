@@ -58,7 +58,12 @@ public class ClientService implements ClientUseCase {
                     request.industry() != null ? request.industry() : client.getIndustry(),
                     request.website() != null ? request.website() : client.getWebsite(),
                     request.phone() != null ? request.phone() : client.getPhone(),
-                    request.address() != null ? clientMapper.toAddress(request.address()) : client.getAddress()
+                    request.address() != null ? clientMapper.toAddress(request.address()) : client.getAddress(),
+                    request.annualRevenue() != null ? request.annualRevenue() : client.getAnnualRevenue(),
+                    request.fax() != null ? request.fax() : client.getFax(),
+                    request.ownership() != null ? request.ownership() : client.getOwnership(),
+                    request.sicCode() != null ? request.sicCode() : client.getSicCode(),
+                    request.description() != null ? request.description() : client.getDescription()
             );
 
             Client updatedClient = clientRepository.update(client);

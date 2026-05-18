@@ -1,0 +1,231 @@
+services:
+  eureka-server:
+    build: ../eureka-server
+    container_name: eureka-server
+    profiles: ["all"]
+    ports:
+      - "8761:8761"
+    networks:
+      - prolance-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  config-server:
+    build: ../config-server
+    container_name: config-server
+    profiles: ["all"]
+    ports:
+      - "8888:8080"
+    networks:
+      - prolance-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+
+  api-gateway:
+    build: ../../api-gateway
+    container_name: api-gateway
+    profiles: ["all"]
+    ports:
+      - "8080:8080"
+    networks:
+      - prolance-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  tenant-service:
+    build: ../services/tenant-service
+    container_name: tenant-service
+    profiles: ["all"]
+    ports:
+      - "8081:8080"
+    networks:
+      - prolance-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      tenant-db:
+        condition: service_healthy
+
+  tenant-db:
+    image: postgres:15-alpine
+    container_name: tenant-db
+    profiles: [ "default", "all"]
+    environment:
+      POSTGRES_DB: tenant_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - tenant-data:/var/lib/postgresql/data
+    networks:
+      - prolance-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U aliyara29"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  crm-db:
+    image: postgres:15-alpine
+    container_name: crm-db
+    profiles: [ "default", "all" ]
+    environment:
+      POSTGRES_DB: crm_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5434:5432"
+    volumes:
+      - crm-data:/var/lib/postgresql/data
+    networks:
+      - prolance-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U aliyara29" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak-db:
+    image: postgres:15-alpine
+    container_name: keycloak-db
+    profiles: [ "default", "all" ]
+    environment:
+      POSTGRES_DB: keycloak_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - prolance-keycloak-data:/var/lib/postgresql/data
+    networks:
+      - prolance-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U aliyara29" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: prolance-keycloak
+    profiles: [ "default", "all", ]
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: ${KEYCLOAK_POSTGRES_DB_URL}
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+#      KC_SPI_EMAIL_SMTP_HOST: ${KC_SPI_EMAIL_SMTP_HOST:-smtp.gmail.com}
+#      KC_SPI_EMAIL_SMTP_PORT: ${KC_SPI_EMAIL_SMTP_PORT:-587}
+#      KC_SPI_EMAIL_SMTP_USER: ${KC_SPI_EMAIL_SMTP_USER:-ali.yara.fr@gmail.com}
+#      KC_SPI_EMAIL_SMTP_PASSWORD: ${KC_SPI_EMAIL_SMTP_PASSWORD}
+#      KC_SPI_EMAIL_SMTP_STARTTLS: true
+#      KC_SPI_EMAIL_SMTP_AUTH: true
+#      KC_SPI_EMAIL_FROM: ${KC_SPI_EMAIL_FROM:-ali.yara.fr@gmail.com}
+#      KC_HTTP_PORT: 8080
+
+    ports:
+      - "8079:8080"
+    volumes:
+          - ../keycloak/themes:/opt/keycloak/themes
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    networks:
+      - prolance-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: prolance-pgadmin
+    profiles: ["default", "all"]
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - prolance-network
+    depends_on:
+      - tenant-db
+      - keycloak-db
+#  zookeeper:
+#    image: confluentinc/cp-zookeeper:7.6.0
+#    container_name: zookeeper
+#    profiles: [ "default", "all" ]
+#    environment:
+#      ZOOKEEPER_CLIENT_PORT: 2181
+#      ZOOKEEPER_TICK_TIME: 2000
+#    ports:
+#      - "2181:2181"
+#    networks:
+#      - prolance-network
+#    healthcheck:
+#      test: [ "CMD", "nc", "-z", "localhost", "2181" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+
+#  kafka:
+#    image: confluentinc/cp-kafka:7.6.0
+#    container_name: kafka
+#    profiles: [ "default", "all" ]
+#    environment:
+#      KAFKA_BROKER_ID: 1
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+#      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+#    ports:
+#      - "29092:29092"
+#      - "9092:9092"
+#    networks:
+#      - prolance-network
+#    depends_on:
+#      zookeeper:
+#        condition: service_healthy
+#    healthcheck:
+#      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092" ]
+#      interval: 15s
+#      timeout: 10s
+#      retries: 5
+
+networks:
+  prolance-network:
+    driver: bridge
+volumes:
+  prolance-keycloak-data:
+  tenant-data:
+  crm-data:
+  pgadmin-data:

@@ -21,6 +21,13 @@ public class ClientPersistenceMapper {
                 .status(domain.getStatus())
                 .type(domain.getType())
                 .source(domain.getSource())
+                .annualRevenue(domain.getAnnualRevenue())
+                .fax(domain.getFax())
+                .ownership(domain.getOwnership())
+                .sicCode(domain.getSicCode())
+                .description(domain.getDescription())
+                .createdBy(domain.getCreatedBy())
+                .updatedBy(domain.getUpdatedBy())
                 .build();
         
         entity.setTenantId(domain.getTenantId());
@@ -43,6 +50,13 @@ public class ClientPersistenceMapper {
                 entity.getStatus(),
                 entity.getType(),
                 entity.getSource(),
+                entity.getAnnualRevenue(),
+                entity.getFax(),
+                entity.getOwnership(),
+                entity.getSicCode(),
+                entity.getDescription(),
+                entity.getCreatedBy(),
+                entity.getUpdatedBy(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );

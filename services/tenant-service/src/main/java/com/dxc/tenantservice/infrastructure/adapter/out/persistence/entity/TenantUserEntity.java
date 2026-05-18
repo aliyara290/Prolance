@@ -46,6 +46,9 @@ public class TenantUserEntity extends BaseAuditingEntity {
     @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
+    private String username;
+
     @Column(name = "first_name", nullable = false)
     private String firstName;
 

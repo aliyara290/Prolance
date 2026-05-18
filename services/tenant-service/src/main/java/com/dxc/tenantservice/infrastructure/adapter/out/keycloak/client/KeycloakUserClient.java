@@ -43,4 +43,7 @@ public interface KeycloakUserClient {
 
     @PutMapping("/admin/realms/${keycloak.realm}/users/{userId}")
     void activateUser(@PathVariable("userId") UUID keycloakUserId, @RequestBody KeycloakUserResDTO user);
+
+    @PutMapping("/admin/realms/${keycloak.realm}/users/{userId}")
+    void updateUser(@PathVariable("userId") UUID keycloakUserId, @RequestBody KeycloakUserResDTO user);
 }

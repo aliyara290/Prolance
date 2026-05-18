@@ -60,7 +60,12 @@ public class ContactService implements ContactUseCase {
                     request.phone() != null ? request.phone() : contact.getPhone(),
                     request.role() != null ? request.role() : contact.getRole(),
                     request.influenceLevel() != null ? request.influenceLevel() : contact.getInfluenceLevel(),
-                    request.notes() != null ? request.notes() : contact.getNotes()
+                    request.notes() != null ? request.notes() : contact.getNotes(),
+                    request.department() != null ? request.department() : contact.getDepartment(),
+                    request.dateOfBirth() != null ? request.dateOfBirth() : contact.getDateOfBirth(),
+                    request.secondaryEmail() != null ? request.secondaryEmail() : contact.getSecondaryEmail(),
+                    request.address() != null ? contactMapper.toAddress(request.address()) : contact.getAddress(),
+                    request.description() != null ? request.description() : contact.getDescription()
             );
 
             if (request.primary() && !contact.isPrimary()) {

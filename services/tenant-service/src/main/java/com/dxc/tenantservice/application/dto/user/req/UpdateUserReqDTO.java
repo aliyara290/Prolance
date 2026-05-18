@@ -1,5 +1,7 @@
 package com.dxc.tenantservice.application.dto.user.req;
 
+import com.dxc.tenantservice.domain.model.valueobject.Language;
+import com.dxc.tenantservice.domain.model.valueobject.Theme;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 

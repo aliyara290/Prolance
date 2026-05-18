@@ -1,9 +1,6 @@
 package com.dxc.crmservice.infrastructure.adapter.in.rest;
 
-import com.dxc.crmservice.domain.exception.InvalidStateTransitionException;
-import com.dxc.crmservice.domain.exception.RecordNotFoundException;
-import com.dxc.crmservice.domain.exception.ServiceLogicException;
-import com.dxc.crmservice.domain.exception.ValidationException;
+import com.dxc.crmservice.domain.exception.*;
 import com.dxc.crmservice.infrastructure.adapter.in.rest.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -74,6 +71,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ErrorResponse.of("ACCESS_DENIED", "You don't have permission to perform this action", null));
     }
+
+    @ExceptionHandler(TenantNotActiveException.class)
+    public ResponseEntity<ErrorResponse> handleTenantNotActive(TenantNotActiveException ex) {
+        log.warn("Tenant not active: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.of("TENANT_NOT_ACTIVE", "Tenant is not active", null));
+    }
+
+
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleGeneric(RuntimeException ex) {

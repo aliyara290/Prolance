@@ -15,6 +15,7 @@ public interface TenantUserUseCase {
     void deactivateUser(UUID userId);
     void activateUser(UUID userId);
     UserResDTO getUser(UUID userId);
+    UserResDTO getUserByKeycloakId();
     Page<UserResDTO> getAllUsers(Pageable pageable);
     UserResDTO addUserRole(UUID userId, ChangeUserRoleReqDTO changeUserRoleReqDTO);
     UserResDTO removeUserRole(UUID userId, ChangeUserRoleReqDTO changeUserRoleReqDTO);

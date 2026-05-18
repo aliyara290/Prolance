@@ -1,6 +1,8 @@
 package com.dxc.crmservice.infrastructure.adapter.out.persistence.entity;
 
+import com.dxc.crmservice.domain.model.valueobject.OpportunityType;
 import com.dxc.crmservice.domain.model.valueobject.Priority;
+import com.dxc.crmservice.domain.model.valueobject.Source;
 import com.dxc.crmservice.domain.model.valueobject.Stage;
 import jakarta.persistence.*;
 import lombok.*;
@@ -64,6 +66,19 @@ public class OpportunityEntity extends BaseAuditingEntity {
 
     @Column(name = "lost_reason")
     private String lostReason;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "opportunity_type")
+    private OpportunityType type;
+
+    @Enumerated(EnumType.STRING)
+    private Source source;
+
+    @Column(name = "created_by")
+    private UUID createdBy;
+
+    @Column(name = "updated_by")
+    private UUID updatedBy;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;

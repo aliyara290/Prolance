@@ -1,6 +1,8 @@
 package com.dxc.crmservice.application.dto.opportunity.res;
 
+import com.dxc.crmservice.domain.model.valueobject.OpportunityType;
 import com.dxc.crmservice.domain.model.valueobject.Priority;
+import com.dxc.crmservice.domain.model.valueobject.Source;
 import com.dxc.crmservice.domain.model.valueobject.Stage;
 
 import java.math.BigDecimal;
@@ -12,6 +14,7 @@ public record OpportunityResponse(
     UUID id,
     UUID clientId,
     String title,
+    String description,
     BigDecimal amount,
     Stage stage,
     Priority priority,
@@ -24,6 +27,10 @@ public record OpportunityResponse(
     LocalDateTime nextFollowUpAt,
     LocalDateTime closingDate,
     String lostReason,
+    OpportunityType type,
+    Source source,
+    UUID createdBy,
+    UUID updatedBy,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {}

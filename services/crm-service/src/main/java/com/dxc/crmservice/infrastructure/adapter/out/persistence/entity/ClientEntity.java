@@ -2,6 +2,7 @@ package com.dxc.crmservice.infrastructure.adapter.out.persistence.entity;
 
 import com.dxc.crmservice.domain.model.valueobject.ClientStatus;
 import com.dxc.crmservice.domain.model.valueobject.ClientType;
+import com.dxc.crmservice.domain.model.valueobject.Ownership;
 import com.dxc.crmservice.domain.model.valueobject.Source;
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,6 +46,26 @@ public class ClientEntity extends BaseAuditingEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Source source;
+
+    @Column(name = "annual_revenue")
+    private Double annualRevenue;
+
+    private String fax;
+
+    @Enumerated(EnumType.STRING)
+    private Ownership ownership;
+
+    @Column(name = "sic_code")
+    private String sicCode;
+
+    @Column(length = 2000)
+    private String description;
+
+    @Column(name = "created_by")
+    private UUID createdBy;
+
+    @Column(name = "updated_by")
+    private UUID updatedBy;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;

@@ -6,12 +6,14 @@ import com.dxc.tenantservice.domain.model.valueobject.TenantIndustry;
 import com.dxc.tenantservice.domain.model.valueobject.TenantStatus;
 import com.dxc.tenantservice.domain.model.valueobject.Address;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
+@ToString
 public class Tenant {
 
     private final UUID id;
@@ -84,7 +86,7 @@ public class Tenant {
                 null, // logo
                 null, // address
                 industry,
-                TenantStatus.PENDING,
+                TenantStatus.ACTIVE,
                 null  // tenantSettings
         );
     }
