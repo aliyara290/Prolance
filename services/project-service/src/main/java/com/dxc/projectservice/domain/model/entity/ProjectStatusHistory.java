@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-@Builder(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@AllArgsConstructor
 public class ProjectStatusHistory {
     private final UUID id;
     private final UUID tenantId;

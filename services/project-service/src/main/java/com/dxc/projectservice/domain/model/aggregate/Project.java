@@ -29,12 +29,13 @@ import java.util.Map;
 import java.util.UUID;
 
 @Getter
-@Builder(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@AllArgsConstructor
 public class Project extends AggregateRoot {
     private final UUID id;
     private final UUID tenantId;
     private final UUID clientId;
+    private final UUID ownerId;
     private final UUID opportunityId;
     private String name;
     private String description;
@@ -76,6 +77,7 @@ public class Project extends AggregateRoot {
                 .id(UUID.randomUUID())
                 .tenantId(tenantId)
                 .clientId(clientId)
+                .ownerId(createdBy)
                 .opportunityId(opportunityId)
                 .name(name)
                 .prefix(generatePrefix(name))
@@ -248,7 +250,7 @@ public class Project extends AggregateRoot {
                 .mapToInt(Member::getAllocationPercentage)
                 .sum();
 
-        if (currentTotal + newAllocation > 500) { // Example invariant: max 500% total allocation (5 full-time equivalent)
+        if (currentTotal + newAllocation > 500) {
             throw new BusinessRuleException("Total project allocation cannot exceed 500%");
         }
     }
@@ -269,7 +271,7 @@ public class Project extends AggregateRoot {
             case PLANNED, ON_HOLD -> next == ProjectStatus.ACTIVE || next == ProjectStatus.CANCELLED;
             case ACTIVE ->
                     next == ProjectStatus.ON_HOLD || next == ProjectStatus.COMPLETED || next == ProjectStatus.CANCELLED;
-            case COMPLETED, CANCELLED -> false; // Terminal states
+            case COMPLETED, CANCELLED -> false;
         };
 
         if (!valid) {

@@ -21,21 +21,37 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class OutboxEventEntity {
+
     @Id
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "aggregate_id")
     private UUID aggregateId;
 
     @Column(nullable = false, name = "aggregate_type")
     private String aggregateType;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "event_type")
     private String type;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String payload;
 
+    @Column(nullable = false)
+    private String status;
+
+    @Column(nullable = false, name = "retry_count")
+    private int retryCount;
+
     @Column(nullable = false, name = "occurred_on")
     private LocalDateTime occurredOn;
+
+    @Column(nullable = false, name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "published_at")
+    private LocalDateTime publishedAt;
+
+    @Column(columnDefinition = "TEXT", name = "error_message")
+    private String errorMessage;
 }

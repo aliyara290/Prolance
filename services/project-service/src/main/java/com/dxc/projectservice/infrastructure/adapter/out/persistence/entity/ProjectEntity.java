@@ -29,8 +29,12 @@ public class ProjectEntity extends BaseAuditingEntity {
     @Column(name = "opportunity_id")
     private UUID opportunityId;
 
+    @Column(name = "owner_id", nullable = false)
+    private UUID ownerId;
+
     @Column(nullable = false)
     private String name;
+    private String prefix;
     private String description;
 
     @Column(nullable = false)
@@ -45,7 +49,7 @@ public class ProjectEntity extends BaseAuditingEntity {
     private LocalDateTime plannedEndDate;
 
     @Column(name = "planned_start_date")
-    private LocalDateTime plannedStartDat;
+    private LocalDateTime plannedStartDate;
 
     @Column(name = "actual_start_date")
     private LocalDateTime actualStartDate;
@@ -71,18 +75,23 @@ public class ProjectEntity extends BaseAuditingEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "project_id")
     private List<MemberEntity> members;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "project_id")
     private List<MilestoneEntity> milestones;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "project_id")
     private List<ProjectResourceEntity> resources;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "project_id")
     private List<ProjectStatusHistory> statusHistory;
 
-    @OneToOne(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "project_id")
     private ProjectMetricsEntity metrics;
 }

@@ -77,7 +77,7 @@ public class TenantUserService implements TenantUserUseCase {
         try {
             // Assign all roles in Keycloak
             UUID keycloakUserId = UUID.fromString(keycloakUserIdStr);
-            TenantUser user = TenantUser.create(tenantId, dto.getUsername(), dto.getEmail(), dto.getFirstName(), dto.getLastName());
+            TenantUser user = TenantUser.create(tenantId, dto.getEmail(), dto.getUsername(), dto.getFirstName(), dto.getLastName());
             user.assignKeycloakUser(keycloakUserId);
 
             for (UserRole role : dto.getRoles()) {

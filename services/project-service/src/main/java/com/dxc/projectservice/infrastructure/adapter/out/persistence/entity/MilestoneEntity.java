@@ -45,6 +45,9 @@ public class MilestoneEntity extends BaseAuditingEntity {
     @Column(name = "progress_percentage", nullable = false)
     private float progressPercentage;
 
+    @Column(name = "created_by", nullable = false)
+    private UUID createdBy;
+
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 }

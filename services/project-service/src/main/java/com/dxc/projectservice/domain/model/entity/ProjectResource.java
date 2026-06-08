@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-@Builder(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@AllArgsConstructor
 public class ProjectResource {
     private final UUID id;
     private final UUID tenantId;
@@ -21,8 +21,9 @@ public class ProjectResource {
     private String url;
     private String description;
     private final LocalDateTime createdAt;
+    private final UUID createdBy;
 
-    public static ProjectResource create(UUID tenantId, String name, ResourceType type, String url, String description) {
+    public static ProjectResource create(UUID tenantId, String name, ResourceType type, String url, String description, UUID createdBy) {
         return ProjectResource.builder()
                 .id(UUID.randomUUID())
                 .tenantId(tenantId)
@@ -31,6 +32,7 @@ public class ProjectResource {
                 .url(url)
                 .description(description)
                 .createdAt(LocalDateTime.now())
+                .createdBy(createdBy)
                 .build();
     }
 }

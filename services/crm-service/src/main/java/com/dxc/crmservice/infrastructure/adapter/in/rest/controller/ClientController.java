@@ -33,7 +33,7 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SALES',, 'PROJECT_MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SALES', 'PROJECT_MANAGER')")
     public ResponseEntity<ApiResponse<ClientResponse>> updateClient(@PathVariable("id") UUID id, @Valid @RequestBody UpdateClientRequest request) {
         ClientResponse clientResponse = clientUseCase.updateClient(id, request);
         return ResponseEntity.ok(ApiResponse.success(clientResponse));

@@ -25,6 +25,8 @@ public class EventStoreAdapter implements EventStorePort {
             
             OutboxEventEntity entity = OutboxEventEntity.builder()
                     .id(event.eventId())
+                    .status("PENDING")
+                    .retryCount(0)
                     .aggregateId(event.projectId())
                     .aggregateType("Project")
                     .type(event.getClass().getSimpleName())

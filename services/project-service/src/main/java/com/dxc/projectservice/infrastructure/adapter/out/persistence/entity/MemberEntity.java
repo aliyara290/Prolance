@@ -25,7 +25,7 @@ public class MemberEntity extends BaseAuditingEntity {
 
     @Column(name = "project_id", nullable = false)
     private UUID projectId;
-    @Column(name = "project_id", nullable = false)
+    @Column(name = "user_id", nullable = false)
     private UUID userId;
 
     @Enumerated(EnumType.STRING)
@@ -42,6 +42,9 @@ public class MemberEntity extends BaseAuditingEntity {
 
     @Column(name = "left_at")
     private LocalDateTime leftAt;
+
+    @Column(name = "created_by", nullable = false)
+    private UUID createdBy;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
