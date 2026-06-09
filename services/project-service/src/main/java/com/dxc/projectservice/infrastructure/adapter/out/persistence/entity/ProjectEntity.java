@@ -26,6 +26,7 @@ public class ProjectEntity extends BaseAuditingEntity {
 
     @Column(name = "client_id", nullable = false)
     private UUID clientId;
+
     @Column(name = "opportunity_id")
     private UUID opportunityId;
 

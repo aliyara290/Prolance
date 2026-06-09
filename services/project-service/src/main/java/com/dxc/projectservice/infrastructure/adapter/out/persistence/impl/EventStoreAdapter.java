@@ -32,6 +32,7 @@ public class EventStoreAdapter implements EventStorePort {
                     .type(event.getClass().getSimpleName())
                     .payload(payload)
                     .occurredOn(event.occurredOn())
+                    .createdAt(event.occurredOn())
                     .build();
 
             outboxEventRepository.save(entity);

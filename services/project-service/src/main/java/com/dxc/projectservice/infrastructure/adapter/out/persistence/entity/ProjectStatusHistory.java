@@ -25,7 +25,7 @@ public class ProjectStatusHistory {
     private UUID projectId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "old_status", nullable = false)
+    @Column(name = "old_status")
     private ProjectStatus oldStatus;
 
     @Enumerated(EnumType.STRING)

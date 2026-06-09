@@ -18,11 +18,12 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE project_metrics SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("deleted_at IS NULL")
-public class ProjectMetricsEntity extends BaseAuditingEntity {
+public class ProjectMetricsEntity {
     @Id
     private UUID id;
+
+    @Column(name = "tenant_id", nullable = false, updatable = false)
+    private UUID tenantId;
 
     @Column(name = "project_id", nullable = false)
     private UUID projectId;

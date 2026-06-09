@@ -110,6 +110,27 @@ services:
       timeout: 5s
       retries: 5
 
+
+  project-db:
+    image: postgres:15-alpine
+    container_name: project-db
+    profiles: [ "default", "all" ]
+    environment:
+      POSTGRES_DB: project_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5435:5432"
+    volumes:
+      - project-data:/var/lib/postgresql/data
+    networks:
+      - prolance-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U aliyara29" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   keycloak-db:
     image: postgres:15-alpine
     container_name: keycloak-db
@@ -133,7 +154,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.1
     container_name: prolance-keycloak
-    profiles: [ "default", "all", ]
+    profiles: [ "default", "all"]
     command: start-dev
     environment:
       KC_DB: postgres
@@ -228,4 +249,5 @@ volumes:
   prolance-keycloak-data:
   tenant-data:
   crm-data:
+  project-data:
   pgadmin-data:

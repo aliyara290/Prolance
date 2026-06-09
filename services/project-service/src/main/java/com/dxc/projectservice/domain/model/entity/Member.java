@@ -40,6 +40,7 @@ public class Member {
             int allocationPercentage,
             UUID createdBy
     ) {
+
         validateRequired(tenantId, "Tenant id is required");
         validateRequired(projectId, "Project id is required");
         validateRequired(userId, "User id is required");
@@ -105,6 +106,7 @@ public class Member {
         touch();
     }
 
+//    helpers
     private void validateActive() {
         if (this.status == MemberStatus.INACTIVE) {
             throw new ValidationException("Member is inactive");

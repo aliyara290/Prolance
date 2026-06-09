@@ -15,8 +15,9 @@ import com.dxc.projectservice.domain.model.event.project.ProjectCreated;
 import com.dxc.projectservice.domain.model.event.project.ProjectDeleted;
 import com.dxc.projectservice.domain.model.event.project.ProjectStatusChanged;
 import com.dxc.projectservice.domain.model.event.project.ProjectUpdated;
+import com.dxc.projectservice.domain.model.event.resource.ResourceAdded;
+import com.dxc.projectservice.domain.model.event.resource.ResourceRemoved;
 import com.dxc.projectservice.domain.model.valueobject.*;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -231,6 +232,35 @@ public class Project extends AggregateRoot {
 
         touch();
         registerEvent(ProjectStatusChanged.now(tenantId, id, oldStatus, newStatus, actionBy));
+    }
+
+    public void addResource(String name, String description, ResourceType type, String url, UUID actionBy) {
+        ProjectResource resource = ProjectResource.builder()
+                .id(UUID.randomUUID())
+                .tenantId(this.tenantId)
+                .projectId(this.id)
+                .name(name)
+                .description(description)
+                .type(type)
+                .url(url)
+                .createdAt(LocalDateTime.now())
+                .createdBy(actionBy)
+                .build();
+
+        this.resources.add(resource);
+        touch();
+        registerEvent(ResourceAdded.now(tenantId, id, resource.getId(), name, actionBy));
+    }
+
+    public void removeResource(UUID resourceId, UUID actionBy) {
+        ProjectResource resource = this.resources.stream()
+                .filter(r -> r.getId().equals(resourceId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessRuleException("Resource not found"));
+
+        this.resources.remove(resource);
+        touch();
+        registerEvent(ResourceRemoved.now(tenantId, id, resourceId, actionBy));
     }
 
     private void recalculateProgress() {

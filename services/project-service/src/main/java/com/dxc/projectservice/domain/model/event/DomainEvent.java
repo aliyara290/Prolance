@@ -8,4 +8,5 @@ public interface DomainEvent {
     LocalDateTime occurredOn();
     UUID tenantId();
     UUID projectId();
+    UUID actionBy();
 }
