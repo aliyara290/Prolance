@@ -60,13 +60,6 @@
 
         </div>
 
-        <!-- RIGHT PANEL — Branding -->
-        <div class="split-right">
-            <img src="${url.resourcesPath}/img/illustration.png" alt="Prolance workspace" class="split-right-illustration" />
-            <p class="split-right-title">Your workspace, all in one place</p>
-            <p class="split-right-desc">Manage projects, track time, and collaborate with your team — seamlessly.</p>
-        </div>
-
     </div>
 
     <!-- Page-level footer -->

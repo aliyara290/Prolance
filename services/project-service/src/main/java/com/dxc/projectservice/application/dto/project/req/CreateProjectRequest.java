@@ -1,6 +1,7 @@
 package com.dxc.projectservice.application.dto.project.req;
 
 import com.dxc.projectservice.domain.model.valueobject.ProjectPriority;
+import com.dxc.projectservice.domain.model.valueobject.ProjectStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -36,5 +37,7 @@ public record CreateProjectRequest(
     BigDecimal estimatedBudget,
     
     @NotNull(message = "projectManagerId is required")
-    UUID projectManagerId
+    UUID projectManagerId,
+    
+    ProjectStatus status
 ) {}

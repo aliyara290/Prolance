@@ -38,6 +38,7 @@ public class Member {
             UUID userId,
             MemberRole role,
             int allocationPercentage,
+            MemberStatus status,
             UUID createdBy
     ) {
 
@@ -49,6 +50,7 @@ public class Member {
         validateAllocation(allocationPercentage);
 
         LocalDateTime now = LocalDateTime.now();
+        MemberStatus initialStatus = status != null ? status : MemberStatus.ACTIVE;
 
         return Member.builder()
                 .id(UUID.randomUUID())
@@ -57,7 +59,7 @@ public class Member {
                 .userId(userId)
                 .role(role)
                 .allocationPercentage(allocationPercentage)
-                .status(MemberStatus.ACTIVE)
+                .status(initialStatus)
                 .createdBy(createdBy)
                 .joinedAt(now)
                 .createdAt(now)
@@ -87,6 +89,27 @@ public class Member {
         touch();
     }
 
+    public void update(MemberRole newRole, Integer newAllocation, MemberStatus newStatus) {
+        if (newStatus != null && this.status != newStatus) {
+            if (newStatus == MemberStatus.REMOVED) {
+                remove();
+            } else if (newStatus == MemberStatus.INACTIVE) {
+                deactivate();
+            } else if (newStatus == MemberStatus.ACTIVE) {
+                this.status = MemberStatus.ACTIVE;
+                touch();
+            }
+        }
+
+        if (newRole != null && this.role != newRole) {
+            updateRole(newRole);
+        }
+
+        if (newAllocation != null && this.allocationPercentage != newAllocation) {
+            updateAllocation(newAllocation);
+        }
+    }
+
     public void remove() {
         if (this.status == MemberStatus.REMOVED) {
             throw new ValidationException("Member is already removed");
@@ -99,8 +122,6 @@ public class Member {
 
     public void deactivate() {
         validateActive();
-
-        LocalDateTime now = LocalDateTime.now();
 
         this.status = MemberStatus.INACTIVE;
         touch();

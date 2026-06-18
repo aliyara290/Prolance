@@ -7,10 +7,14 @@ import com.dxc.projectservice.application.port.in.MilestoneUseCase;
 import com.dxc.projectservice.infrastructure.adapter.in.rest.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import com.dxc.projectservice.infrastructure.adapter.in.rest.response.PageMeta;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -52,4 +56,31 @@ public class MilestoneController {
         MilestoneResponse response = milestoneUseCase.completeMilestone(projectId, milestoneId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<MilestoneResponse>>> getMilestones(
+            @PathVariable("projectId") UUID projectId,
+            Pageable pageable) {
+        Page<MilestoneResponse> response = milestoneUseCase.getMilestones(projectId, pageable);
+        PageMeta meta = PageMeta.builder()
+                .totalPages(response.getTotalPages())
+                .totalElements(response.getTotalElements())
+                .size(response.getSize())
+                .hasNext(response.hasNext())
+                .hasPrevious(response.hasPrevious())
+                .page(response.getNumber())
+                .build();
+
+        return ResponseEntity.ok(ApiResponse.success(response.getContent(), meta));
+    }
+
+    @GetMapping("/{milestoneId}")
+    public ResponseEntity<ApiResponse<MilestoneResponse>> getMilestoneById(
+            @PathVariable("projectId") UUID projectId,
+            @PathVariable("milestoneId") UUID milestoneId) {
+        MilestoneResponse response = milestoneUseCase.getMilestoneById(projectId, milestoneId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+
 }

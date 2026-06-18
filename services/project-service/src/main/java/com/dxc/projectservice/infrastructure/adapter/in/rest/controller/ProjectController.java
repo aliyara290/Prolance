@@ -3,6 +3,7 @@ package com.dxc.projectservice.infrastructure.adapter.in.rest.controller;
 import com.dxc.projectservice.application.dto.project.req.CreateProjectRequest;
 import com.dxc.projectservice.application.dto.project.req.UpdateProjectRequest;
 import com.dxc.projectservice.application.dto.project.res.ProjectResponse;
+import com.dxc.projectservice.application.dto.project.res.ProjectsNamesResponse;
 import com.dxc.projectservice.application.port.in.ProjectUseCase;
 import com.dxc.projectservice.infrastructure.adapter.in.rest.response.ApiResponse;
 import com.dxc.projectservice.infrastructure.adapter.in.rest.response.PageMeta;
@@ -49,6 +50,12 @@ public class ProjectController {
                 .build();
 
         return ResponseEntity.ok(ApiResponse.success(response.getContent(), meta));
+    }
+
+    @GetMapping("/names")
+    public ResponseEntity<ApiResponse<List<ProjectsNamesResponse>>> getProjectsNames(Pageable pageable) {
+        List<ProjectsNamesResponse> response = projectUseCase.getProjectsNames(pageable);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PutMapping("/{id}")

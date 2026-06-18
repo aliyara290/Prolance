@@ -1,5 +1,6 @@
 package com.dxc.projectservice.application.dto.milestones.req;
 
+import com.dxc.projectservice.domain.model.valueobject.MilestoneStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,5 +19,9 @@ public record UpdateMilestoneRequest(
     LocalDateTime startDate,
     
     @NotNull(message = "dueDate is required")
-    LocalDateTime dueDate
+    LocalDateTime dueDate,
+    
+    Integer sequenceOrder,
+    Float progressPercentage,
+    MilestoneStatus status
 ) {}

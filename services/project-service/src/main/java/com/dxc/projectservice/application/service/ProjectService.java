@@ -3,6 +3,7 @@ package com.dxc.projectservice.application.service;
 import com.dxc.projectservice.application.dto.project.req.CreateProjectRequest;
 import com.dxc.projectservice.application.dto.project.req.UpdateProjectRequest;
 import com.dxc.projectservice.application.dto.project.res.ProjectResponse;
+import com.dxc.projectservice.application.dto.project.res.ProjectsNamesResponse;
 import com.dxc.projectservice.application.mapper.ProjectApplicationMapper;
 import com.dxc.projectservice.application.port.in.ProjectUseCase;
 import com.dxc.projectservice.application.port.out.DomainEventPublisher;
@@ -12,6 +13,7 @@ import com.dxc.projectservice.domain.exception.RecordNotFoundException;
 import com.dxc.projectservice.domain.model.aggregate.Project;
 import com.dxc.projectservice.domain.model.valueobject.MemberRole;
 import com.dxc.projectservice.domain.model.valueobject.ProjectFinancials;
+import com.dxc.projectservice.domain.model.valueobject.MemberStatus;
 import com.dxc.projectservice.domain.model.valueobject.ProjectTimeline;
 import com.dxc.projectservice.infrastructure.config.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -60,14 +63,15 @@ public class ProjectService implements ProjectUseCase {
                 timeline,
                 financials,
                 request.projectManagerId(),
+                request.status(),
                 userId
         );
 
         // Make creator the OWNER
-        project.addMember(userId, MemberRole.OWNER, 100, userId);
+        project.addMember(userId, MemberRole.OWNER, 100, MemberStatus.ACTIVE, userId);
 
         // Add project manager
-        project.addMember(request.projectManagerId(), MemberRole.MANAGER, 100, userId);
+        project.addMember(request.projectManagerId(), MemberRole.MANAGER, 100, MemberStatus.ACTIVE, userId);
 
         Project savedProject = projectRepository.save(project);
         eventPublisher.publish(project.getDomainEvents());
@@ -93,6 +97,22 @@ public class ProjectService implements ProjectUseCase {
     }
 
     @Override
+    public List<ProjectsNamesResponse> getProjectsNames(Pageable pageable) {
+        UUID tenantId = getTenantIdAndVerify();
+
+        Page<Project> projects = projectRepository.findAll(tenantId, pageable);
+
+        return projects.stream()
+                .map(project -> new ProjectsNamesResponse(
+                        project.getId(),
+                        project.getName(),
+                        project.getPrefix(),
+                        project.getStatus()
+                ))
+                .toList();
+    }
+
+    @Override
     @Transactional
     public ProjectResponse updateProject(UUID id, UpdateProjectRequest request) {
         UUID tenantId = getTenantIdAndVerify();
@@ -100,8 +120,19 @@ public class ProjectService implements ProjectUseCase {
         
         Project project = getProject(id, tenantId);
         
-        project.updateProject(request.name(), request.description(), userId);
-        
+        project.updateProject(
+            request.name(),
+            request.description(),
+            request.clientId(),
+            request.opportunityId(),
+            request.priority(),
+            request.plannedStartDate(),
+            request.plannedEndDate(),
+            request.estimatedBudget(),
+            request.projectManagerId(),
+            request.status(),
+            userId
+        );        
         Project savedProject = projectRepository.save(project);
         eventPublisher.publish(project.getDomainEvents());
         project.clearDomainEvents();

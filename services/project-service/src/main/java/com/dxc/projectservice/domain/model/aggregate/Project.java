@@ -35,9 +35,9 @@ import java.util.UUID;
 public class Project extends AggregateRoot {
     private final UUID id;
     private final UUID tenantId;
-    private final UUID clientId;
+    private UUID clientId;
     private final UUID ownerId;
-    private final UUID opportunityId;
+    private UUID opportunityId;
     private String name;
     private String description;
 
@@ -70,10 +70,12 @@ public class Project extends AggregateRoot {
             ProjectTimeline timeline,
             ProjectFinancials financials,
             UUID projectManagerId,
+            ProjectStatus status,
             UUID createdBy
     ) {
         validateInitialData(tenantId, clientId, name, priority, projectManagerId, createdBy);
 
+        ProjectStatus initialStatus = status != null ? status : ProjectStatus.PLANNED;
         Project project = Project.builder()
                 .id(UUID.randomUUID())
                 .tenantId(tenantId)
@@ -83,7 +85,7 @@ public class Project extends AggregateRoot {
                 .name(name)
                 .prefix(generatePrefix(name))
                 .description(description)
-                .status(ProjectStatus.PLANNED)
+                .status(initialStatus)
                 .priority(priority)
                 .timeline(timeline)
                 .financials(financials != null ? financials : ProjectFinancials.empty())
@@ -99,23 +101,23 @@ public class Project extends AggregateRoot {
                 .build();
 
         project.statusHistory.add(ProjectStatusHistory.create(
-                tenantId, null, ProjectStatus.PLANNED, createdBy, "Project initialized"));
+                tenantId, null, initialStatus, createdBy, "Project initialized"));
 
 
         project.registerEvent(ProjectCreated.now(
-                tenantId, project.getId(), clientId, name, ProjectStatus.PLANNED, priority, projectManagerId, createdBy));
+                tenantId, project.getId(), clientId, name, initialStatus, priority, projectManagerId, createdBy));
 
         return project;
     }
 
-    public void addMember(UUID userId, MemberRole role, int allocation, UUID actionBy) {
+    public void addMember(UUID userId, MemberRole role, int allocation, com.dxc.projectservice.domain.model.valueobject.MemberStatus status, UUID actionBy) {
         if (members.stream().anyMatch(m -> m.getUserId().equals(userId))) {
             throw new BusinessRuleException("User is already a member of this project");
         }
 
         validateTotalAllocation(allocation);
 
-        members.add(Member.create(tenantId, id, userId, role, allocation, actionBy));
+        members.add(Member.create(tenantId, id, userId, role, allocation, status, actionBy));
         touch();
         registerEvent(MemberAdded.now(tenantId, id, userId, role, allocation, actionBy));
     }
@@ -133,21 +135,23 @@ public class Project extends AggregateRoot {
     }
 
 
-    public void updateMemberRole(UUID userId, MemberRole newRole, UUID actionBy) {
+    public void updateMember(UUID userId, MemberRole newRole, Integer newAllocation, com.dxc.projectservice.domain.model.valueobject.MemberStatus newStatus, UUID actionBy) {
         Member member = members.stream()
                 .filter(m -> m.getUserId().equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new BusinessRuleException("Member not found"));
 
         MemberRole oldRole = member.getRole();
-        member.updateRole(newRole);
+        member.update(newRole, newAllocation, newStatus);
 
         touch();
-        registerEvent(MemberRoleUpdated.now(tenantId, id, userId, oldRole, newRole, actionBy));
+        if (newRole != null && oldRole != newRole) {
+            registerEvent(MemberRoleUpdated.now(tenantId, id, userId, oldRole, newRole, actionBy));
+        }
     }
 
-    public void addMilestone(String title, String description, LocalDateTime start, LocalDateTime due, int order, UUID actionBy) {
-        milestones.add(Milestone.create(tenantId, title, description, start, due, order, actionBy));
+    public void addMilestone(String title, String description, LocalDateTime start, LocalDateTime due, int order, Float progressPercentage, com.dxc.projectservice.domain.model.valueobject.MilestoneStatus status, UUID actionBy) {
+        milestones.add(Milestone.create(tenantId, title, description, start, due, order, progressPercentage, status, actionBy));
         touch();
         registerEvent(MilestoneAdded.now(tenantId, id, title, actionBy));
     }
@@ -164,7 +168,19 @@ public class Project extends AggregateRoot {
         registerEvent(MilestoneCompleted.now(tenantId, id, milestoneId, actionBy));
     }
 
-    public void updateProject(String name, String description, UUID actionBy) {
+    public void updateProject(
+            String name,
+            String description,
+            UUID clientId,
+            UUID opportunityId,
+            ProjectPriority priority,
+            LocalDateTime plannedStartDate,
+            LocalDateTime plannedEndDate,
+            java.math.BigDecimal estimatedBudget,
+            UUID projectManagerId,
+            com.dxc.projectservice.domain.model.valueobject.ProjectStatus status,
+            UUID actionBy
+    ) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("oldName", this.name);
         payload.put("newName", name);
@@ -174,6 +190,29 @@ public class Project extends AggregateRoot {
         this.name = name;
         this.description = description;
         this.prefix = generatePrefix(this.name);
+        
+        if (clientId != null) this.clientId = clientId;
+        if (opportunityId != null) this.opportunityId = opportunityId;
+        if (priority != null) this.priority = priority;
+        if (projectManagerId != null) this.projectManagerId = projectManagerId;
+        
+        if (plannedStartDate != null || plannedEndDate != null) {
+            LocalDateTime newStart = plannedStartDate != null ? plannedStartDate : (this.timeline != null ? this.timeline.plannedStartDate() : null);
+            LocalDateTime newEnd = plannedEndDate != null ? plannedEndDate : (this.timeline != null ? this.timeline.plannedEndDate() : null);
+            LocalDateTime actualStart = this.timeline != null ? this.timeline.actualStartDate() : null;
+            LocalDateTime actualEnd = this.timeline != null ? this.timeline.actualEndDate() : null;
+            this.timeline = new ProjectTimeline(newStart, newEnd, actualStart, actualEnd);
+        }
+        
+        if (estimatedBudget != null) {
+            java.math.BigDecimal actualCost = this.financials != null ? this.financials.actualCost() : java.math.BigDecimal.ZERO;
+            this.financials = new ProjectFinancials(estimatedBudget, actualCost);
+        }
+
+        if (status != null && this.status != status) {
+            changeStatus(status, actionBy, "Status updated via project update");
+        }
+
         touch();
         registerEvent(ProjectUpdated.now(tenantId, id, payload, actionBy));
     }
@@ -183,7 +222,7 @@ public class Project extends AggregateRoot {
         registerEvent(ProjectDeleted.now(tenantId, id, actionBy));
     }
 
-    public void updateMilestone(UUID milestoneId, String title, String description, LocalDateTime start, LocalDateTime due, UUID actionBy) {
+    public void updateMilestone(UUID milestoneId, String title, String description, LocalDateTime start, LocalDateTime due, Integer sequenceOrder, Float progressPercentage, com.dxc.projectservice.domain.model.valueobject.MilestoneStatus status, UUID actionBy) {
         Milestone milestone = milestones.stream()
                 .filter(m -> m.getId().equals(milestoneId))
                 .findFirst()
@@ -199,7 +238,7 @@ public class Project extends AggregateRoot {
         payload.put("oldDue", milestone.getDueDate());
         payload.put("newDue", due);
 
-        milestone.update(title, description, start, due);
+        milestone.update(title, description, start, due, sequenceOrder, progressPercentage, status);
         touch();
         registerEvent(MilestoneUpdated.now(tenantId, id, milestoneId, payload, actionBy));
     }
@@ -217,7 +256,7 @@ public class Project extends AggregateRoot {
     }
 
     public void changeStatus(ProjectStatus newStatus, UUID actionBy, String comment) {
-        validateStatusTransition(this.status, newStatus);
+//        validateStatusTransition(this.status, newStatus);
 
         ProjectStatus oldStatus = this.status;
         this.status = newStatus;

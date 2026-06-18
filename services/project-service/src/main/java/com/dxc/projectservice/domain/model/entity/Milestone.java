@@ -29,18 +29,27 @@ public class Milestone {
     private UUID createdBy;
     private LocalDateTime updatedAt;
 
-    public static Milestone create(UUID tenantId, String title, String description, LocalDateTime startDate, LocalDateTime dueDate, int sequenceOrder, UUID createdBy) {
+    public static Milestone create(UUID tenantId, String title, String description, LocalDateTime startDate, LocalDateTime dueDate, int sequenceOrder, Float progressPercentage, MilestoneStatus status, UUID createdBy) {
         validateDates(startDate, dueDate);
+        
+        MilestoneStatus initialStatus = status != null ? status : MilestoneStatus.ACTIVE;
+        float initialProgress = progressPercentage != null ? progressPercentage : 0f;
+        LocalDateTime initialCompletedAt = initialStatus == MilestoneStatus.COMPLETED ? LocalDateTime.now() : null;
+        if (initialStatus == MilestoneStatus.COMPLETED) {
+            initialProgress = 100f;
+        }
+
         return Milestone.builder()
                 .id(UUID.randomUUID())
                 .tenantId(tenantId)
                 .title(title)
                 .description(description)
-                .status(MilestoneStatus.PENDING)
+                .status(initialStatus)
                 .startDate(startDate)
                 .dueDate(dueDate)
                 .sequenceOrder(sequenceOrder)
-                .progressPercentage(0)
+                .progressPercentage(initialProgress)
+                .completedAt(initialCompletedAt)
                 .createdAt(LocalDateTime.now())
                 .createdBy(createdBy)
                 .build();
@@ -56,17 +65,34 @@ public class Milestone {
 
         if (progress >= 100 && this.status != MilestoneStatus.COMPLETED) {
             complete();
-        } else if (progress > 0 && this.status == MilestoneStatus.PENDING) {
+        } else if (progress > 0 && this.status == MilestoneStatus.ACTIVE) {
             this.status = MilestoneStatus.IN_PROGRESS;
         }
     }
 
-    public void update(String title, String description, LocalDateTime start, LocalDateTime due) {
+    public void update(String title, String description, LocalDateTime start, LocalDateTime due, Integer sequenceOrder, Float progressPercentage, MilestoneStatus status) {
         validateDates(start, due);
         this.title = title;
         this.description = description;
         this.startDate = start;
         this.dueDate = due;
+        
+        if (sequenceOrder != null) {
+            this.sequenceOrder = sequenceOrder;
+        }
+        
+        if (progressPercentage != null) {
+            updateProgress(progressPercentage);
+        }
+        
+        if (status != null && this.status != status) {
+            this.status = status;
+            if (status == MilestoneStatus.COMPLETED) {
+                this.progressPercentage = 100;
+                this.completedAt = LocalDateTime.now();
+            }
+        }
+        
         touch();
     }
 
