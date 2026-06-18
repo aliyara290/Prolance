@@ -1,7 +1,5 @@
 package com.dxc.crmservice.application.service;
 
-import com.dxc.crmservice.application.dto.client.res.ClientResponse;
-import com.dxc.crmservice.application.dto.contact.res.ContactResponse;
 import com.dxc.crmservice.application.dto.lead.req.CreateLeadRequest;
 import com.dxc.crmservice.application.dto.lead.req.UpdateLeadRequest;
 import com.dxc.crmservice.application.dto.lead.res.LeadResponse;
@@ -13,7 +11,7 @@ import com.dxc.crmservice.application.port.in.OpportunityUseCase;
 import com.dxc.crmservice.application.port.out.ClientRepository;
 import com.dxc.crmservice.application.port.out.ContactRepository;
 import com.dxc.crmservice.application.port.out.LeadRepository;
-import com.dxc.crmservice.application.port.out.feign.FeignPort;
+import com.dxc.crmservice.application.port.out.feign.UserFeignPort;
 import com.dxc.crmservice.domain.exception.RecordNotFoundException;
 import com.dxc.crmservice.domain.exception.ServiceLogicException;
 import com.dxc.crmservice.domain.model.aggregate.Client;
@@ -57,7 +55,8 @@ class LeadServiceTest {
     @Mock ContactUseCase      contactUseCase;
     @Mock ClientUseCase       clientUseCase;
     @Mock OpportunityUseCase  opportunityUseCase;
-    @Mock FeignPort           feignPort;
+    @Mock
+    UserFeignPort userFeignPort;
 
     @InjectMocks LeadService leadService;
 
@@ -126,7 +125,7 @@ class LeadServiceTest {
 
             when(leadMapper.toDomain(any(), eq(TENANT_ID))).thenReturn(lead);
             when(clientRepository.findById(CLIENT_ID, TENANT_ID)).thenReturn(client);
-            when(feignPort.getUser(USER_ID)).thenReturn(stubUserResponse());
+            when(userFeignPort.getUser(USER_ID)).thenReturn(stubUserResponse());
             when(leadMapper.toResponse(lead)).thenReturn(response);
 
             LeadResponse result = leadService.createLead(request);
@@ -161,7 +160,7 @@ class LeadServiceTest {
 
             when(leadMapper.toDomain(any(), eq(TENANT_ID))).thenReturn(lead);
             when(contactRepository.findById(CONTACT_ID, TENANT_ID)).thenReturn(contact);
-            when(feignPort.getUser(USER_ID)).thenReturn(stubUserResponse());
+            when(userFeignPort.getUser(USER_ID)).thenReturn(stubUserResponse());
             when(leadMapper.toResponse(lead)).thenReturn(response);
 
             LeadResponse result = leadService.createLead(request);

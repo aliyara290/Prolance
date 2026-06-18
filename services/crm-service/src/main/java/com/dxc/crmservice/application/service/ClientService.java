@@ -6,6 +6,7 @@ import com.dxc.crmservice.application.dto.client.res.ClientResponse;
 import com.dxc.crmservice.application.mapper.ClientMapper;
 import com.dxc.crmservice.application.port.in.ClientUseCase;
 import com.dxc.crmservice.application.port.out.ClientRepository;
+import com.dxc.crmservice.application.security.TenantGuard;
 import com.dxc.crmservice.application.utils.Utils;
 import com.dxc.crmservice.domain.exception.ServiceLogicException;
 import com.dxc.crmservice.domain.model.aggregate.Client;
@@ -26,10 +27,12 @@ public class ClientService implements ClientUseCase {
 
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
+    private final TenantGuard tenantGuard;
 
     @Override
     public ClientResponse createClient(CreateClientRequest request) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Client client = clientMapper.toDomain(request, tenantId);
             Client savedClient = clientRepository.save(client);
@@ -43,6 +46,7 @@ public class ClientService implements ClientUseCase {
     @Override
     public ClientResponse updateClient(UUID id, UpdateClientRequest request) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Client client = clientRepository.findById(id, tenantId);
             if (client == null) {
@@ -54,7 +58,12 @@ public class ClientService implements ClientUseCase {
                     request.industry() != null ? request.industry() : client.getIndustry(),
                     request.website() != null ? request.website() : client.getWebsite(),
                     request.phone() != null ? request.phone() : client.getPhone(),
-                    request.address() != null ? clientMapper.toAddress(request.address()) : client.getAddress()
+                    request.address() != null ? clientMapper.toAddress(request.address()) : client.getAddress(),
+                    request.annualRevenue() != null ? request.annualRevenue() : client.getAnnualRevenue(),
+                    request.fax() != null ? request.fax() : client.getFax(),
+                    request.ownership() != null ? request.ownership() : client.getOwnership(),
+                    request.sicCode() != null ? request.sicCode() : client.getSicCode(),
+                    request.description() != null ? request.description() : client.getDescription()
             );
 
             Client updatedClient = clientRepository.update(client);
@@ -68,6 +77,7 @@ public class ClientService implements ClientUseCase {
     @Override
     public void deleteClient(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             clientRepository.delete(id, tenantId);
         } catch (Exception e) {
@@ -79,6 +89,7 @@ public class ClientService implements ClientUseCase {
     @Override
     public ClientResponse getClient(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Client client = clientRepository.findById(id, tenantId);
         if (client == null) {
             throw new ServiceLogicException("Client not found");
@@ -89,6 +100,7 @@ public class ClientService implements ClientUseCase {
     @Override
     public Page<ClientResponse> getAllClients(Pageable pageable) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Page<Client> clients = clientRepository.findAll(tenantId, pageable);
         return clients.map(clientMapper::toResponse);
     }

@@ -2,9 +2,6 @@ server:
   port: 8081
 
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: create
   application:
     name: tenant-service
   profiles:

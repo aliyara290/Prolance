@@ -6,6 +6,7 @@ import com.dxc.crmservice.application.dto.contact.res.ContactResponse;
 import com.dxc.crmservice.application.mapper.ContactMapper;
 import com.dxc.crmservice.application.port.in.ContactUseCase;
 import com.dxc.crmservice.application.port.out.ContactRepository;
+import com.dxc.crmservice.application.security.TenantGuard;
 import com.dxc.crmservice.application.utils.Utils;
 import com.dxc.crmservice.domain.exception.ServiceLogicException;
 import com.dxc.crmservice.domain.model.entity.Contact;
@@ -26,10 +27,12 @@ public class ContactService implements ContactUseCase {
 
     private final ContactRepository contactRepository;
     private final ContactMapper contactMapper;
+    private final TenantGuard tenantGuard;
 
     @Override
     public ContactResponse createContact(CreateContactRequest request) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Contact contact = contactMapper.toDomain(request, tenantId);
             Contact savedContact = contactRepository.save(contact);
@@ -43,6 +46,7 @@ public class ContactService implements ContactUseCase {
     @Override
     public ContactResponse updateContact(UUID id, UpdateContactRequest request) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Contact contact = contactRepository.findById(id, tenantId);
             if (contact == null) {
@@ -56,7 +60,12 @@ public class ContactService implements ContactUseCase {
                     request.phone() != null ? request.phone() : contact.getPhone(),
                     request.role() != null ? request.role() : contact.getRole(),
                     request.influenceLevel() != null ? request.influenceLevel() : contact.getInfluenceLevel(),
-                    request.notes() != null ? request.notes() : contact.getNotes()
+                    request.notes() != null ? request.notes() : contact.getNotes(),
+                    request.department() != null ? request.department() : contact.getDepartment(),
+                    request.dateOfBirth() != null ? request.dateOfBirth() : contact.getDateOfBirth(),
+                    request.secondaryEmail() != null ? request.secondaryEmail() : contact.getSecondaryEmail(),
+                    request.address() != null ? contactMapper.toAddress(request.address()) : contact.getAddress(),
+                    request.description() != null ? request.description() : contact.getDescription()
             );
 
             if (request.primary() && !contact.isPrimary()) {
@@ -76,6 +85,7 @@ public class ContactService implements ContactUseCase {
     @Override
     public void deleteContact(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             contactRepository.delete(id, tenantId);
         } catch (Exception e) {
@@ -87,6 +97,7 @@ public class ContactService implements ContactUseCase {
     @Override
     public ContactResponse getContact(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Contact contact = contactRepository.findById(id, tenantId);
         if (contact == null) {
             throw new ServiceLogicException("Contact not found");
@@ -97,6 +108,7 @@ public class ContactService implements ContactUseCase {
     @Override
     public Page<ContactResponse> getAllContacts(Pageable pageable) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Page<Contact> contacts = contactRepository.findAll(tenantId, pageable);
         return contacts.map(contactMapper::toResponse);
     }

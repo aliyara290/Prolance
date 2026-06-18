@@ -1,7 +1,7 @@
 package com.dxc.tenantservice.application.dto.tenant.res;
 
-import com.dxc.tenantservice.domain.model.enums.TenantIndustry;
-import com.dxc.tenantservice.domain.model.enums.TenantStatus;
+import com.dxc.tenantservice.domain.model.valueobject.TenantIndustry;
+import com.dxc.tenantservice.domain.model.valueobject.TenantStatus;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -18,6 +18,7 @@ public record TenantResDTO(
         String description,
         String logo,
         TenantIndustry industry,
-        TenantStatus status
+        TenantStatus status,
+        AddressResponseDTO address
 ) {
 }

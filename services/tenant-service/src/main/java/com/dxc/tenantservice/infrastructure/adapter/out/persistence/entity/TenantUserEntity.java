@@ -1,12 +1,14 @@
 package com.dxc.tenantservice.infrastructure.adapter.out.persistence.entity;
 
-import com.dxc.tenantservice.domain.model.enums.UserStatus;
+import com.dxc.tenantservice.domain.model.valueobject.UserStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -20,6 +22,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE tenant_users SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class TenantUserEntity extends BaseAuditingEntity {
     @Id
     private UUID id;
@@ -42,6 +46,9 @@ public class TenantUserEntity extends BaseAuditingEntity {
     @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
+    private String username;
+
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
@@ -62,4 +69,7 @@ public class TenantUserEntity extends BaseAuditingEntity {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_preference_id")
     private TenantUserPreferenceEntity userPreference;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }

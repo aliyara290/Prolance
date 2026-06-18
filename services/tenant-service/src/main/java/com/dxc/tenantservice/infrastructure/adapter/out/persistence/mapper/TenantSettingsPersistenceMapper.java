@@ -1,6 +1,6 @@
 package com.dxc.tenantservice.infrastructure.adapter.out.persistence.mapper;
 
-import com.dxc.tenantservice.domain.model.enums.Language;
+import com.dxc.tenantservice.domain.model.valueobject.Language;
 import com.dxc.tenantservice.domain.model.tenant.TenantSettings;
 import com.dxc.tenantservice.infrastructure.adapter.out.persistence.entity.TenantSettingsEntity;
 import org.springframework.stereotype.Component;

@@ -165,6 +165,18 @@ public class KeycloakAdapter implements KeycloakPort {
     }
 
     @Override
+    public void updateUser(UUID keycloakUserId, KeycloakUserResDTO userDto) {
+        try {
+            log.info("Updating user in Keycloak: userId={}", keycloakUserId);
+            userClient.updateUser(keycloakUserId, userDto);
+            log.info("User updated successfully: userId={}", keycloakUserId);
+        } catch (Exception ex) {
+            log.error("Error updating user: userId={}, error={}", keycloakUserId, ex.getMessage(), ex);
+            throw new KeycloakIntegrationException("Failed to update user in Keycloak: " + ex.getMessage(), ex);
+        }
+    }
+
+    @Override
     public void deleteUser(String keycloakUserId) {
         try {
             log.info("Deleting user from Keycloak: userId={}", keycloakUserId);

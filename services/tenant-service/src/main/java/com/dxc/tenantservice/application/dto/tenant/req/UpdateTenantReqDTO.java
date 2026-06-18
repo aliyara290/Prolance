@@ -1,6 +1,5 @@
 package com.dxc.tenantservice.application.dto.tenant.req;
 
-import com.dxc.tenantservice.domain.model.valueobjects.Address;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -33,7 +32,7 @@ public class UpdateTenantReqDTO {
     private String logo;
 
     @Valid
-    private Address address;
+    private AddressReqDTO address;
 
     @Min(value = 1, message = "Company size must be at least 1")
     @Max(value = 1_000_000, message = "Company size is unrealistically large")

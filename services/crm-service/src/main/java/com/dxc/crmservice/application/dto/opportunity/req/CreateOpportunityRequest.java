@@ -1,6 +1,8 @@
 package com.dxc.crmservice.application.dto.opportunity.req;
 
+import com.dxc.crmservice.domain.model.valueobject.OpportunityType;
 import com.dxc.crmservice.domain.model.valueobject.Priority;
+import com.dxc.crmservice.domain.model.valueobject.Source;
 import com.dxc.crmservice.domain.model.valueobject.Stage;
 import jakarta.validation.constraints.*;
 
@@ -40,7 +42,11 @@ public record CreateOpportunityRequest(
         LocalDate expectedEndDate,
 
         @NotNull(message = "Priority is required")
-        Priority priority
+        Priority priority,
+
+        OpportunityType type,
+
+        Source source
 
 ) {
 }

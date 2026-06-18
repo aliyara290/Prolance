@@ -29,6 +29,7 @@ public class Activity {
     private final UUID entityId;
     private final EntityType entityType;
 
+    private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

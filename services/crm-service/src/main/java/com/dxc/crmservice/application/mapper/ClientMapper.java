@@ -21,11 +21,40 @@ public interface ClientMapper {
                 request.phone(),
                 toAddress(request.address()),
                 request.type(),
-                request.source()
+                request.source(),
+                request.annualRevenue(),
+                request.fax(),
+                request.ownership(),
+                request.sicCode(),
+                request.description(),
+                null // createdBy - resolved from security context if needed
         );
     }
 
-    ClientResponse toResponse(Client client);
+    default ClientResponse toResponse(Client client) {
+        if (client == null) return null;
+        return new ClientResponse(
+                client.getId(),
+                client.getName(),
+                client.getIndustry(),
+                client.getWebsite(),
+                client.getPhone(),
+                toAddressDto(client.getAddress()),
+                client.getAddress() != null ? client.getAddress().getCountry() : null,
+                client.getStatus(),
+                client.getType(),
+                client.getSource(),
+                client.getAnnualRevenue(),
+                client.getFax(),
+                client.getOwnership(),
+                client.getSicCode(),
+                client.getDescription(),
+                client.getCreatedBy(),
+                client.getUpdatedBy(),
+                client.getCreatedAt(),
+                client.getUpdatedAt()
+        );
+    }
 
     default Address toAddress(AddressDto dto) {
         if (dto == null) return null;

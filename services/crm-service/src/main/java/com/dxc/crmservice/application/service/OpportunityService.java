@@ -6,6 +6,7 @@ import com.dxc.crmservice.application.dto.opportunity.res.OpportunityResponse;
 import com.dxc.crmservice.application.mapper.OpportunityMapper;
 import com.dxc.crmservice.application.port.in.OpportunityUseCase;
 import com.dxc.crmservice.application.port.out.OpportunityRepository;
+import com.dxc.crmservice.application.security.TenantGuard;
 import com.dxc.crmservice.application.utils.Utils;
 import com.dxc.crmservice.domain.exception.ServiceLogicException;
 import com.dxc.crmservice.domain.model.aggregate.Opportunity;
@@ -25,12 +26,14 @@ import java.util.UUID;
 @Transactional
 public class OpportunityService implements OpportunityUseCase {
 
+    private final TenantGuard tenantGuard;
     private final OpportunityRepository opportunityRepository;
     private final OpportunityMapper opportunityMapper;
 
     @Override
     public OpportunityResponse createOpportunity(CreateOpportunityRequest request) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Opportunity opportunity = opportunityMapper.toDomain(request, tenantId);
             opportunityRepository.save(opportunity);
@@ -44,6 +47,7 @@ public class OpportunityService implements OpportunityUseCase {
     @Override
     public OpportunityResponse updateOpportunity(UUID id, UpdateOpportunityRequest request) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Opportunity opportunity = opportunityRepository.findById(id, tenantId);
             if (opportunity == null) {
@@ -75,6 +79,7 @@ public class OpportunityService implements OpportunityUseCase {
     @Override
     public void deleteOpportunity(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             opportunityRepository.delete(id, tenantId);
         } catch (Exception e) {
@@ -87,6 +92,7 @@ public class OpportunityService implements OpportunityUseCase {
     @Transactional(readOnly = true)
     public OpportunityResponse getOpportunity(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Opportunity opportunity = opportunityRepository.findById(id, tenantId);
         if (opportunity == null) {
             throw new ServiceLogicException("Opportunity not found");
@@ -98,6 +104,7 @@ public class OpportunityService implements OpportunityUseCase {
     @Transactional(readOnly = true)
     public Page<OpportunityResponse> getAllOpportunities(Pageable pageable) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Page<Opportunity> opportunities = opportunityRepository.findAll(tenantId, pageable);
         return opportunities.map(opportunityMapper::toResponse);
     }
@@ -105,6 +112,7 @@ public class OpportunityService implements OpportunityUseCase {
     @Override
     public OpportunityResponse moveStage(UUID id, Stage stage) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Opportunity opportunity = opportunityRepository.findById(id, tenantId);
         if (opportunity == null) {
             throw new ServiceLogicException("Opportunity not found");
@@ -117,6 +125,7 @@ public class OpportunityService implements OpportunityUseCase {
     @Override
     public OpportunityResponse markAsWon(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Opportunity opportunity = opportunityRepository.findById(id, tenantId);
         if (opportunity == null) {
             throw new ServiceLogicException("Opportunity not found");
@@ -129,6 +138,7 @@ public class OpportunityService implements OpportunityUseCase {
     @Override
     public OpportunityResponse markAsLost(UUID id, String reason) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Opportunity opportunity = opportunityRepository.findById(id, tenantId);
         if (opportunity == null) {
             throw new ServiceLogicException("Opportunity not found");

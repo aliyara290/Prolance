@@ -2,10 +2,12 @@ package com.dxc.crmservice.domain.model.entity;
 
 import com.dxc.crmservice.domain.exception.BusinessRuleViolationException;
 import com.dxc.crmservice.domain.exception.ValidationException;
+import com.dxc.crmservice.domain.model.valueobject.Address;
 import com.dxc.crmservice.domain.model.valueobject.InfluenceLevel;
 import com.dxc.crmservice.domain.model.valueobject.Role;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -25,6 +27,17 @@ public class Contact {
     private boolean primary;
     private LocalDateTime lastContactedAt;
     private String notes;
+
+    private String department;
+    private LocalDate dateOfBirth;
+    private String secondaryEmail;
+    private Address address;
+    private String description;
+
+    private UUID createdBy;
+    private UUID updatedBy;
+
+    private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -38,7 +51,13 @@ public class Contact {
                     Role role,
                     InfluenceLevel influenceLevel,
                     boolean primary,
-                    String notes) {
+                    String notes,
+                    String department,
+                    LocalDate dateOfBirth,
+                    String secondaryEmail,
+                    Address address,
+                    String description,
+                    UUID createdBy) {
 
         this.id = id == null ? UUID.randomUUID() : id;
         this.tenantId = requireNonNull(tenantId, "tenantId");
@@ -49,7 +68,11 @@ public class Contact {
 
         this.primary = primary;
 
-        updateProfile(firstName, lastName, email, phone, role, influenceLevel, notes);
+        this.createdBy = createdBy;
+        this.updatedBy = createdBy;
+
+        updateProfile(firstName, lastName, email, phone, role, influenceLevel, notes,
+                department, dateOfBirth, secondaryEmail, address, description);
     }
 
     public static Contact create(UUID tenantId,
@@ -61,7 +84,13 @@ public class Contact {
                                  Role role,
                                  InfluenceLevel influenceLevel,
                                  boolean primary,
-                                 String notes) {
+                                 String notes,
+                                 String department,
+                                 LocalDate dateOfBirth,
+                                 String secondaryEmail,
+                                 Address address,
+                                 String description,
+                                 UUID createdBy) {
 
         return new Contact(
                 null,
@@ -74,7 +103,13 @@ public class Contact {
                 role,
                 influenceLevel,
                 primary,
-                notes
+                notes,
+                department,
+                dateOfBirth,
+                secondaryEmail,
+                address,
+                description,
+                createdBy
         );
     }
 
@@ -90,6 +125,13 @@ public class Contact {
                                     boolean primary,
                                     LocalDateTime lastContactedAt,
                                     String notes,
+                                    String department,
+                                    LocalDate dateOfBirth,
+                                    String secondaryEmail,
+                                    Address address,
+                                    String description,
+                                    UUID createdBy,
+                                    UUID updatedBy,
                                     LocalDateTime createdAt,
                                     LocalDateTime updatedAt) {
 
@@ -104,10 +146,17 @@ public class Contact {
                 role,
                 influenceLevel,
                 primary,
-                notes
+                notes,
+                department,
+                dateOfBirth,
+                secondaryEmail,
+                address,
+                description,
+                createdBy
         );
 
         contact.lastContactedAt = lastContactedAt;
+        contact.updatedBy = updatedBy;
         contact.createdAt = requireNonNull(createdAt, "createdAt");
         contact.updatedAt = requireNonNull(updatedAt, "updatedAt");
 
@@ -120,7 +169,12 @@ public class Contact {
                               String phone,
                               Role role,
                               InfluenceLevel influenceLevel,
-                              String notes) {
+                              String notes,
+                              String department,
+                              LocalDate dateOfBirth,
+                              String secondaryEmail,
+                              Address address,
+                              String description) {
 
         this.firstName = validateName(firstName, "First name");
         this.lastName = validateName(lastName, "Last name");
@@ -132,6 +186,11 @@ public class Contact {
         this.influenceLevel = requireNonNull(influenceLevel, "influenceLevel");
 
         this.notes = notes;
+        this.department = department;
+        this.dateOfBirth = dateOfBirth;
+        this.secondaryEmail = secondaryEmail;
+        this.address = address;
+        this.description = description;
 
         touch();
     }
