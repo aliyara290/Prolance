@@ -17,4 +17,6 @@ public record MilestoneResponse(
     float progressPercentage,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
-) {}
+) {
+
+}
