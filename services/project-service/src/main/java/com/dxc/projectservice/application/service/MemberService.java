@@ -7,10 +7,13 @@ import com.dxc.projectservice.application.mapper.MemberApplicationMapper;
 import com.dxc.projectservice.application.port.in.MemberUseCase;
 import com.dxc.projectservice.application.port.out.DomainEventPublisher;
 import com.dxc.projectservice.application.port.out.ProjectRepository;
+import com.dxc.projectservice.application.port.out.feign.UserFeignPort;
 import com.dxc.projectservice.application.security.TenantGuard;
 import com.dxc.projectservice.domain.exception.RecordNotFoundException;
 import com.dxc.projectservice.domain.model.aggregate.Project;
 import com.dxc.projectservice.domain.model.entity.Member;
+import com.dxc.projectservice.infrastructure.adapter.out.feign.dto.ResponseWrapper;
+import com.dxc.projectservice.infrastructure.adapter.out.feign.dto.UserResponseDTO;
 import com.dxc.projectservice.infrastructure.config.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,6 +32,7 @@ public class MemberService implements MemberUseCase {
     private final ProjectRepository projectRepository;
     private final DomainEventPublisher eventPublisher;
     private final MemberApplicationMapper memberMapper;
+    private final UserFeignPort userFeignPort;
     private final TenantGuard tenantGuard;
 
     @Override
@@ -38,6 +42,12 @@ public class MemberService implements MemberUseCase {
         UUID actionBy = TenantContextHolder.getUserId();
         
         Project project = getProject(projectId, tenantId);
+
+        ResponseWrapper<UserResponseDTO> user = userFeignPort.getUser(request.userId());
+        if(user.data() == null) {
+            throw new RecordNotFoundException("User not found");
+        }
+        
         project.addMember(request.userId(), request.role(), request.allocationPercentage(), request.status(), actionBy);
         
         projectRepository.save(project);

@@ -18,6 +18,6 @@ import java.util.UUID;
 )
 public interface UserClient {
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/keycloak")
     ResponseEntity<ResponseWrapper<UserResponseDTO>> getUser(@RequestBody @PathVariable("id") UUID id);
 }
