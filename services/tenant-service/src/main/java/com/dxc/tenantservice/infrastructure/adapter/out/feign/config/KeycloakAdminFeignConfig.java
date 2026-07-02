@@ -1,4 +1,4 @@
-package com.dxc.tenantservice.infrastructure.adapter.out.keycloak.config;
+package com.dxc.tenantservice.infrastructure.adapter.out.feign.config;
 
 import feign.RequestInterceptor;
 import lombok.extern.slf4j.Slf4j;

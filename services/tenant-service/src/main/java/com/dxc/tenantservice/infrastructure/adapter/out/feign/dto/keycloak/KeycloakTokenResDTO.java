@@ -1,4 +1,4 @@
-package com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.keycloak;
+package com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.keycloak;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

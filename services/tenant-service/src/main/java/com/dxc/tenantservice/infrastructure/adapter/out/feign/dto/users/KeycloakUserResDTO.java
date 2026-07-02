@@ -1,4 +1,4 @@
-package com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users;
+package com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.users;
 
 import lombok.*;
 

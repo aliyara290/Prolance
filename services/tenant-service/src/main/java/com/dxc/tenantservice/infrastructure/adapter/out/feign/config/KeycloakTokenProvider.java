@@ -1,8 +1,8 @@
-package com.dxc.tenantservice.infrastructure.adapter.out.keycloak.config;
+package com.dxc.tenantservice.infrastructure.adapter.out.feign.config;
 
 
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.client.KeycloakTokenClient;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.keycloak.KeycloakTokenResDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.client.KeycloakTokenClient;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.keycloak.KeycloakTokenResDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

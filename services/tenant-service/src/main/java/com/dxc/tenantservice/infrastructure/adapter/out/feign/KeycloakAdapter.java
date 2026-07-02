@@ -1,14 +1,14 @@
-package com.dxc.tenantservice.infrastructure.adapter.out.keycloak;
+package com.dxc.tenantservice.infrastructure.adapter.out.feign;
 
 import com.dxc.tenantservice.application.port.out.keycloak.KeycloakPort;
 import com.dxc.tenantservice.domain.exception.KeycloakIntegrationException;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.client.*;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.groups.CreateKeycloakGroupReqDTO;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.groups.KeycloakGroupResDTO;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.role.KeycloakRoleReqDTO;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.role.KeycloakRoleResDTO;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserReqDTO;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserResDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.client.*;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.groups.CreateKeycloakGroupReqDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.groups.KeycloakGroupResDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.role.KeycloakRoleReqDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.role.KeycloakRoleResDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.users.KeycloakUserReqDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.users.KeycloakUserResDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package com.dxc.tenantservice.infrastructure.adapter.out.keycloak.config;
+package com.dxc.tenantservice.infrastructure.adapter.out.feign.config;
 
 import feign.Contract;
 import feign.codec.Encoder;

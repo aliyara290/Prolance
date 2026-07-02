@@ -1,7 +1,7 @@
-package com.dxc.tenantservice.infrastructure.adapter.out.keycloak.client;
+package com.dxc.tenantservice.infrastructure.adapter.out.feign.client;
 
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.config.KeycloakTokenClientConfig;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.keycloak.KeycloakTokenResDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.config.KeycloakTokenClientConfig;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.keycloak.KeycloakTokenResDTO;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;

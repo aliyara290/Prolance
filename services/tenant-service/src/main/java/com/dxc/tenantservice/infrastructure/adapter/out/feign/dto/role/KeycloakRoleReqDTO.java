@@ -1,4 +1,4 @@
-package com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.role;
+package com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.role;
 
 import lombok.*;
 

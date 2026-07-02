@@ -1,8 +1,8 @@
-package com.dxc.tenantservice.infrastructure.adapter.out.keycloak.client;
+package com.dxc.tenantservice.infrastructure.adapter.out.feign.client;
 
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.config.KeycloakAdminFeignConfig;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserReqDTO;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserResDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.config.KeycloakAdminFeignConfig;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.users.KeycloakUserReqDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.users.KeycloakUserResDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
