@@ -1,5 +1,6 @@
 package com.dxc.crmservice.application.dto.lead.res;
 
+import com.dxc.crmservice.application.dto.AddressDto;
 import com.dxc.crmservice.application.dto.client.res.ClientResponse;
 import com.dxc.crmservice.application.dto.contact.res.ContactResponse;
 import com.dxc.crmservice.domain.model.valueobject.LeadStatus;
@@ -26,6 +27,16 @@ public record LeadResponse(
         ContactResponse contact,
         @JsonInclude(JsonInclude.Include.NON_NULL)
         ClientResponse client,
+        String phone,
+        String industry,
+        Double annualRevenue,
+        String company,
+        String email,
+        String website,
+        Integer numberOfEmployees,
+        AddressDto address,
+        UUID createdBy,
+        UUID updatedBy,
         LocalDateTime createdAt,
         LocalDateTime updatedAt) {
 }

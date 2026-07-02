@@ -45,8 +45,9 @@ public class ContactRepositoryAdapter implements ContactRepository {
 
     @Override
     public void delete(UUID id, UUID tenantId) {
-        contactRepositoryJpa.findByIdAndTenantId(id, tenantId)
-                .ifPresent(contactRepositoryJpa::delete);
+        ContactEntity contactEntity = contactRepositoryJpa.findByIdAndTenantId(id, tenantId)
+                .orElseThrow(() -> new RuntimeException("Contact not found"));
+        contactRepositoryJpa.delete(contactEntity);
     }
 
     @Override

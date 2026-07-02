@@ -6,6 +6,7 @@ import com.dxc.crmservice.application.dto.activity.res.ActivityResponse;
 import com.dxc.crmservice.application.mapper.ActivityMapper;
 import com.dxc.crmservice.application.port.in.ActivityUseCase;
 import com.dxc.crmservice.application.port.out.ActivityRepository;
+import com.dxc.crmservice.application.security.TenantGuard;
 import com.dxc.crmservice.application.utils.Utils;
 import com.dxc.crmservice.domain.exception.ServiceLogicException;
 import com.dxc.crmservice.domain.model.entity.Activity;
@@ -25,12 +26,14 @@ import java.util.UUID;
 @Transactional
 public class ActivityService implements ActivityUseCase {
 
+    private final TenantGuard tenantGuard;
     private final ActivityRepository activityRepository;
     private final ActivityMapper activityMapper;
 
     @Override
     public ActivityResponse createActivity(CreateActivityRequest request) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Activity activity = activityMapper.toDomain(request, tenantId);
             activityRepository.save(activity);
@@ -44,6 +47,7 @@ public class ActivityService implements ActivityUseCase {
     @Override
     public ActivityResponse updateActivity(UUID id, UpdateActivityRequest request) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Activity activity = activityRepository.findById(id, tenantId);
             if (activity == null) {
@@ -70,6 +74,7 @@ public class ActivityService implements ActivityUseCase {
     @Override
     public void deleteActivity(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             activityRepository.delete(id, tenantId);
         } catch (Exception e) {
@@ -82,6 +87,7 @@ public class ActivityService implements ActivityUseCase {
     @Transactional(readOnly = true)
     public ActivityResponse getActivity(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Activity activity = activityRepository.findById(id, tenantId);
         if (activity == null) {
             throw new ServiceLogicException("Activity not found");
@@ -93,6 +99,7 @@ public class ActivityService implements ActivityUseCase {
     @Transactional(readOnly = true)
     public Page<ActivityResponse> getAllActivities(Pageable pageable) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Page<Activity> activities = activityRepository.findAll(tenantId, pageable);
         return activities.map(activityMapper::toResponse);
     }
@@ -100,6 +107,7 @@ public class ActivityService implements ActivityUseCase {
     @Override
     public ActivityResponse completeActivity(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Activity activity = activityRepository.findById(id, tenantId);
         if (activity == null) {
             throw new ServiceLogicException("Activity not found");
@@ -112,6 +120,7 @@ public class ActivityService implements ActivityUseCase {
     @Override
     public ActivityResponse rescheduleActivity(UUID id, LocalDateTime newDate) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Activity activity = activityRepository.findById(id, tenantId);
         if (activity == null) {
             throw new ServiceLogicException("Activity not found");

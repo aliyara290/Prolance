@@ -1,0 +1,955 @@
+/* =========================================
+   THEME TOKENS
+========================================= */
+:root {
+  --color-primary: #267af7;
+  --color-primary-hover: #1464dc;
+  --color-primary-active: #0f4fb1;
+  --color-primary-soft: #e8f1ff;
+
+  --color-bg: #f0f2f5;
+  --color-card: #ffffff;
+  --color-card-muted: #f1f5f9;
+  --color-panel-right: #f5f7ff;
+
+  --color-text: #121320;
+  --color-text-secondary: #555555;
+  --color-text-muted: #64748b;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+
+  --color-success: #16a34a;
+  --color-success-soft: #dcfce7;
+
+  --color-warning: #f59e0b;
+  --color-warning-soft: #fef3c7;
+
+  --color-danger: #dc2626;
+  --color-danger-soft: #fee2e2;
+
+  --color-info: #0ea5e9;
+  --color-info-soft: #e0f2fe;
+
+  --font-sans: "Inter", sans-serif;
+
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.05);
+  --shadow-card: 0 4px 24px rgb(15 23 42 / 0.1);
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  /* background-color: var(--color-bg); */
+
+  color: var(--color-text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  -webkit-font-smoothing: antialiased;
+  padding: 24px 16px;
+}
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-image: url('../img/background.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.4;
+}
+
+/* =========================================
+   SPLIT CARD LAYOUT
+========================================= */
+.split-card {
+  display: flex;
+  width: 100%;
+  max-width: 480px;
+  background-color: var(--color-card);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* --- LEFT PANEL --- */
+.split-left {
+  flex: 1;
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-container {
+  margin-bottom: 28px;
+}
+
+.logo-lockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  /* background-color: var(--color-primary); */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-icon svg {
+  width: 24px;
+  height: 24px;
+  color: #fff;
+}
+
+.logo-text {
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+}
+
+.card-header {
+  margin-bottom: 24px;
+}
+
+.card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.card-subtitle {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+/* --- RIGHT PANEL --- */
+.split-right {
+  flex: 1;
+  background: linear-gradient(145deg, #eef2ff 0%, #f5f7ff 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  text-align: center;
+}
+
+.split-right-illustration {
+  width: 100%;
+  max-width: 280px;
+  margin-bottom: 24px;
+}
+
+.split-right-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.split-right-desc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  max-width: 220px;
+}
+
+/* =========================================
+   ALERTS
+========================================= */
+.alert {
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.alert svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.alert-error {
+  background-color: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.alert-success {
+  background-color: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.alert-warning {
+  background-color: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.alert-info {
+  background-color: var(--color-info-soft);
+  color: var(--color-info);
+}
+
+/* =========================================
+   FORM ELEMENTS
+========================================= */
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.kc-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 6px;
+}
+
+.kc-input {
+  width: 100%;
+  min-width: 200px;
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 14px;
+  color: var(--color-text);
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.kc-input:hover {
+  border-color: var(--color-border-strong);
+}
+
+.kc-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-soft);
+}
+
+.kc-input.is-error {
+  border-color: var(--color-danger);
+  background-color: #fff8f8;
+}
+
+.kc-input.is-error:focus {
+  box-shadow: 0 0 0 2px var(--color-danger-soft);
+}
+
+.field-error {
+  margin-top: 5px;
+  font-size: 12px;
+  color: var(--color-danger);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.field-error::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background-color: var(--color-danger);
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='white'%3E%3Cpath d='M6 4v3M6 8.5v.5' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.kc-button {
+  width: 100%;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 24px;
+  border: 1.5px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  font-family: inherit;
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.kc-button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.kc-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-primary);
+}
+
+/* Outline / ghost variant */
+.kc-button-outline {
+  background-color: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.kc-button-outline:hover {
+  background-color: var(--color-primary-soft);
+  border-color: var(--color-primary-hover);
+  color: var(--color-primary-hover);
+}
+
+.kc-link {
+  font-size: 13px;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.kc-link:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.flex-between .kc-label {
+  margin-bottom: 0;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.checkbox-group label {
+  font-size: 13px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+/* =========================================
+   SOCIAL LOGIN
+========================================= */
+.social-login-section {
+  margin-top: 20px;
+}
+
+.social-login-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+
+.social-icons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.social-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.social-icon-btn:hover {
+  border-color: var(--color-border-strong);
+  background-color: var(--color-card-muted);
+  transform: translateY(-1px);
+}
+
+.social-icon-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+.footer-action {
+  margin-top: auto;
+  padding-top: 24px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.footer-action .kc-link {
+  font-weight: 600;
+}
+
+.page-footer {
+  margin-top: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.page-footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.page-footer-links a {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.page-footer-links a:hover {
+  color: var(--color-text);
+}
+
+.page-footer-links span {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.page-footer p {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+@media (max-width: 640px) {
+  .split-card {
+    flex-direction: column;
+    max-width: 400px;
+  }
+
+  .split-left {
+    flex: unset;
+    padding: 32px 28px;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .split-right {
+    padding: 28px;
+    min-height: 200px;
+  }
+}
+
+/* =========================================
+   OTP / 2FA
+========================================= */
+
+/* Device selector cards */
+.otp-devices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.otp-device-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: var(--color-card);
+  user-select: none;
+}
+
+.otp-device-card:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.otp-device-card.selected {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.otp-device-card input[type="radio"] {
+  display: none;
+}
+
+.otp-device-radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.15s ease;
+}
+
+.otp-device-card.selected .otp-device-radio {
+  border-color: var(--color-primary);
+}
+
+.otp-device-radio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  display: none;
+}
+
+.otp-device-card.selected .otp-device-radio-dot {
+  display: block;
+}
+
+.otp-device-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background-color: #eef2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.otp-device-icon svg {
+  width: 20px;
+  height: 20px;
+  color: var(--color-primary);
+}
+
+.otp-device-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.otp-device-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.otp-device-type {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+/* OTP digit boxes */
+.otp-digits-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 8px 0 4px;
+}
+
+.otp-digit {
+  width: 44px;
+  height: 52px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+  background-color: var(--color-card);
+  transition: all 0.15s ease;
+  font-family: var(--font-sans);
+  caret-color: var(--color-primary);
+}
+
+.otp-digit:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-soft);
+}
+
+.otp-digit:not(:placeholder-shown) {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+/* Error state on individual digit boxes */
+.otp-digit.is-error {
+  border-color: var(--color-danger) !important;
+  background-color: var(--color-danger-soft) !important;
+  color: var(--color-danger);
+  animation: otp-shake 0.4s ease;
+}
+
+.otp-digit.is-error:focus {
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15);
+}
+
+/* Shake animation when OTP is wrong */
+@keyframes otp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-5px); }
+  40%       { transform: translateX(5px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+
+/* Inline error message below the digit row */
+.otp-field-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-danger);
+}
+
+.otp-field-error svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Separator dot between first 3 and last 3 */
+.otp-separator {
+  display: flex;
+  align-items: center;
+  color: var(--color-text-muted);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 52px;
+  padding: 0 2px;
+}
+
+/* Hidden real input (receives the combined value) */
+.otp-hidden-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}
+
+.otp-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* Resend / alternate method link */
+.otp-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.remeber-forgot{
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* =========================================
+   IDP LINK CONFIRM  (Account already exists)
+========================================= */
+.idp-link-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.idp-link-actions form {
+  width: 100%;
+}
+
+.idp-link-actions .kc-button {
+  margin-top: 0;
+}
+
+/* =========================================
+   REQUIRED FIELD MARKER
+========================================= */
+.field-required {
+  color: var(--color-danger);
+  font-size: 12px;
+  margin-left: 2px;
+}
+
+/* =========================================
+   ERROR / PAGE EXPIRED
+========================================= */
+.error-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.error-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background-color: var(--color-warning-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.error-icon-wrap svg {
+  width: 28px;
+  height: 28px;
+  color: var(--color-warning);
+}
+
+.error-instructions {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.error-instructions .kc-link {
+  font-weight: 600;
+}
+
+/* =========================================
+   VERIFY EMAIL  &  IDP LINK EMAIL
+========================================= */
+.verify-email-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 0 4px;
+}
+
+/* Hero SVG icon container */
+.verify-email-icon {
+  /* width: 96px;
+  height: 96px; */
+  margin-bottom: 20px;
+  animation: ve-float 3s ease-in-out infinite;
+}
+
+
+@keyframes ve-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+
+/* Title */
+.verify-email-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+}
+
+/* Instruction card */
+.verify-email-card {
+  background-color: var(--color-card-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  width: 100%;
+  text-align: left;
+}
+
+.verify-email-intro {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+}
+
+.verify-email-intro strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* Actions block */
+.verify-email-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+/* Primary resend button */
+.verify-email-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse) !important;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 11px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+  margin-top: 4px;
+}
+
+.verify-email-btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  color: var(--color-text-inverse) !important;
+}
+
+/* Hint text */
+.verify-email-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+/* =========================================
+   INFO / SUCCESS PAGE
+========================================= */
+.info-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 0 8px;
+  gap: 0;
+}
+
+/* Outer dashed-ring + inner filled circle wrapper */
+.info-icon-wrap {
+  margin-bottom: 24px;
+}
+
+.info-icon-ring {
+  width: 96px;
+  height: 96px;
+  animation: info-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+             info-ring-spin 12s linear infinite;
+}
+
+.info-icon-ring svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Pop-in entrance */
+@keyframes info-pop {
+  0%   { opacity: 0; transform: scale(0.6); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Very slow outer dashed ring rotation */
+@keyframes info-ring-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Keep inner circle stationary while ring rotates */
+.info-icon-ring svg circle:first-child {
+  transform-origin: center;
+}
+
+/* Main info message */
+.info-summary {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  max-width: 280px;
+  margin-bottom: 28px;
+}
+
+/* Primary CTA button */
+.info-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 0;
+}
+
+/* Secondary text action */
+.info-secondary-action {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}

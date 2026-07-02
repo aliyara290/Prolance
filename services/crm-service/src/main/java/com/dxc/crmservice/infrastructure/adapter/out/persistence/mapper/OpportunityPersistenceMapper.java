@@ -25,6 +25,10 @@ public class OpportunityPersistenceMapper {
                 .lastActivityAt(domain.getLastActivityAt())
                 .nextFollowUpAt(domain.getNextFollowUpAt())
                 .lostReason(domain.getLostReason())
+                .type(domain.getType())
+                .source(domain.getSource())
+                .createdBy(domain.getCreatedBy())
+                .updatedBy(domain.getUpdatedBy())
                 .build();
         
         entity.setTenantId(domain.getTenantId());
@@ -53,6 +57,10 @@ public class OpportunityPersistenceMapper {
                 entity.getLastActivityAt(),
                 entity.getNextFollowUpAt(),
                 entity.getLostReason(),
+                entity.getType(),
+                entity.getSource(),
+                entity.getCreatedBy(),
+                entity.getUpdatedBy(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );

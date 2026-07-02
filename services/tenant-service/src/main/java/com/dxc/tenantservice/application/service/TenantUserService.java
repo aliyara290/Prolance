@@ -16,9 +16,9 @@ import com.dxc.tenantservice.domain.model.tenant.Tenant;
 import com.dxc.tenantservice.domain.model.tenant.TenantSettings;
 import com.dxc.tenantservice.domain.model.tenant.TenantUser;
 import com.dxc.tenantservice.domain.model.tenant.UserPreference;
-import com.dxc.tenantservice.domain.model.enums.UserRole;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserReqDTO;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserResDTO;
+import com.dxc.tenantservice.domain.model.valueobject.UserRole;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.users.KeycloakUserReqDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.users.KeycloakUserResDTO;
 import com.dxc.tenantservice.infrastructure.config.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,8 +54,7 @@ public class TenantUserService implements TenantUserUseCase {
         }
 
         // Enforce plan limits
-        Tenant tenant = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new TenantStateException("Tenant not found: " + tenantId));
+        Tenant tenant = tenantRepository.findById(tenantId).orElseThrow(() -> new TenantStateException("Tenant not found: " + tenantId));
 
         log.info("================ Tenant found: {}", tenant.getKeycloakGroupId());
 
@@ -64,9 +62,7 @@ public class TenantUserService implements TenantUserUseCase {
         if (settings != null) {
             long currentUserCount = tenantUserRepository.countByTenantId(tenantId);
             if (currentUserCount >= settings.getMaxUsers()) {
-                throw new UserStateException(
-                        "Tenant has reached the maximum number of users (" + settings.getMaxUsers() + ") for the current plan"
-                );
+                throw new UserStateException("Tenant has reached the maximum number of users (" + settings.getMaxUsers() + ") for the current plan");
             }
         }
 
@@ -81,7 +77,7 @@ public class TenantUserService implements TenantUserUseCase {
         try {
             // Assign all roles in Keycloak
             UUID keycloakUserId = UUID.fromString(keycloakUserIdStr);
-            TenantUser user = TenantUser.create(tenantId, dto.getEmail(), dto.getFirstName(), dto.getLastName());
+            TenantUser user = TenantUser.create(tenantId, dto.getEmail(), dto.getUsername(), dto.getFirstName(), dto.getLastName());
             user.assignKeycloakUser(keycloakUserId);
 
             for (UserRole role : dto.getRoles()) {
@@ -126,12 +122,7 @@ public class TenantUserService implements TenantUserUseCase {
 
         TenantUser user = findUserByIdAndTenant(userId, tenantId);
 
-        user.updateProfile(
-                dto.getFirstName(),
-                dto.getLastName(),
-                dto.getJobTitle(),
-                dto.getDepartment()
-        );
+        user.updateProfile(dto.getFirstName(), dto.getLastName(), dto.getJobTitle(), dto.getDepartment());
 
         TenantUser saved = tenantUserRepository.save(user);
         return userDtoMapper.toDto(saved);
@@ -143,22 +134,22 @@ public class TenantUserService implements TenantUserUseCase {
         UUID tenantId = resolveTenantId();
         log.info("Deactivating user: userId={}, tenantId={}", userId, tenantId);
 
-       try {
-           TenantUser user = findUserByIdAndTenant(userId, tenantId);
-           user.deactivate();
+        try {
+            TenantUser user = findUserByIdAndTenant(userId, tenantId);
+            user.deactivate();
 
-           KeycloakUserResDTO keycloakUser = keycloakPort.getUser(user.getKeycloakUserId());
-           keycloakUser.setEnabled("false");
-           keycloakPort.deactivateUser(user.getKeycloakUserId(), keycloakUser);
+            KeycloakUserResDTO keycloakUser = keycloakPort.getUser(user.getKeycloakUserId());
+            keycloakUser.setEnabled("false");
+            keycloakPort.deactivateUser(user.getKeycloakUserId(), keycloakUser);
 
-           keycloakPort.logOutUser(user.getKeycloakUserId());
-           tenantUserRepository.save(user);
+            keycloakPort.logOutUser(user.getKeycloakUserId());
+            tenantUserRepository.save(user);
 
-           log.info("User deactivated: userId={}", userId);
-       } catch (Exception ex) {
-           log.error("Failed to deactivate user: {}", userId, ex);
-           throw new UserStateException("Failed to deactivate user: " + ex.getMessage());
-       }
+            log.info("User deactivated: userId={}", userId);
+        } catch (Exception ex) {
+            log.error("Failed to deactivate user: {}", userId, ex);
+            throw new UserStateException("Failed to deactivate user: " + ex.getMessage());
+        }
     }
 
     @Override
@@ -194,12 +185,32 @@ public class TenantUserService implements TenantUserUseCase {
     }
 
     @Override
+    public UserResDTO getUserByKeycloakId() {
+        UUID tenantId = resolveTenantId();
+        UUID keycloakUserId = TenantContextHolder.getUserId();
+        log.debug("Fetching user by keycloakId for tenant: tenantId={}", tenantId);
+        if (keycloakUserId == null) {
+            throw new UserStateException("Keycloak user ID not found");
+        }
+        TenantUser user = tenantUserRepository.findByKeycloakUserId(keycloakUserId).orElseThrow(() -> new UserStateException("User not found"));
+        return userDtoMapper.toDto(user);
+    }
+
+    @Override
+    public UserResDTO findUserByKeycloakIdAndTenantId(UUID keycloakUserId) {
+        UUID tenantId = resolveTenantId();
+        log.debug("Fetching user by keycloakId and tenantId: keycloakUserId={}, tenantId={}", keycloakUserId, tenantId);
+        TenantUser user = tenantUserRepository.findByKeycloakUserIdAndTenantId(keycloakUserId, tenantId)
+                .orElseThrow(() -> new UserStateException("User not found"));
+        return userDtoMapper.toDto(user);
+    }
+
+    @Override
     public Page<UserResDTO> getAllUsers(Pageable pageable) {
         UUID tenantId = resolveTenantId();
         log.debug("Fetching all users for tenant: tenantId={}", tenantId);
 
-        return tenantUserRepository.findByTenantId(pageable, tenantId)
-                .map(userDtoMapper::toDto);
+        return tenantUserRepository.findByTenantId(pageable, tenantId).map(userDtoMapper::toDto);
     }
 
 
@@ -212,15 +223,10 @@ public class TenantUserService implements TenantUserUseCase {
 
         TenantUser user = findUserByIdAndTenant(userId, tenantId);
 
-        Tenant tenant = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new TenantStateException("Tenant not found: " + tenantId));
+        Tenant tenant = tenantRepository.findById(tenantId).orElseThrow(() -> new TenantStateException("Tenant not found: " + tenantId));
 
         // Assign in Keycloak and track the group ID
-        UUID roleGroupId = keycloakPort.assignUserToGroup(
-                user.getKeycloakUserId().toString(),
-                tenant.getKeycloakGroupId(),
-                role.name()
-        );
+        UUID roleGroupId = keycloakPort.assignUserToGroup(user.getKeycloakUserId().toString(), tenant.getKeycloakGroupId(), role.name());
         user.addRoleGroup(roleGroupId);
 
         TenantUser saved = tenantUserRepository.save(user);
@@ -242,18 +248,13 @@ public class TenantUserService implements TenantUserUseCase {
             throw new UserStateException("Cannot remove the last role from user. A user must have at least one role.");
         }
 
-        Tenant tenant = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new TenantStateException("Tenant not found: " + tenantId));
+        Tenant tenant = tenantRepository.findById(tenantId).orElseThrow(() -> new TenantStateException("Tenant not found: " + tenantId));
 
         // Resolve the role group ID before removing from Keycloak
         UUID roleGroupId = keycloakPort.findRoleGroupId(tenant.getKeycloakGroupId(), role.name());
 
         // Remove from Keycloak
-        keycloakPort.removeUserFromGroup(
-                user.getKeycloakUserId().toString(),
-                tenant.getKeycloakGroupId(),
-                role.name()
-        );
+        keycloakPort.removeUserFromGroup(user.getKeycloakUserId().toString(), tenant.getKeycloakGroupId(), role.name());
         user.removeRoleGroup(roleGroupId);
 
         TenantUser saved = tenantUserRepository.save(user);
@@ -276,8 +277,7 @@ public class TenantUserService implements TenantUserUseCase {
     }
 
     private TenantUser findUserByIdAndTenant(UUID userId, UUID tenantId) {
-        TenantUser user = tenantUserRepository.findById(userId)
-                .orElseThrow(() -> new UserStateException("User not found: " + userId));
+        TenantUser user = tenantUserRepository.findById(userId).orElseThrow(() -> new UserStateException("User not found: " + userId));
 
         if (!user.getTenantId().equals(tenantId)) {
             throw new UserStateException("User not found: " + userId);
@@ -286,21 +286,6 @@ public class TenantUserService implements TenantUserUseCase {
     }
 
     private KeycloakUserReqDTO buildKeycloakUser(CreateUserReqDTO dto, UUID tenantId) {
-        return KeycloakUserReqDTO.builder()
-                .username(dto.getEmail())
-                .email(dto.getEmail())
-                .firstName(dto.getFirstName())
-                .lastName(dto.getLastName())
-                .enabled(true)
-                .emailVerified(false)
-                .attributes(Map.of("tenantId", List.of(tenantId.toString())))
-                .credentials(List.of(
-                        new KeycloakUserReqDTO.KeycloakCredentialRepresentation(
-                                "password",
-                                dto.getPassword(),
-                                true  // temporary = true — user must change on first login
-                        )
-                ))
-                .build();
+        return KeycloakUserReqDTO.builder().username(dto.getEmail()).email(dto.getEmail()).firstName(dto.getFirstName()).lastName(dto.getLastName()).enabled(true).emailVerified(false).attributes(Map.of("tenantId", List.of(tenantId.toString()))).credentials(List.of(new KeycloakUserReqDTO.KeycloakCredentialRepresentation("password", dto.getPassword(), true))).build();
     }
 }

@@ -2,7 +2,7 @@ package com.dxc.tenantservice.application.dto.user.req;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import com.dxc.tenantservice.domain.model.enums.UserRole;
+import com.dxc.tenantservice.domain.model.valueobject.UserRole;
 
 @Getter
 @Setter

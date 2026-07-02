@@ -48,14 +48,14 @@ public class LeadController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SALES', 'USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SALES')")
     public ResponseEntity<ApiResponse<LeadResponse>> getLead(@PathVariable("id") UUID id) {
         LeadResponse leadResponse = leadUseCase.getLead(id);
         return ResponseEntity.ok(ApiResponse.success(leadResponse));
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SALES', 'USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SALES')")
     public ResponseEntity<ApiResponse<List<LeadResponse>>> getAllLeads(Pageable pageable) {
         Page<LeadResponse> leads = leadUseCase.getAllLeads(pageable);
 

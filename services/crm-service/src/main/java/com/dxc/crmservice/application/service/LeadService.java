@@ -10,7 +10,6 @@ import com.dxc.crmservice.application.dto.lead.req.UpdateLeadRequest;
 import com.dxc.crmservice.application.dto.lead.res.LeadResponse;
 import com.dxc.crmservice.application.dto.opportunity.req.CreateOpportunityRequest;
 import com.dxc.crmservice.application.dto.opportunity.res.OpportunityResponse;
-import com.dxc.crmservice.application.mapper.ContactMapper;
 import com.dxc.crmservice.application.mapper.LeadMapper;
 import com.dxc.crmservice.application.port.in.ClientUseCase;
 import com.dxc.crmservice.application.port.in.ContactUseCase;
@@ -19,7 +18,8 @@ import com.dxc.crmservice.application.port.in.OpportunityUseCase;
 import com.dxc.crmservice.application.port.out.ClientRepository;
 import com.dxc.crmservice.application.port.out.ContactRepository;
 import com.dxc.crmservice.application.port.out.LeadRepository;
-import com.dxc.crmservice.application.port.out.feign.FeignPort;
+import com.dxc.crmservice.application.port.out.feign.UserFeignPort;
+import com.dxc.crmservice.application.security.TenantGuard;
 import com.dxc.crmservice.application.utils.Utils;
 import com.dxc.crmservice.domain.exception.RecordNotFoundException;
 import com.dxc.crmservice.domain.exception.ServiceLogicException;
@@ -30,6 +30,7 @@ import com.dxc.crmservice.domain.model.valueobject.LeadStatus;
 import com.dxc.crmservice.domain.model.valueobject.Stage;
 import com.dxc.crmservice.infrastructure.adapter.out.feign.dto.ResponseWrapper;
 import com.dxc.crmservice.infrastructure.adapter.out.feign.dto.UserResponseDTO;
+import com.dxc.crmservice.infrastructure.config.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -46,6 +47,7 @@ import java.util.UUID;
 @Transactional
 public class LeadService implements LeadUseCase {
 
+    private final TenantGuard tenantGuard;
     private final LeadRepository leadRepository;
     private final ContactRepository contactRepository;
     private final ClientRepository clientRepository;
@@ -53,13 +55,13 @@ public class LeadService implements LeadUseCase {
     private final ContactUseCase contactUseCase;
     private final ClientUseCase clientUseCase;
     private final OpportunityUseCase opportunityUseCase;
-    private final FeignPort feignPort;
+    private final UserFeignPort userFeignPort;
 
 
     @Override
-    public OpportunityResponse qualifyAndConvert(UUID leadId) {
+    public OpportunityResponse  qualifyAndConvert(UUID leadId) {
         UUID tenantId = Utils.resolveTenantId();
-
+        tenantGuard.ensureTenantIsActive(tenantId);
         Lead lead = leadRepository.findById(leadId, tenantId);
         if (lead == null) {
             throw new RecordNotFoundException("Lead not found");
@@ -86,8 +88,9 @@ public class LeadService implements LeadUseCase {
                         Stage.PROSPECTING, // Default stage
                         null,
                         null,
-
-                        lead.getPriority()
+                        lead.getPriority(),
+                        null, // type
+                        lead.getSource() // source
                 );
 
         return opportunityUseCase.createOpportunity(oppReq);
@@ -96,6 +99,7 @@ public class LeadService implements LeadUseCase {
     @Override
     public LeadResponse createLead(CreateLeadRequest request) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Lead lead = leadMapper.toDomain(request, tenantId);
 
@@ -140,9 +144,12 @@ public class LeadService implements LeadUseCase {
             if (request.assignedTo() == null) {
                 throw new ServiceLogicException("Lead must have an assigned user");
             }
-            ResponseWrapper<UserResponseDTO> user = feignPort.getUser(request.assignedTo());
-            lead.assignTo(user.data().id());
-
+            ResponseWrapper<UserResponseDTO> user = userFeignPort.getUser(request.assignedTo());
+            if (user.data() == null) {
+                throw new RecordNotFoundException("User not found");
+            }
+            lead.assignTo(user.data().keycloakUserId());
+            lead.createdBy(TenantContextHolder.getUserId());
             leadRepository.save(lead);
             return leadMapper.toResponse(lead);
         } catch (Exception e) {
@@ -157,13 +164,18 @@ public class LeadService implements LeadUseCase {
             CreateContactRequest contactRequest = CreateContactRequest.builder()
                     .email(request.email())
                     .phone(request.phone())
-                    .notes(request.email())
+                    .notes(request.notes())
                     .firstName(request.firstName())
                     .lastName(request.lastName())
                     .role(request.role())
                     .influenceLevel(request.influenceLevel())
                     .primary(request.primary())
                     .clientId(clientId)
+                    .department(request.department())
+                    .dateOfBirth(request.dateOfBirth())
+                    .secondaryEmail(request.secondaryEmail())
+                    .address(request.address())
+                    .description(request.description())
                     .build();
 
             return contactUseCase.createContact(contactRequest);
@@ -185,6 +197,7 @@ public class LeadService implements LeadUseCase {
     @Override
     public LeadResponse updateLead(UUID id, UpdateLeadRequest request) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Lead lead = leadRepository.findById(id, tenantId);
             if (lead == null) {
@@ -195,7 +208,15 @@ public class LeadService implements LeadUseCase {
                     request.title() != null ? request.title() : lead.getTitle(),
                     request.description() != null ? request.description() : lead.getDescription(),
                     request.source() != null ? request.source() : lead.getSource(),
-                    request.priority() != null ? request.priority() : lead.getPriority()
+                    request.priority() != null ? request.priority() : lead.getPriority(),
+                    request.phone() != null ? request.phone() : lead.getPhone(),
+                    request.industry() != null ? request.industry() : lead.getIndustry(),
+                    request.annualRevenue() != null ? request.annualRevenue() : lead.getAnnualRevenue(),
+                    request.company() != null ? request.company() : lead.getCompany(),
+                    request.email() != null ? request.email() : lead.getEmail(),
+                    request.website() != null ? request.website() : lead.getWebsite(),
+                    request.numberOfEmployees() != null ? request.numberOfEmployees() : lead.getNumberOfEmployees(),
+                    request.address() != null ? leadMapper.toAddress(request.address()) : lead.getAddress()
             );
 
             if (request.clientId() != null && !request.clientId().equals(lead.getClientId())) {
@@ -217,6 +238,7 @@ public class LeadService implements LeadUseCase {
     @Override
     public void deleteLead(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         try {
             Lead lead = leadRepository.findById(id, tenantId);
             if (lead == null) {
@@ -233,6 +255,7 @@ public class LeadService implements LeadUseCase {
     @Transactional(readOnly = true)
     public LeadResponse getLead(UUID id) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Lead lead = leadRepository.findById(id, tenantId);
         if (lead == null) {
             throw new RecordNotFoundException("Lead not found");
@@ -244,6 +267,7 @@ public class LeadService implements LeadUseCase {
     @Transactional(readOnly = true)
     public Page<LeadResponse> getAllLeads(Pageable pageable) {
         UUID tenantId = Utils.resolveTenantId();
+        tenantGuard.ensureTenantIsActive(tenantId);
         Page<Lead> leads = leadRepository.findAll(tenantId, pageable);
         return leads.map(leadMapper::toResponse);
     }

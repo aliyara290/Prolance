@@ -12,7 +12,6 @@ public class GatewayConfig {
     public RouteLocator routeLocator(RouteLocatorBuilder builder) {
 
         return builder.routes()
-
                 .route("tenant-service", r -> r
                         .path("/tenant/**")
                         .filters(f -> f
@@ -25,6 +24,18 @@ public class GatewayConfig {
                                 .rewritePath("/crm/(?<segment>.*)", "/${segment}")
                         )
                         .uri("lb://CRM-SERVICE"))
+                .route("project-service", r -> r
+                        .path("/project/**")
+                        .filters(f -> f
+                                .rewritePath("/project/(?<segment>.*)", "/${segment}")
+                        )
+                        .uri("lb://PROJECT-SERVICE"))
+                .route("task-service", r -> r
+                        .path("/tasks/**")
+                        .filters(f -> f
+                                .rewritePath("/tasks/(?<segment>.*)", "/${segment}")
+                        )
+                        .uri("lb://TASK-SERVICE"))
                 .build();
     }
 }

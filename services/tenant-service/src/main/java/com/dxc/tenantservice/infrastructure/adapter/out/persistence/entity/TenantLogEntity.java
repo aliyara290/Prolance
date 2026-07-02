@@ -1,6 +1,6 @@
 package com.dxc.tenantservice.infrastructure.adapter.out.persistence.entity;
 
-import com.dxc.tenantservice.domain.model.enums.TenantLogAction;
+import com.dxc.tenantservice.domain.model.valueobject.TenantLogAction;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

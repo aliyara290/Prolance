@@ -45,7 +45,9 @@ public class LeadRepositoryAdapter implements LeadRepository {
 
     @Override
     public void delete(UUID id, UUID tenantId) {
-        leadRepositoryJpa.findByIdAndTenantId(id, tenantId).ifPresent(leadRepositoryJpa::delete);
+        LeadEntity leadEntity = leadRepositoryJpa.findByIdAndTenantId(id, tenantId)
+                .orElseThrow(() -> new RuntimeException("Lead not found"));
+        leadRepositoryJpa.delete(leadEntity);
     }
 
     @Override

@@ -23,6 +23,7 @@ public class TenantUserPersistenceMapper {
                 .tenantId(domain.getTenantId())
                 .keycloakUserId(domain.getKeycloakUserId())
                 .keycloakRoleGroupIds(domain.getKeycloakRoleGroupIds())
+                .username(domain.getUsername())
                 .email(domain.getEmail())
                 .firstName(domain.getFirstName())
                 .lastName(domain.getLastName())
@@ -49,6 +50,7 @@ public class TenantUserPersistenceMapper {
                 entity.getKeycloakUserId(),
                 entity.getKeycloakRoleGroupIds(),
                 entity.getEmail(),
+                entity.getUsername(),
                 entity.getFirstName(),
                 entity.getLastName(),
                 entity.getJobTitle(),

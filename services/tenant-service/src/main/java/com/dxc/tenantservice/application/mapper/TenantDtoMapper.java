@@ -6,7 +6,7 @@ import com.dxc.tenantservice.domain.model.tenant.Tenant;
 import com.dxc.tenantservice.domain.model.tenant.TenantUser;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",uses = {TenantAddressMapper.class})
 public interface TenantDtoMapper {
     Tenant toDomain(TenantReqDto dto);
     TenantResDTO toDto(Tenant domain);

@@ -3,6 +3,7 @@ package com.dxc.crmservice.application.mapper;
 import com.dxc.crmservice.application.dto.opportunity.req.CreateOpportunityRequest;
 import com.dxc.crmservice.application.dto.opportunity.res.OpportunityResponse;
 import com.dxc.crmservice.domain.model.aggregate.Opportunity;
+import com.dxc.crmservice.domain.model.valueobject.Stage;
 import org.mapstruct.Mapper;
 
 import java.util.UUID;
@@ -19,12 +20,15 @@ public interface OpportunityMapper {
                 tenantId,
                 request.clientId(),
                 request.title(),
-                "", // description
+                request.description(),
                 budget,
-                request.expectedRevenue() != null ? request.expectedRevenue() : null, // expectedRevenue
-                request.probability() > 0 ? request.probability() : 0,  // probability
-                request.stage(),
-                request.priority()
+                request.expectedRevenue() != null ? request.expectedRevenue() : null,
+                request.probability() > 0 ? request.probability() : 0,
+                request.stage() != null ? request.stage() : Stage.PROPOSAL,
+                request.priority(),
+                request.type(),
+                request.source(),
+                null // createdBy
         );
     }
 
@@ -39,6 +43,7 @@ public interface OpportunityMapper {
                 opportunity.getId(),
                 opportunity.getClientId(),
                 opportunity.getTitle(),
+                opportunity.getDescription(),
                 amount,
                 opportunity.getStage(),
                 opportunity.getPriority(),
@@ -51,6 +56,10 @@ public interface OpportunityMapper {
                 opportunity.getNextFollowUpAt(),
                 opportunity.getClosingDate(),
                 opportunity.getLostReason(),
+                opportunity.getType(),
+                opportunity.getSource(),
+                opportunity.getCreatedBy(),
+                opportunity.getUpdatedBy(),
                 opportunity.getCreatedAt(),
                 opportunity.getUpdatedAt()
         );

@@ -1,0 +1,5 @@
+package com.dxc.tenantservice.domain.model.valueobject;
+
+public enum TenantIndustry {
+    TECHNOLOGY, FINANCE, HEALTHCARE, EDUCATION, MANUFACTURING, CONSULTING, MEDIA, REAL_ESTATE, TRANSPORTATION, ENERGY, AGRICULTURE, RETAIL, OTHER
+}

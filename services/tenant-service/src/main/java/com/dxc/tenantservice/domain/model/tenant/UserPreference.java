@@ -1,7 +1,7 @@
 package com.dxc.tenantservice.domain.model.tenant;
 
-import com.dxc.tenantservice.domain.model.enums.Language;
-import com.dxc.tenantservice.domain.model.enums.Theme;
+import com.dxc.tenantservice.domain.model.valueobject.Language;
+import com.dxc.tenantservice.domain.model.valueobject.Theme;
 import lombok.Getter;
 import java.util.UUID;
 

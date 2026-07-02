@@ -1,5 +1,5 @@
 package com.dxc.projectservice.domain.model.valueobject;
 
 public enum MilestoneStatus {
-    PENDING, IN_PROGRESS, COMPLETED
+    ACTIVE, IN_PROGRESS, ARCHIVED, ON_HOLD, CANCELLED, COMPLETED
 }

@@ -2,8 +2,9 @@ package com.dxc.tenantservice.domain.model.tenant;
 
 import com.dxc.tenantservice.domain.exception.UserStateException;
 import com.dxc.tenantservice.domain.exception.UserValidationException;
-import com.dxc.tenantservice.domain.model.enums.UserStatus;
+import com.dxc.tenantservice.domain.model.valueobject.UserStatus;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -12,14 +13,16 @@ import java.util.Set;
 import java.util.UUID;
 
 @Getter
+@Slf4j
 public class TenantUser {
 
     private final UUID id;
     private final UUID tenantId;
 
     private UUID keycloakUserId;
-    private final Set<UUID> keycloakRoleGroupIds;
+    private final Set<UUID>  keycloakRoleGroupIds;
 
+    private String username;
     private String email;
     private String firstName;
     private String lastName;
@@ -31,12 +34,15 @@ public class TenantUser {
     private LocalDateTime lastLoginAt;
     private UserPreference userPreference;
 
+    private LocalDateTime deleted_at;
+
     public TenantUser(
             UUID id,
             UUID tenantId,
             UUID keycloakUserId,
             Set<UUID> keycloakRoleGroupIds,
             String email,
+            String username,
             String firstName,
             String lastName,
             String jobTitle,
@@ -51,12 +57,13 @@ public class TenantUser {
         this.tenantId = tenantId;
         this.keycloakUserId = keycloakUserId;
         this.email = email;
+        this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.jobTitle = jobTitle;
         this.department = department;
         this.keycloakRoleGroupIds = keycloakRoleGroupIds != null ? new HashSet<>(keycloakRoleGroupIds) : new HashSet<>();
-        this.status = status != null ? status : UserStatus.PENDING;
+        this.status = status != null ? status : UserStatus.ACTIVE;
         this.lastLoginAt = lastLoginAt;
         this.userPreference = userPreference;
     }
@@ -64,20 +71,34 @@ public class TenantUser {
     public static TenantUser create(
             UUID tenantId,
             String email,
+            String username,
             String firstName,
             String lastName
     ) {
+        return createWithId(UUID.randomUUID(), tenantId, email, username, firstName, lastName);
+    }
+
+    public static TenantUser createWithId(
+            UUID id,
+            UUID tenantId,
+            String email,
+            String username,
+            String firstName,
+            String lastName
+    ) {
+        log.info("user email |||||-----: {}", email);
         return new TenantUser(
-                UUID.randomUUID(),
+                id,
                 tenantId,
                 null, // keycloakUserId
                 null, // keycloakRoleGroupIds
                 email,
+                username,
                 firstName,
                 lastName,
                 null, // jobTitle
                 null, // department
-                UserStatus.PENDING,
+                UserStatus.ACTIVE,
                 null, // lastLoginAt
                 null  // userPreference
         );
