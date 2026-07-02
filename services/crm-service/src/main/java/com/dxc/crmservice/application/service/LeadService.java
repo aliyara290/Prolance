@@ -145,7 +145,10 @@ public class LeadService implements LeadUseCase {
                 throw new ServiceLogicException("Lead must have an assigned user");
             }
             ResponseWrapper<UserResponseDTO> user = userFeignPort.getUser(request.assignedTo());
-            lead.assignTo(user.data().id());
+            if (user.data() == null) {
+                throw new RecordNotFoundException("User not found");
+            }
+            lead.assignTo(user.data().keycloakUserId());
             lead.createdBy(TenantContextHolder.getUserId());
             leadRepository.save(lead);
             return leadMapper.toResponse(lead);
