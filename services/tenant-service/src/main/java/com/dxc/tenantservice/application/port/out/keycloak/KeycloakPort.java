@@ -1,7 +1,7 @@
 package com.dxc.tenantservice.application.port.out.keycloak;
 
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserReqDTO;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserResDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.users.KeycloakUserReqDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.users.KeycloakUserResDTO;
 
 import java.util.List;
 import java.util.UUID;

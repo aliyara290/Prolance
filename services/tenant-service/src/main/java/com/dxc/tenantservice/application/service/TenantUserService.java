@@ -17,8 +17,8 @@ import com.dxc.tenantservice.domain.model.tenant.TenantSettings;
 import com.dxc.tenantservice.domain.model.tenant.TenantUser;
 import com.dxc.tenantservice.domain.model.tenant.UserPreference;
 import com.dxc.tenantservice.domain.model.valueobject.UserRole;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserReqDTO;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserResDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.users.KeycloakUserReqDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.users.KeycloakUserResDTO;
 import com.dxc.tenantservice.infrastructure.config.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -193,6 +193,15 @@ public class TenantUserService implements TenantUserUseCase {
             throw new UserStateException("Keycloak user ID not found");
         }
         TenantUser user = tenantUserRepository.findByKeycloakUserId(keycloakUserId).orElseThrow(() -> new UserStateException("User not found"));
+        return userDtoMapper.toDto(user);
+    }
+
+    @Override
+    public UserResDTO findUserByKeycloakIdAndTenantId(UUID keycloakUserId) {
+        UUID tenantId = resolveTenantId();
+        log.debug("Fetching user by keycloakId and tenantId: keycloakUserId={}, tenantId={}", keycloakUserId, tenantId);
+        TenantUser user = tenantUserRepository.findByKeycloakUserIdAndTenantId(keycloakUserId, tenantId)
+                .orElseThrow(() -> new UserStateException("User not found"));
         return userDtoMapper.toDto(user);
     }
 

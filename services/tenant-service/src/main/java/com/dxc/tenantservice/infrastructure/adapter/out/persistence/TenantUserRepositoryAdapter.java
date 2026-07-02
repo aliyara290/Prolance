@@ -45,6 +45,11 @@ public class TenantUserRepositoryAdapter implements TenantUserRepository {
     }
 
     @Override
+    public Optional<TenantUser> findByKeycloakUserIdAndTenantId(UUID keycloakUserId, UUID tenantId) {
+        return repository.findByKeycloakUserIdAndTenantId(keycloakUserId, tenantId).map(mapper::entityToDomain);
+    }
+
+    @Override
     public Optional<TenantUser> findByEmailAndTenantId(String email, UUID tenantId) {
         return repository.findByEmailAndTenantId(email, tenantId).map(mapper::entityToDomain);
     }

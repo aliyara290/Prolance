@@ -83,6 +83,14 @@ public class TenantUserController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER', 'VIEWER', 'ACCOUNTANT', 'SALES')")
+    @GetMapping("/{keycloakId}/keycloak")
+    public ResponseEntity<ApiResponse<UserResDTO>> findUserByKeycloakIdAndTenantId(
+            @PathVariable("keycloakId") UUID keycloakId) {
+        UserResDTO response = tenantUserUseCase.findUserByKeycloakIdAndTenantId(keycloakId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
     @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER', 'VIEWER')")
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserResDTO>>> getAllUsers(Pageable pageable) {

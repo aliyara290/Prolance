@@ -63,7 +63,7 @@ public class TenantUser {
         this.jobTitle = jobTitle;
         this.department = department;
         this.keycloakRoleGroupIds = keycloakRoleGroupIds != null ? new HashSet<>(keycloakRoleGroupIds) : new HashSet<>();
-        this.status = status != null ? status : UserStatus.PENDING;
+        this.status = status != null ? status : UserStatus.ACTIVE;
         this.lastLoginAt = lastLoginAt;
         this.userPreference = userPreference;
     }
@@ -75,9 +75,20 @@ public class TenantUser {
             String firstName,
             String lastName
     ) {
+        return createWithId(UUID.randomUUID(), tenantId, email, username, firstName, lastName);
+    }
+
+    public static TenantUser createWithId(
+            UUID id,
+            UUID tenantId,
+            String email,
+            String username,
+            String firstName,
+            String lastName
+    ) {
         log.info("user email |||||-----: {}", email);
         return new TenantUser(
-                UUID.randomUUID(),
+                id,
                 tenantId,
                 null, // keycloakUserId
                 null, // keycloakRoleGroupIds
@@ -87,7 +98,7 @@ public class TenantUser {
                 lastName,
                 null, // jobTitle
                 null, // department
-                UserStatus.PENDING,
+                UserStatus.ACTIVE,
                 null, // lastLoginAt
                 null  // userPreference
         );
