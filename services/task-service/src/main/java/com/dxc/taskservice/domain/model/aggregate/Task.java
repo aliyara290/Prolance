@@ -68,6 +68,7 @@ public class Task extends AggregateRoot {
             String title,
             String description,
             TaskType type,
+            TaskStatus status,
             TaskPriority priority,
             LocalDateTime startDate,
             LocalDateTime dueDate,
@@ -76,7 +77,6 @@ public class Task extends AggregateRoot {
     ) {
         validateInitialData(tenantId, projectId, title, type, priority, startDate, createdBy);
 
-        TaskStatus initialStatus = TaskStatus.TODO;
         TaskTimeline taskTimeline = TaskTimeline.of(startDate, dueDate);
 
         Task task = Task.builder()
@@ -88,7 +88,7 @@ public class Task extends AggregateRoot {
                 .description(description)
                 .type(type)
                 .priority(priority)
-                .status(initialStatus)
+                .status(status != null ? status : TaskStatus.TODO)
                 .timeline(taskTimeline)
                 .createdBy(createdBy)
                 .reporterId(reporterId != null ? reporterId : createdBy)
@@ -101,10 +101,10 @@ public class Task extends AggregateRoot {
                 .build();
 
         task.statusHistory.add(TaskStatusHistory.create(
-                tenantId, task.getId(), null, initialStatus, createdBy, "Task created"));
+                tenantId, task.getId(), null, status, createdBy, "Task created"));
 
         task.registerEvent(TaskCreated.now(
-                tenantId, task.getId(), projectId, title, type, priority, initialStatus, createdBy));
+                tenantId, task.getId(), projectId, title, type, priority, status, createdBy));
 
         return task;
     }
