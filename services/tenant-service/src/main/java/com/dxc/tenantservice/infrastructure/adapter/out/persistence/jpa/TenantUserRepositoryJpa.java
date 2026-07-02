@@ -13,6 +13,7 @@ import java.util.UUID;
 @Repository
 public interface TenantUserRepositoryJpa extends JpaRepository<TenantUserEntity, UUID> {
     Optional<TenantUserEntity> findByKeycloakUserId(UUID keycloakUserId);
+    Optional<TenantUserEntity> findByKeycloakUserIdAndTenantId(UUID keycloakUserId, UUID tenantId);
     Optional<TenantUserEntity> findByEmailAndTenantId(String email, UUID tenantId);
     Page<TenantUserEntity> findByTenantId(Pageable pageable, UUID tenantId);
     boolean existsByEmailAndTenantId(String email, UUID tenantId);

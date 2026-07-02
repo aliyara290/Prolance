@@ -3,9 +3,11 @@ package com.dxc.projectservice.application.service;
 import com.dxc.projectservice.application.dto.milestones.req.CreateMilestoneRequest;
 import com.dxc.projectservice.application.dto.milestones.req.UpdateMilestoneRequest;
 import com.dxc.projectservice.application.dto.milestones.res.MilestoneResponse;
+import com.dxc.projectservice.application.dto.milestones.res.MilestoneStatisticsResponse;
 import com.dxc.projectservice.application.mapper.MilestoneApplicationMapper;
 import com.dxc.projectservice.application.port.in.MilestoneUseCase;
 import com.dxc.projectservice.application.port.out.DomainEventPublisher;
+import com.dxc.projectservice.application.port.out.MilestoneRepository;
 import com.dxc.projectservice.application.port.out.ProjectRepository;
 import com.dxc.projectservice.application.security.TenantGuard;
 import com.dxc.projectservice.domain.exception.RecordNotFoundException;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +35,7 @@ public class MilestoneService implements MilestoneUseCase {
     private final DomainEventPublisher eventPublisher;
     private final MilestoneApplicationMapper milestoneMapper;
     private final TenantGuard tenantGuard;
-    private final com.dxc.projectservice.application.port.out.MilestoneRepository milestoneRepository;
+    private final MilestoneRepository milestoneRepository;
 
     @Override
     @Transactional
@@ -167,7 +170,7 @@ public class MilestoneService implements MilestoneUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<MilestoneResponse> getTenantMilestonesByStatus(com.dxc.projectservice.domain.model.valueobject.MilestoneStatus status, Pageable pageable) {
+    public Page<MilestoneResponse> getTenantMilestonesByStatus(MilestoneStatus status, Pageable pageable) {
         UUID tenantId = getTenantIdAndVerify();
         return milestoneRepository.findByTenantIdAndStatus(tenantId, status, pageable)
                 .map(milestoneMapper::toResponse);
@@ -177,7 +180,7 @@ public class MilestoneService implements MilestoneUseCase {
     @Transactional(readOnly = true)
     public Page<MilestoneResponse> getOverdueMilestones(Pageable pageable) {
         UUID tenantId = getTenantIdAndVerify();
-        return milestoneRepository.findOverdueMilestones(tenantId, java.time.LocalDateTime.now(), pageable)
+        return milestoneRepository.findOverdueMilestones(tenantId, LocalDateTime.now(), pageable)
                 .map(milestoneMapper::toResponse);
     }
 
@@ -185,15 +188,15 @@ public class MilestoneService implements MilestoneUseCase {
     @Transactional(readOnly = true)
     public Page<MilestoneResponse> getUpcomingMilestones(Pageable pageable) {
         UUID tenantId = getTenantIdAndVerify();
-        return milestoneRepository.findUpcomingMilestones(tenantId, java.time.LocalDateTime.now(), pageable)
+        return milestoneRepository.findUpcomingMilestones(tenantId, LocalDateTime.now(), pageable)
                 .map(milestoneMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public com.dxc.projectservice.application.dto.milestones.res.MilestoneStatisticsResponse getMilestoneStatistics() {
+    public MilestoneStatisticsResponse getMilestoneStatistics() {
         UUID tenantId = getTenantIdAndVerify();
-        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         
         long total = milestoneRepository.countByTenantId(tenantId);
         long completed = milestoneRepository.countByTenantIdAndStatus(tenantId, MilestoneStatus.COMPLETED);
@@ -202,6 +205,6 @@ public class MilestoneService implements MilestoneUseCase {
         long active = milestoneRepository.countByTenantIdAndStatus(tenantId, MilestoneStatus.ACTIVE)
                       + milestoneRepository.countByTenantIdAndStatus(tenantId, MilestoneStatus.IN_PROGRESS);
         
-        return new com.dxc.projectservice.application.dto.milestones.res.MilestoneStatisticsResponse(total, completed, active, overdue);
+        return new MilestoneStatisticsResponse(total, completed, active, overdue);
     }
 }

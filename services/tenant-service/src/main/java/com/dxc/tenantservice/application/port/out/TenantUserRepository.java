@@ -12,6 +12,7 @@ public interface TenantUserRepository {
     TenantUser save(TenantUser user);
     Optional<TenantUser> findById(UUID id);
     Optional<TenantUser> findByKeycloakUserId(UUID keycloakUserId);
+    Optional<TenantUser> findByKeycloakUserIdAndTenantId(UUID keycloakUserId, UUID tenantId);
     Optional<TenantUser> findByEmailAndTenantId(String email, UUID tenantId);
     Page<TenantUser> findByTenantId(Pageable pageable, UUID tenantId);
     boolean existsByEmailAndTenantId(String email, UUID tenantId);

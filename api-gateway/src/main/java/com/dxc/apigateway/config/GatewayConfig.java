@@ -30,6 +30,12 @@ public class GatewayConfig {
                                 .rewritePath("/project/(?<segment>.*)", "/${segment}")
                         )
                         .uri("lb://PROJECT-SERVICE"))
+                .route("task-service", r -> r
+                        .path("/tasks/**")
+                        .filters(f -> f
+                                .rewritePath("/tasks/(?<segment>.*)", "/${segment}")
+                        )
+                        .uri("lb://TASK-SERVICE"))
                 .build();
     }
 }

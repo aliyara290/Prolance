@@ -131,6 +131,27 @@ services:
       timeout: 5s
       retries: 5
 
+  task-db:
+    image: postgres:15-alpine
+    container_name: task-db
+    profiles: [ "default", "all" ]
+    environment:
+      POSTGRES_DB: task_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5436:5432"
+    volumes:
+      - task-data:/var/lib/postgresql/data
+    networks:
+      - prolance-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U aliyara29" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
   keycloak-db:
     image: postgres:15-alpine
     container_name: keycloak-db
@@ -163,16 +184,6 @@ services:
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-
-#      KC_SPI_EMAIL_SMTP_HOST: ${KC_SPI_EMAIL_SMTP_HOST:-smtp.gmail.com}
-#      KC_SPI_EMAIL_SMTP_PORT: ${KC_SPI_EMAIL_SMTP_PORT:-587}
-#      KC_SPI_EMAIL_SMTP_USER: ${KC_SPI_EMAIL_SMTP_USER:-ali.yara.fr@gmail.com}
-#      KC_SPI_EMAIL_SMTP_PASSWORD: ${KC_SPI_EMAIL_SMTP_PASSWORD}
-#      KC_SPI_EMAIL_SMTP_STARTTLS: true
-#      KC_SPI_EMAIL_SMTP_AUTH: true
-#      KC_SPI_EMAIL_FROM: ${KC_SPI_EMAIL_FROM:-ali.yara.fr@gmail.com}
-#      KC_HTTP_PORT: 8080
-
     ports:
       - "8079:8080"
     volumes:
@@ -245,9 +256,11 @@ services:
 networks:
   prolance-network:
     driver: bridge
+
 volumes:
   prolance-keycloak-data:
   tenant-data:
   crm-data:
   project-data:
+  task-data:
   pgadmin-data:

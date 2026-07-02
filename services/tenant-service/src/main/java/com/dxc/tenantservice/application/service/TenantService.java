@@ -15,7 +15,7 @@ import com.dxc.tenantservice.domain.exception.TenantStateException;
 import com.dxc.tenantservice.domain.model.valueobject.UserRole;
 import com.dxc.tenantservice.domain.model.valueobject.Address;
 import com.dxc.tenantservice.domain.model.tenant.Tenant;
-import com.dxc.tenantservice.infrastructure.adapter.out.keycloak.dto.users.KeycloakUserResDTO;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.users.KeycloakUserResDTO;
 import com.dxc.tenantservice.infrastructure.config.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +43,7 @@ public class TenantService implements TenantUseCase {
     public TenantRegistrationResponseDTO registerTenant(RegisterTenantReqDTO reqDTO) {
         RegistrationSaga saga = ctx.getBean(RegistrationSaga.class);
         UUID tenantId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
 
         try {
 //            register company in keycloak as group
@@ -62,7 +63,10 @@ public class TenantService implements TenantUseCase {
             userKeycloakReq.setFirstName(userKeycloakRes.getFirstName());
             userKeycloakReq.setLastName(userKeycloakRes.getLastName());
             userKeycloakReq.setEmail(userKeycloakRes.getEmail());
-            userKeycloakReq.setAttributes(Map.of("tenantId",List.of(tenantId.toString())));
+            userKeycloakReq.setAttributes(Map.of(
+                    "tenantId", List.of(tenantId.toString()),
+                    "userId", List.of(userId.toString())
+            ));
             keycloakPort.updateUser(userKeycloakRes.getId(), userKeycloakReq);
             saga.register(() -> keycloakPort.updateUser(userKeycloakRes.getId(), userKeycloakRes));
 
@@ -71,7 +75,7 @@ public class TenantService implements TenantUseCase {
 
             log.info("ABOUT TO PERSIST TO DB");
             // Persist to Database (to rollback if any step fails using Transactions)
-            tenantPersistenceService.persist(tenantId, tenantGroupId, roleGroupId, reqDTO, userKeycloakRes);
+            tenantPersistenceService.persist(tenantId, userId, tenantGroupId, roleGroupId, reqDTO, userKeycloakRes);
             return new TenantRegistrationResponseDTO(tenantId.toString());
         } catch (Exception ex) {
             log.error("Registration failed for tenant: {}. Initiating rollback...", reqDTO.getName(), ex);
