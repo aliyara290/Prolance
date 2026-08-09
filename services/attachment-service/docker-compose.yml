@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  attachment-db:
+    image: postgres:16-alpine
+    container_name: attachment-db
+    environment:
+      POSTGRES_DB: attachment_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5437:5432"
+    volumes:
+      - attachment-db-data:/var/lib/postgresql/data
+    networks:
+      - prolance-network
+
+  localstack:
+    image: localstack/localstack:3.6
+    container_name: localstack
+    environment:
+      SERVICES: s3
+      DEFAULT_REGION: eu-west-1
+      AWS_DEFAULT_REGION: eu-west-1
+    ports:
+      - "4566:4566"
+    volumes:
+      - localstack-data:/var/lib/localstack
+    networks:
+      - prolance-network
+
+  attachment-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: attachment-service
+    ports:
+      - "8087:8087"
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://attachment-db:5432/attachment_db
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_REGION: eu-west-1
+      AWS_S3_BUCKET: prolance-attachments
+      EUREKA_URI: http://discovery-service:8761/eureka
+      KEYCLOAK_ISSUER_URI: http://keycloak:9090/realms/prolance
+    depends_on:
+      - attachment-db
+      - localstack
+    networks:
+      - prolance-network
+
+volumes:
+  attachment-db-data:
+  localstack-data:
+
+networks:
+  prolance-network:
+    driver: bridge
