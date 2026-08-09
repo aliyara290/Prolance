@@ -16,6 +16,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
+import com.dxc.crmservice.domain.event.AuditLogEvent;
+import com.dxc.crmservice.domain.model.valueobject.AuditAction;
+import com.dxc.crmservice.domain.model.valueobject.EntityType;
+import com.dxc.crmservice.infrastructure.config.TenantContextHolder;
 
 import java.util.UUID;
 
@@ -28,6 +33,7 @@ public class ClientService implements ClientUseCase {
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
     private final TenantGuard tenantGuard;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public ClientResponse createClient(CreateClientRequest request) {
@@ -36,6 +42,16 @@ public class ClientService implements ClientUseCase {
         try {
             Client client = clientMapper.toDomain(request, tenantId);
             Client savedClient = clientRepository.save(client);
+            
+            eventPublisher.publishEvent(new AuditLogEvent(
+                    tenantId,
+                    TenantContextHolder.getUserId(),
+                    AuditAction.CREATE,
+                    EntityType.CLIENT,
+                    savedClient.getId(),
+                    "Client '" + savedClient.getName() + "' created"
+            ));
+            
             return clientMapper.toResponse(savedClient);
         } catch (Exception e) {
             log.error("Error creating client: " + e.getMessage());
@@ -67,6 +83,16 @@ public class ClientService implements ClientUseCase {
             );
 
             Client updatedClient = clientRepository.update(client);
+            
+            eventPublisher.publishEvent(new AuditLogEvent(
+                    tenantId,
+                    TenantContextHolder.getUserId(),
+                    AuditAction.UPDATE,
+                    EntityType.CLIENT,
+                    client.getId(),
+                    "Client '" + client.getName() + "' updated"
+            ));
+            
             return clientMapper.toResponse(updatedClient);
         } catch (Exception e) {
             log.error("Error updating client: " + e.getMessage());
@@ -80,6 +106,15 @@ public class ClientService implements ClientUseCase {
         tenantGuard.ensureTenantIsActive(tenantId);
         try {
             clientRepository.delete(id, tenantId);
+            
+            eventPublisher.publishEvent(new AuditLogEvent(
+                    tenantId,
+                    TenantContextHolder.getUserId(),
+                    AuditAction.DELETE,
+                    EntityType.CLIENT,
+                    id,
+                    "Client deleted"
+            ));
         } catch (Exception e) {
             log.error("Error deleting client: " + e.getMessage());
             throw new ServiceLogicException("Failed to delete client");

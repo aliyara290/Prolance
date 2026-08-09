@@ -16,6 +16,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
+import com.dxc.crmservice.domain.event.AuditLogEvent;
+import com.dxc.crmservice.domain.model.valueobject.AuditAction;
+import com.dxc.crmservice.domain.model.valueobject.EntityType;
+import com.dxc.crmservice.infrastructure.config.TenantContextHolder;
 
 import java.util.UUID;
 
@@ -28,6 +33,7 @@ public class ContactService implements ContactUseCase {
     private final ContactRepository contactRepository;
     private final ContactMapper contactMapper;
     private final TenantGuard tenantGuard;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public ContactResponse createContact(CreateContactRequest request) {
@@ -36,6 +42,16 @@ public class ContactService implements ContactUseCase {
         try {
             Contact contact = contactMapper.toDomain(request, tenantId);
             Contact savedContact = contactRepository.save(contact);
+            
+            eventPublisher.publishEvent(new AuditLogEvent(
+                    tenantId,
+                    TenantContextHolder.getUserId(),
+                    AuditAction.CREATE,
+                    EntityType.CONTACT,
+                    savedContact.getId(),
+                    "Contact '" + savedContact.getFirstName() + " " + savedContact.getLastName() + "' created"
+            ));
+            
             return contactMapper.toResponse(savedContact);
         } catch (Exception e) {
             log.error("Error creating contact: " + e.getMessage());
@@ -75,6 +91,16 @@ public class ContactService implements ContactUseCase {
             }
 
             Contact updatedContact = contactRepository.update(contact);
+            
+            eventPublisher.publishEvent(new AuditLogEvent(
+                    tenantId,
+                    TenantContextHolder.getUserId(),
+                    AuditAction.UPDATE,
+                    EntityType.CONTACT,
+                    contact.getId(),
+                    "Contact '" + contact.getFirstName() + " " + contact.getLastName() + "' updated"
+            ));
+            
             return contactMapper.toResponse(updatedContact);
         } catch (Exception e) {
             log.error("Error updating contact: " + e.getMessage());
@@ -88,6 +114,15 @@ public class ContactService implements ContactUseCase {
         tenantGuard.ensureTenantIsActive(tenantId);
         try {
             contactRepository.delete(id, tenantId);
+            
+            eventPublisher.publishEvent(new AuditLogEvent(
+                    tenantId,
+                    TenantContextHolder.getUserId(),
+                    AuditAction.DELETE,
+                    EntityType.CONTACT,
+                    id,
+                    "Contact deleted"
+            ));
         } catch (Exception e) {
             log.error("Error deleting contact: " + e.getMessage());
             throw new ServiceLogicException("Failed to delete contact");

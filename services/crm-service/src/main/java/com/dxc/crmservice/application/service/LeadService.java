@@ -37,6 +37,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
+import com.dxc.crmservice.domain.event.AuditLogEvent;
+import com.dxc.crmservice.domain.model.valueobject.AuditAction;
+import com.dxc.crmservice.domain.model.valueobject.EntityType;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -56,6 +60,7 @@ public class LeadService implements LeadUseCase {
     private final ClientUseCase clientUseCase;
     private final OpportunityUseCase opportunityUseCase;
     private final UserFeignPort userFeignPort;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Override
@@ -93,7 +98,18 @@ public class LeadService implements LeadUseCase {
                         lead.getSource() // source
                 );
 
-        return opportunityUseCase.createOpportunity(oppReq);
+        OpportunityResponse response = opportunityUseCase.createOpportunity(oppReq);
+
+        eventPublisher.publishEvent(new AuditLogEvent(
+                tenantId,
+                TenantContextHolder.getUserId(),
+                AuditAction.UPDATE,
+                EntityType.LEAD,
+                leadId,
+                "Lead qualified and converted to opportunity"
+        ));
+
+        return response;
     }
 
     @Override
@@ -151,6 +167,16 @@ public class LeadService implements LeadUseCase {
             lead.assignTo(user.data().keycloakUserId());
             lead.createdBy(TenantContextHolder.getUserId());
             leadRepository.save(lead);
+            
+            eventPublisher.publishEvent(new AuditLogEvent(
+                    tenantId,
+                    TenantContextHolder.getUserId(),
+                    AuditAction.CREATE,
+                    EntityType.LEAD,
+                    lead.getId(),
+                    "Lead '" + lead.getTitle() + "' created"
+            ));
+            
             return leadMapper.toResponse(lead);
         } catch (Exception e) {
             log.error("Error creating lead: " + e.getMessage());
@@ -228,6 +254,16 @@ public class LeadService implements LeadUseCase {
             }
 
             Lead updatedLead = leadRepository.update(lead);
+            
+            eventPublisher.publishEvent(new AuditLogEvent(
+                    tenantId,
+                    TenantContextHolder.getUserId(),
+                    AuditAction.UPDATE,
+                    EntityType.LEAD,
+                    lead.getId(),
+                    "Lead '" + lead.getTitle() + "' updated"
+            ));
+            
             return leadMapper.toResponse(updatedLead);
         } catch (Exception e) {
             log.error("Error updating lead: " + e.getMessage());
@@ -245,6 +281,15 @@ public class LeadService implements LeadUseCase {
                 throw new RecordNotFoundException("Lead not found");
             }
             leadRepository.delete(id, tenantId);
+            
+            eventPublisher.publishEvent(new AuditLogEvent(
+                    tenantId,
+                    TenantContextHolder.getUserId(),
+                    AuditAction.DELETE,
+                    EntityType.LEAD,
+                    id,
+                    "Lead deleted"
+            ));
         } catch (Exception e) {
             log.error("Error deleting lead: " + e.getMessage());
             throw new ServiceLogicException("Failed to delete lead");

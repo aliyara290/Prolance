@@ -133,9 +133,9 @@ public class Opportunity {
             throw new ValidationException("Stage cannot be null");
         }
 
-        if (!this.stage.canMoveTo(newStage)) {
-            throw new InvalidStateTransitionException("Invalid stage transition: " + this.stage + " → " + newStage);
-        }
+//        if (!this.stage.canMoveTo(newStage)) {
+//            throw new InvalidStateTransitionException("Invalid stage transition: " + this.stage + " → " + newStage);
+//        }
 
         this.stage = newStage;
 
