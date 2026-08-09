@@ -152,12 +152,12 @@ public class Task extends AggregateRoot {
 
     public void deleteTask(UUID actionBy) {
         touch();
-        registerEvent(TaskDeleted.now(tenantId, id, actionBy));
+        registerEvent(TaskDeleted.now(tenantId, id, milestoneId, actionBy));
     }
 
     // Status workflow
     public void changeStatus(TaskStatus newStatus, UUID actionBy, String comment) {
-        validateStatusTransition(this.status, newStatus);
+//        validateStatusTransition(this.status, newStatus);
 
         TaskStatus oldStatus = this.status;
         this.status = newStatus;

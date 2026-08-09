@@ -1,5 +1,5 @@
 server:
-  port: 8084
+  port: 8080
 
 spring:
   application:
@@ -11,3 +11,10 @@ spring:
   cloud:
     config:
       uri: http://localhost:8888
+  kafka:
+    bootstrap-servers: localhost:29092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true

@@ -36,6 +36,7 @@ public class ProjectService implements ProjectUseCase {
     private final DomainEventPublisher eventPublisher;
     private final ProjectApplicationMapper projectMapper;
     private final TenantGuard tenantGuard;
+    private final com.dxc.projectservice.infrastructure.adapter.out.persistence.jpa.OutboxEventRepository outboxEventRepository;
 
     @Override
     @Transactional
@@ -158,6 +159,24 @@ public class ProjectService implements ProjectUseCase {
     private Project getProject(UUID id, UUID tenantId) {
         return projectRepository.findById(id, tenantId)
                 .orElseThrow(() -> new RecordNotFoundException("Project not found with id " + id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<com.dxc.projectservice.application.dto.project.ProjectActivityDto> getProjectActivities(UUID projectId) {
+        UUID tenantId = getTenantIdAndVerify();
+        // verify project exists and belongs to tenant
+        getProject(projectId, tenantId);
+
+        return outboxEventRepository.findByAggregateIdOrderByOccurredOnDesc(projectId)
+                .stream()
+                .map(event -> new com.dxc.projectservice.application.dto.project.ProjectActivityDto(
+                        event.getId(),
+                        event.getType(),
+                        event.getPayload(),
+                        event.getOccurredOn()
+                ))
+                .toList();
     }
 
     private UUID getTenantIdAndVerify() {

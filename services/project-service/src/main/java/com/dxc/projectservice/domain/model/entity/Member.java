@@ -30,6 +30,7 @@ public class Member {
 
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
     private UUID createdBy;
 
     public static Member create(
@@ -116,6 +117,7 @@ public class Member {
         }
 
         this.status = MemberStatus.REMOVED;
+        this.deletedAt = LocalDateTime.now();
         this.leftAt = LocalDateTime.now();
         touch();
     }

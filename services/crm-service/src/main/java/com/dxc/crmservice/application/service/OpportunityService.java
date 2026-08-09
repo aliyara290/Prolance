@@ -17,6 +17,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
+import com.dxc.crmservice.domain.event.AuditLogEvent;
+import com.dxc.crmservice.domain.model.valueobject.AuditAction;
+import com.dxc.crmservice.domain.model.valueobject.EntityType;
+import com.dxc.crmservice.infrastructure.config.TenantContextHolder;
 
 import java.util.UUID;
 
@@ -29,6 +34,7 @@ public class OpportunityService implements OpportunityUseCase {
     private final TenantGuard tenantGuard;
     private final OpportunityRepository opportunityRepository;
     private final OpportunityMapper opportunityMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public OpportunityResponse createOpportunity(CreateOpportunityRequest request) {
@@ -37,6 +43,16 @@ public class OpportunityService implements OpportunityUseCase {
         try {
             Opportunity opportunity = opportunityMapper.toDomain(request, tenantId);
             opportunityRepository.save(opportunity);
+            
+            eventPublisher.publishEvent(new AuditLogEvent(
+                    tenantId,
+                    TenantContextHolder.getUserId(),
+                    AuditAction.CREATE,
+                    EntityType.OPPORTUNITY,
+                    opportunity.getId(),
+                    "Opportunity '" + opportunity.getTitle() + "' created"
+            ));
+            
             return opportunityMapper.toResponse(opportunity);
         } catch (Exception e) {
             log.error("Error creating opportunity: {}", e.getMessage());
@@ -69,6 +85,16 @@ public class OpportunityService implements OpportunityUseCase {
             }
 
             Opportunity updatedOpportunity = opportunityRepository.update(opportunity);
+            
+            eventPublisher.publishEvent(new AuditLogEvent(
+                    tenantId,
+                    TenantContextHolder.getUserId(),
+                    AuditAction.UPDATE,
+                    EntityType.OPPORTUNITY,
+                    opportunity.getId(),
+                    "Opportunity '" + opportunity.getTitle() + "' updated"
+            ));
+            
             return opportunityMapper.toResponse(updatedOpportunity);
         } catch (Exception e) {
             log.error("Error updating opportunity: {}", e.getMessage());
@@ -82,6 +108,15 @@ public class OpportunityService implements OpportunityUseCase {
         tenantGuard.ensureTenantIsActive(tenantId);
         try {
             opportunityRepository.delete(id, tenantId);
+            
+            eventPublisher.publishEvent(new AuditLogEvent(
+                    tenantId,
+                    TenantContextHolder.getUserId(),
+                    AuditAction.DELETE,
+                    EntityType.OPPORTUNITY,
+                    id,
+                    "Opportunity deleted"
+            ));
         } catch (Exception e) {
             log.error("Error deleting opportunity: {}", e.getMessage());
             throw new ServiceLogicException("Failed to delete opportunity");
@@ -119,6 +154,16 @@ public class OpportunityService implements OpportunityUseCase {
         }
         opportunity.moveStage(stage);
         opportunityRepository.update(opportunity);
+        
+        eventPublisher.publishEvent(new AuditLogEvent(
+                tenantId,
+                TenantContextHolder.getUserId(),
+                AuditAction.UPDATE,
+                EntityType.OPPORTUNITY,
+                id,
+                "Opportunity moved to stage " + stage
+        ));
+        
         return opportunityMapper.toResponse(opportunity);
     }
 
@@ -132,6 +177,16 @@ public class OpportunityService implements OpportunityUseCase {
         }
         opportunity.markAsWon();
         opportunityRepository.update(opportunity);
+        
+        eventPublisher.publishEvent(new AuditLogEvent(
+                tenantId,
+                TenantContextHolder.getUserId(),
+                AuditAction.UPDATE,
+                EntityType.OPPORTUNITY,
+                id,
+                "Opportunity marked as WON"
+        ));
+        
         return opportunityMapper.toResponse(opportunity);
     }
 
@@ -145,6 +200,16 @@ public class OpportunityService implements OpportunityUseCase {
         }
         opportunity.markAsLost(reason);
         opportunityRepository.update(opportunity);
+        
+        eventPublisher.publishEvent(new AuditLogEvent(
+                tenantId,
+                TenantContextHolder.getUserId(),
+                AuditAction.UPDATE,
+                EntityType.OPPORTUNITY,
+                id,
+                "Opportunity marked as LOST: " + reason
+        ));
+        
         return opportunityMapper.toResponse(opportunity);
     }
 }

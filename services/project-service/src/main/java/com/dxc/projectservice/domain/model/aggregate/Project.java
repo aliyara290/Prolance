@@ -255,6 +255,26 @@ public class Project extends AggregateRoot {
         registerEvent(MilestoneDeleted.now(tenantId, id, milestoneId, actionBy));
     }
 
+    public void updateMilestoneProgress(UUID milestoneId, float progressPercentage) {
+        Milestone milestone = milestones.stream()
+                .filter(m -> m.getId().equals(milestoneId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessRuleException("Milestone not found"));
+
+        milestone.updateProgress(progressPercentage);
+        recalculateProgress();
+        
+        // If the project just reached 100% progress due to milestone, we might want to auto-complete the project.
+        if (this.progress.percentage() == 100f && this.status != ProjectStatus.COMPLETED) {
+            changeStatus(ProjectStatus.COMPLETED, null, "Auto-completed because all milestones are done");
+        } else if (this.progress.percentage() < 100f && this.status == ProjectStatus.COMPLETED) {
+            changeStatus(ProjectStatus.ACTIVE, null, "Auto-reverted because a milestone was reopened");
+        }
+
+        touch();
+        registerEvent(MilestoneUpdated.now(tenantId, id, milestoneId, Map.of("newProgress", progressPercentage), null));
+    }
+
     public void changeStatus(ProjectStatus newStatus, UUID actionBy, String comment) {
 //        validateStatusTransition(this.status, newStatus);
 
@@ -310,6 +330,7 @@ public class Project extends AggregateRoot {
                 .average()
                 .orElse(0);
 
+        totalProgress = Math.round(totalProgress * 10.0f) / 10.0f;
         this.progress = new ProjectProgress(totalProgress);
     }
 

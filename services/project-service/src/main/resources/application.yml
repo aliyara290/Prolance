@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: 8080
 
 spring:
   application:
@@ -11,3 +11,12 @@ spring:
   cloud:
     config:
       uri: http://localhost:8888
+  kafka:
+    bootstrap-servers: localhost:29092
+    consumer:
+      group-id: project-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
