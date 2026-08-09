@@ -12,7 +12,8 @@ public record DashboardResponse(KpiData kpis, ChartData charts) {
             double totalPipelineValue,
             long totalClients,
             long newClientsThisMonth,
-            long totalContacts
+            long totalContacts,
+            List<RecentActivityDto> recentActivities
     ) {}
 
     public record ChartData(

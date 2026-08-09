@@ -72,6 +72,12 @@ public interface DashboardQueryJpa extends JpaRepository<LeadEntity, UUID> {
                        @Param("from") LocalDateTime from,
                        @Param("to") LocalDateTime to);
 
+    // ── Recent Activities ──
+    @Query("SELECT a.id, a.action, a.message, a.entityType, a.createdAt " +
+            "FROM AuditLogEntity a WHERE a.tenantId = :tenantId " +
+            "ORDER BY a.createdAt DESC")
+    List<Object[]> findRecentActivities(@Param("tenantId") UUID tenantId, org.springframework.data.domain.Pageable pageable);
+
     // ── Lead Charts ──
 
     @Query("SELECT l.status, COUNT(l) FROM LeadEntity l WHERE l.tenantId = :tenantId " +

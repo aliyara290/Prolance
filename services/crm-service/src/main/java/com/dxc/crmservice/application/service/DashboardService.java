@@ -62,6 +62,17 @@ public class DashboardService implements DashboardUseCase {
 
         long totalContacts = queryPort.countContacts(tenantId, from, to);
 
+        List<com.dxc.crmservice.application.dto.dashboard.RecentActivityDto> recentActivities = queryPort.getRecentActivities(tenantId, 5)
+                .stream()
+                .map(row -> new com.dxc.crmservice.application.dto.dashboard.RecentActivityDto(
+                        (UUID) row[0],
+                        row[1].toString(), // action
+                        (String) row[2], // message
+                        row[3].toString(), // entityType
+                        (LocalDateTime) row[4] // createdAt
+                ))
+                .toList();
+
         return new KpiData(
                 totalLeads,
                 Math.round(conversionRate * 100.0) / 100.0,
@@ -70,7 +81,8 @@ public class DashboardService implements DashboardUseCase {
                 totalPipelineValue,
                 totalClients,
                 newClientsThisMonth,
-                totalContacts
+                totalContacts,
+                recentActivities
         );
     }
 

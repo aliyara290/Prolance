@@ -23,6 +23,8 @@ public interface DashboardQueryPort {
 
     long countContacts(UUID tenantId, LocalDateTime from, LocalDateTime to);
 
+    List<Object[]> getRecentActivities(UUID tenantId, int limit);
+
     // Charts
     List<Object[]> countLeadsGroupedByStatus(UUID tenantId, LocalDateTime from, LocalDateTime to);
 

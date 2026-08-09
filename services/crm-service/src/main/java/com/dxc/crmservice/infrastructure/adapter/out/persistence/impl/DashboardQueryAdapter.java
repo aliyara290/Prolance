@@ -56,6 +56,11 @@ public class DashboardQueryAdapter implements DashboardQueryPort {
     }
 
     @Override
+    public List<Object[]> getRecentActivities(UUID tenantId, int limit) {
+        return jpa.findRecentActivities(tenantId, org.springframework.data.domain.PageRequest.of(0, limit));
+    }
+
+    @Override
     public List<Object[]> countLeadsGroupedByStatus(UUID tenantId, LocalDateTime from, LocalDateTime to) {
         return jpa.countLeadsGroupedByStatus(tenantId, from, to);
     }
