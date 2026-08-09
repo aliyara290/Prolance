@@ -9,18 +9,21 @@ public record TaskDeleted(
         UUID eventId,
         UUID tenantId,
         UUID taskId,
+        UUID milestoneId,
         UUID actionBy,
         LocalDateTime occurredOn
 ) implements DomainEvent {
     public static TaskDeleted now(
             UUID tenantId,
             UUID taskId,
+            UUID milestoneId,
             UUID actionBy
     ) {
         return new TaskDeleted(
                 UUID.randomUUID(),
                 tenantId,
                 taskId,
+                milestoneId,
                 actionBy,
                 LocalDateTime.now()
         );

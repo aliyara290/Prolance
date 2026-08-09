@@ -17,4 +17,6 @@ public interface ProjectUseCase {
     List<ProjectsNamesResponse> getProjectsNames(Pageable pageable);
     ProjectResponse updateProject(UUID id, UpdateProjectRequest request);
     void deleteProject(UUID id);
+
+    List<com.dxc.projectservice.application.dto.project.ProjectActivityDto> getProjectActivities(UUID projectId);
 }

@@ -115,6 +115,31 @@ public class MilestoneService implements MilestoneUseCase {
         return milestoneMapper.toResponse(updatedMilestone);
     }
 
+    @Transactional
+    public void updateProgressFromTask(UUID milestoneId, float progressPercentage) {
+        UUID tenantIdStr = null;
+        try {
+            tenantIdStr = getTenantIdAndVerify();
+        } catch (IllegalArgumentException e) {
+            // It might be called from Kafka without TenantContext. We already set it in Kafka listener.
+            tenantIdStr = UUID.fromString(TenantContextHolder.getTenantId());
+        }
+
+        UUID tenantId = tenantIdStr;
+        
+        // Find milestone to get project ID
+        Milestone milestone = milestoneRepository.findById(milestoneId, tenantId)
+                .orElseThrow(() -> new RecordNotFoundException("Milestone not found with id " + milestoneId));
+                
+        Project project = getProject(milestone.getProjectId(), tenantId);
+        
+        project.updateMilestoneProgress(milestoneId, progressPercentage);
+        
+        projectRepository.save(project);
+        eventPublisher.publish(project.getDomainEvents());
+        project.clearDomainEvents();
+    }
+
     @Override
     @Transactional(readOnly = true)
     public Page<MilestoneResponse> getMilestones(UUID projectId, Pageable pageable) {

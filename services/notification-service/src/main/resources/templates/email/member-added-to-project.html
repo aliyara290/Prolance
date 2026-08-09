@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You've Been Added to a Project</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+
+    <!-- Wrapper Table -->
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f5f5f5;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+
+                <!-- Main Card -->
+                <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" style="max-width: 560px; width: 100%; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+
+                    <!-- Header with Logo -->
+                    <tr>
+                        <td align="center" style="padding: 32px 40px 24px 40px; border-bottom: 1px solid #f0f0f0;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
+                                <tr>
+                                    <td style="vertical-align: middle; padding-right: 12px;">
+                                        <img src="cid:prolance-logo" alt="DXC" width="90" style="display: block; height: auto;" />
+                                    </td>
+                                    <td style="vertical-align: middle; border-left: 1px solid #e0e0e0; padding-left: 12px;">
+                                        <span style="font-size: 24px; font-weight: 500; color: #5f6368; letter-spacing: -0.5px;">Prolance</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Greeting -->
+                    <tr>
+                        <td style="padding: 24px 40px 0 40px;">
+                            <p style="margin: 0; font-size: 15px; color: #333333; line-height: 1.5;">
+                                Hello <strong th:text="${recipientName}">User</strong>,
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Message -->
+                    <tr>
+                        <td style="padding: 12px 40px 0 40px;">
+                            <p style="margin: 0; font-size: 15px; color: #555555; line-height: 1.6;" th:text="${message}">
+                                You have been added to a project.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Project Detail Card -->
+                    <tr>
+                        <td style="padding: 24px 40px 0 40px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #FAFAFA; border-radius: 8px; border: 1px solid #EEEEEE;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                            <tr>
+                                                <td style="padding-bottom: 12px;">
+                                                    <span style="font-size: 11px; font-weight: 600; color: #999999; text-transform: uppercase; letter-spacing: 0.5px;">Project</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-bottom: 16px;">
+                                                    <span style="font-size: 16px; font-weight: 600; color: #222222;" th:text="${projectName}">Project Name</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="border-top: 1px solid #EEEEEE; padding-top: 12px;">
+                                                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                                        <tr>
+                                                            <td width="50%" style="vertical-align: top;">
+                                                                <span style="font-size: 11px; font-weight: 600; color: #999999; text-transform: uppercase; letter-spacing: 0.5px;">Added by</span>
+                                                                <br/>
+                                                                <span style="font-size: 14px; color: #333333; font-weight: 500;" th:text="${inviterName}">Inviter</span>
+                                                            </td>
+                                                            <td width="50%" style="vertical-align: top; text-align: right;">
+                                                                <span style="font-size: 11px; font-weight: 600; color: #999999; text-transform: uppercase; letter-spacing: 0.5px;">Your Role</span>
+                                                                <br/>
+                                                                <span style="display: inline-block; margin-top: 4px; font-size: 12px; font-weight: 600; color: #1565C0; background-color: #E3F2FD; padding: 2px 10px; border-radius: 12px;" th:text="${role}">Member</span>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- CTA Button -->
+                    <tr>
+                        <td align="center" style="padding: 28px 40px 0 40px;" th:if="${actionUrl}">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td align="center" style="background-color: #E65100; border-radius: 8px;">
+                                        <a th:href="|http://localhost:4200${actionUrl}|" target="_blank" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; color: #ffffff; text-decoration: none; letter-spacing: 0.3px;">
+                                            View Project
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Helpful Hint -->
+                    <tr>
+                        <td align="center" style="padding: 16px 40px 0 40px;">
+                            <p style="margin: 0; font-size: 13px; color: #999999;">
+                                or simply reply to this email
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Divider -->
+                    <tr>
+                        <td style="padding: 32px 40px 0 40px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td style="border-top: 1px solid #EEEEEE;"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td align="center" style="padding: 24px 40px 32px 40px;">
+                            <p style="margin: 0 0 4px 0; font-size: 12px; color: #BBBBBB;">
+                                &copy; 2026 DXC Prolance. All rights reserved.
+                            </p>
+                            <p style="margin: 0; font-size: 12px; color: #BBBBBB;">
+                                This is an automated notification. Please do not reply directly.
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+                <!-- End Main Card -->
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

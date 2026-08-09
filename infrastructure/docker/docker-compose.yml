@@ -1,48 +1,134 @@
+x-spring-env: &spring-env
+  SPRING_PROFILES_ACTIVE: dev
+  JAVA_TOOL_OPTIONS: >
+    -Xms128m
+    -Xmx256m
+    -XX:+UseG1GC
+    -XX:MaxRAMPercentage=70
+    -Djava.security.egd=file:/dev/./urandom
+
+x-spring-app-env: &spring-app-env
+  <<: *spring-env
+  JAVA_TOOL_OPTIONS: >
+    -Xms128m
+    -Xmx256m
+    -XX:+UseG1GC
+    -XX:MaxRAMPercentage=70
+    -Djava.security.egd=file:/dev/./urandom
+    -Deureka.client.serviceUrl.defaultZone=http://eureka-server:8761/eureka/
+  SPRING_CONFIG_IMPORT: "optional:configserver:http://config-server:8888"
+  SPRING_CLOUD_CONFIG_URI: "http://config-server:8888"
+  KEYCLOAK_BASE_URL: "http://keycloak:8080"
+  KEYCLOAK_ISSUER_URL: "http://keycloak:8080/realms/prolance"
+  APP_KEYCLOAK_URL: "http://keycloak:8080/realms/prolance"
+  KEYCLOAK_ADMIN_CLIENT_SECRET: "**********"
+  DB_USERNAME: "aliyara29"
+  DB_PASSWORD: "Yara2001"
+
+x-spring-common: &spring-common
+  restart: unless-stopped
+  networks:
+    - prolance-network
+  mem_limit: 512m
+  cpus: 0.75
+  healthcheck:
+    test:
+      ["CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health"]
+    interval: 30s
+    timeout: 5s
+    retries: 5
+    start_period: 60s
+  environment:
+    SPRING_PROFILES_ACTIVE: docker
+    JAVA_TOOL_OPTIONS: >
+      -Xms128m
+      -Xmx256m
+      -XX:+UseG1GC
+      -XX:MaxRAMPercentage=70
+      -Djava.security.egd=file:/dev/./urandom
+
+x-postgres-env: &postgres-env
+  POSTGRES_USER: ${POSTGRES_USER}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+x-postgres-common: &postgres-common
+  image: postgres:15-alpine
+  restart: unless-stopped
+  networks:
+    - prolance-network
+  shm_size: 256m
+  mem_limit: 512m
+  cpus: 0.5
+  environment:
+    POSTGRES_USER: ${POSTGRES_USER}
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+    interval: 30s
+    timeout: 5s
+    retries: 3
+
 services:
   eureka-server:
-    build: ../eureka-server
+    <<: *spring-common
+    build:
+      context: ../../
+      dockerfile: infrastructure/discovery-service/Dockerfile
     container_name: eureka-server
-    profiles: ["all"]
+    profiles: ["all", "eureka"]
     ports:
       - "8761:8761"
-    networks:
-      - prolance-network
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test:
+        [
+          "CMD",
+          "wget",
+          "--spider",
+          "-q",
+          "http://localhost:8761/actuator/health",
+        ]
+      start_period: 60s
+    environment:
+      <<: *spring-env
 
   config-server:
-    build: ../config-server
+    <<: *spring-common
+    build:
+      context: ../../
+      dockerfile: infrastructure/config-server/Dockerfile
     container_name: config-server
-    profiles: ["all"]
+    profiles: ["all", "config"]
     ports:
-      - "8888:8080"
-    networks:
-      - prolance-network
+      - "8888:8888"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test:
+        [
+          "CMD",
+          "wget",
+          "--spider",
+          "-q",
+          "http://localhost:8888/actuator/health",
+        ]
+      start_period: 60s
+    environment:
+      <<: *spring-env
     depends_on:
       eureka-server:
         condition: service_healthy
 
   api-gateway:
-    build: ../../api-gateway
+    <<: *spring-common
+    build:
+      context: ../../
+      dockerfile: api-gateway/Dockerfile
     container_name: api-gateway
-    profiles: ["all"]
+    profiles: ["all", "gateway"]
     ports:
       - "8080:8080"
-    networks:
-      - prolance-network
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    environment:
+      <<: *spring-app-env
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8079/realms/prolance
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/prolance/protocol/openid-connect/certs
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -50,18 +136,17 @@ services:
         condition: service_healthy
 
   tenant-service:
-    build: ../services/tenant-service
+    <<: *spring-common
+    build:
+      context: ../../
+      dockerfile: services/tenant-service/Dockerfile
     container_name: tenant-service
-    profiles: ["all"]
+    profiles: ["all", "tenant"]
     ports:
       - "8081:8080"
-    networks:
-      - prolance-network
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    environment:
+      <<: *spring-app-env
+      DB_URL: jdbc:postgresql://tenant-db:5432/tenant_db
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -70,112 +155,197 @@ services:
       tenant-db:
         condition: service_healthy
 
-  tenant-db:
-    image: postgres:15-alpine
-    container_name: tenant-db
-    profiles: [ "default", "all"]
+  crm-service:
+    <<: *spring-common
+    build:
+      context: ../../
+      dockerfile: services/crm-service/Dockerfile
+    container_name: crm-service
+    profiles: ["all", "crm"]
+    ports:
+      - "8082:8080"
     environment:
+      <<: *spring-app-env
+      DB_URL: jdbc:postgresql://crm-db:5432/crm_db
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      crm-db:
+        condition: service_healthy
+
+  project-service:
+    <<: *spring-common
+    build:
+      context: ../../
+      dockerfile: services/project-service/Dockerfile
+    container_name: project-service
+    profiles: ["all", "project"]
+    ports:
+      - "8083:8080"
+    environment:
+      <<: *spring-app-env
+      DB_URL: jdbc:postgresql://project-db:5432/project_db
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      project-db:
+        condition: service_healthy
+
+  task-service:
+    <<: *spring-common
+    build:
+      context: ../../
+      dockerfile: services/task-service/Dockerfile
+    container_name: task-service
+    profiles: ["all", "task"]
+    ports:
+      - "8084:8080"
+    environment:
+      <<: *spring-app-env
+      DB_URL: jdbc:postgresql://task-db:5432/task_db
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      task-db:
+        condition: service_healthy
+
+  notification-service:
+    <<: *spring-common
+    build:
+      context: ../../
+      dockerfile: services/notification-service/Dockerfile
+    container_name: notification-service
+    profiles: ["all", "notification"]
+    ports:
+      - "8085:8080"
+    environment:
+      <<: *spring-app-env
+      DB_URL: jdbc:postgresql://notification-db:5432/notification_db
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      notification-db:
+        condition: service_healthy
+
+  attachment-service:
+    <<: *spring-common
+    build:
+      context: ../../
+      dockerfile: services/attachment-service/Dockerfile
+    container_name: attachment-service
+    profiles: ["all", "attachment"]
+    ports:
+      - "8087:8080"
+    environment:
+      <<: *spring-app-env
+      DB_URL: jdbc:postgresql://attachments-db:5432/attachments_db
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: dummy
+      AWS_SECRET_ACCESS_KEY: dummy
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      attachments-db:
+        condition: service_healthy
+
+  tenant-db:
+    <<: *postgres-common
+    container_name: tenant-db
+    profiles: ["default", "all", "tenant"]
+    environment:
+      <<: *postgres-env
       POSTGRES_DB: tenant_db
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
       - tenant-data:/var/lib/postgresql/data
-    networks:
-      - prolance-network
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U aliyara29"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   crm-db:
-    image: postgres:15-alpine
+    <<: *postgres-common
     container_name: crm-db
-    profiles: [ "default", "all" ]
+    profiles: ["default", "all", "crm"]
     environment:
+      <<: *postgres-env
       POSTGRES_DB: crm_db
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5434:5432"
     volumes:
       - crm-data:/var/lib/postgresql/data
-    networks:
-      - prolance-network
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U aliyara29" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
 
   project-db:
-    image: postgres:15-alpine
+    <<: *postgres-common
     container_name: project-db
-    profiles: [ "default", "all" ]
+    profiles: ["default", "all", "project"]
     environment:
+      <<: *postgres-env
       POSTGRES_DB: project_db
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5435:5432"
     volumes:
       - project-data:/var/lib/postgresql/data
-    networks:
-      - prolance-network
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U aliyara29" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   task-db:
-    image: postgres:15-alpine
+    <<: *postgres-common
     container_name: task-db
-    profiles: [ "default", "all" ]
+    profiles: ["default", "all", "task"]
     environment:
+      <<: *postgres-env
       POSTGRES_DB: task_db
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5436:5432"
     volumes:
       - task-data:/var/lib/postgresql/data
-    networks:
-      - prolance-network
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U aliyara29" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
+  notification-db:
+    <<: *postgres-common
+    container_name: notification-db
+    profiles: ["default", "all", "notification"]
+    environment:
+      <<: *postgres-env
+      POSTGRES_DB: notification_db
+    ports:
+      - "5437:5432"
+    volumes:
+      - notification-data:/var/lib/postgresql/data
+
+  attachments-db:
+    <<: *postgres-common
+    container_name: attachments-db
+    profiles: ["default", "all", "attachment"]
+    environment:
+      <<: *postgres-env
+      POSTGRES_DB: attachments_db
+    ports:
+      - "5438:5432"
+    volumes:
+      - attachments-data:/var/lib/postgresql/data
 
   keycloak-db:
-    image: postgres:15-alpine
+    <<: *postgres-common
     container_name: keycloak-db
-    profiles: [ "default", "all" ]
+    profiles: ["default", "all", "keycloak"]
     environment:
+      <<: *postgres-env
       POSTGRES_DB: keycloak_db
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - prolance-keycloak-data:/var/lib/postgresql/data
-    networks:
-      - prolance-network
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U aliyara29" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.1
     container_name: prolance-keycloak
-    profiles: [ "default", "all"]
+    profiles: ["default", "all"]
     command: start-dev
     environment:
       KC_DB: postgres
@@ -210,48 +380,53 @@ services:
     depends_on:
       - tenant-db
       - keycloak-db
-#  zookeeper:
-#    image: confluentinc/cp-zookeeper:7.6.0
-#    container_name: zookeeper
-#    profiles: [ "default", "all" ]
-#    environment:
-#      ZOOKEEPER_CLIENT_PORT: 2181
-#      ZOOKEEPER_TICK_TIME: 2000
-#    ports:
-#      - "2181:2181"
-#    networks:
-#      - prolance-network
-#    healthcheck:
-#      test: [ "CMD", "nc", "-z", "localhost", "2181" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
 
-#  kafka:
-#    image: confluentinc/cp-kafka:7.6.0
-#    container_name: kafka
-#    profiles: [ "default", "all" ]
-#    environment:
-#      KAFKA_BROKER_ID: 1
-#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-#      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-#      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-#    ports:
-#      - "29092:29092"
-#      - "9092:9092"
-#    networks:
-#      - prolance-network
-#    depends_on:
-#      zookeeper:
-#        condition: service_healthy
-#    healthcheck:
-#      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092" ]
-#      interval: 15s
-#      timeout: 10s
-#      retries: 5
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: zookeeper
+    profiles: ["default", "all"]
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - prolance-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka
+    profiles: ["default", "all"]
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "29092:29092"
+      - "9092:9092"
+    networks:
+      - prolance-network
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "kafka-broker-api-versions --bootstrap-server localhost:9092",
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 5
 
 networks:
   prolance-network:
@@ -263,4 +438,6 @@ volumes:
   crm-data:
   project-data:
   task-data:
+  notification-data:
+  attachments-data:
   pgadmin-data:

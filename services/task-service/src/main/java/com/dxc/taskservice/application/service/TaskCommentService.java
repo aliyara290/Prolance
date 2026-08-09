@@ -12,6 +12,7 @@ import com.dxc.taskservice.domain.exception.RecordNotFoundException;
 import com.dxc.taskservice.domain.model.aggregate.Task;
 import com.dxc.taskservice.domain.model.entity.TaskComment;
 import com.dxc.taskservice.infrastructure.config.TenantContextHolder;
+import com.dxc.taskservice.application.port.out.DomainEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class TaskCommentService implements TaskCommentUseCase {
     private final UserFeignPort userFeignPort;
     private final TenantGuard tenantGuard;
     private final TaskCommentApplicationMapper commentMapper;
+    private final DomainEventPublisher eventPublisher;
 
     @Override
     public TaskCommentResponse addComment(UUID taskId, AddCommentRequest request) {
@@ -42,6 +44,8 @@ public class TaskCommentService implements TaskCommentUseCase {
         Task task = loadTask(taskId, tenantId);
         task.addComment(userId, request.content(), userId);
         taskRepository.save(task);
+        eventPublisher.publish(task.getDomainEvents());
+        task.clearDomainEvents();
 
         // Return the newly created comment
         TaskComment created = task.getComments().get(task.getComments().size() - 1);
@@ -56,6 +60,8 @@ public class TaskCommentService implements TaskCommentUseCase {
         Task task = loadTask(taskId, tenantId);
         task.editComment(commentId, request.content(), userId, userId);
         taskRepository.save(task);
+        eventPublisher.publish(task.getDomainEvents());
+        task.clearDomainEvents();
 
         TaskComment edited = task.getComments().stream()
                 .filter(c -> c.getId().equals(commentId))
@@ -73,6 +79,8 @@ public class TaskCommentService implements TaskCommentUseCase {
         Task task = loadTask(taskId, tenantId);
         task.removeComment(commentId, userId);
         taskRepository.save(task);
+        eventPublisher.publish(task.getDomainEvents());
+        task.clearDomainEvents();
     }
 
     @Override

@@ -13,6 +13,7 @@ import com.dxc.taskservice.application.port.out.TaskRepository;
 import com.dxc.taskservice.application.port.out.feign.ProjectFeignPort;
 import com.dxc.taskservice.application.port.out.feign.UserFeignPort;
 import com.dxc.taskservice.application.security.TenantGuard;
+import com.dxc.taskservice.application.port.out.DomainEventPublisher;
 import com.dxc.taskservice.domain.exception.RecordNotFoundException;
 import com.dxc.taskservice.domain.model.aggregate.Task;
 import com.dxc.taskservice.infrastructure.adapter.out.feign.dto.ProjectValidationResponse;
@@ -36,6 +37,7 @@ public class TaskService implements TaskUseCase {
     private final ProjectFeignPort projectFeignPort;
     private final UserFeignPort userFeignPort;
     private final TenantGuard tenantGuard;
+    private final DomainEventPublisher eventPublisher;
 
     @Override
     public TaskResponse createTask(CreateTaskRequest request) {
@@ -46,7 +48,6 @@ public class TaskService implements TaskUseCase {
             throw new IllegalArgumentException(response.message());
         }
 
-        // Verify reporter exists if different from current user
         if (request.reporterId() != null && !request.reporterId().equals(userId)) {
             verifyUserExists(request.reporterId());
         }
@@ -87,6 +88,8 @@ public class TaskService implements TaskUseCase {
         }
 
         taskRepository.save(task);
+        eventPublisher.publish(task.getDomainEvents());
+        task.clearDomainEvents();
 
         return taskApplicationMapper.toResponse(task);
     }
@@ -110,6 +113,8 @@ public class TaskService implements TaskUseCase {
         );
 
         taskRepository.save(task);
+        eventPublisher.publish(task.getDomainEvents());
+        task.clearDomainEvents();
         return taskApplicationMapper.toResponse(task);
     }
 
@@ -122,6 +127,8 @@ public class TaskService implements TaskUseCase {
         task.deleteTask(userId);
 
         taskRepository.delete(id, tenantId);
+        eventPublisher.publish(task.getDomainEvents());
+        task.clearDomainEvents();
     }
 
     @Override
@@ -141,6 +148,8 @@ public class TaskService implements TaskUseCase {
         task.changeStatus(request.newStatus(), userId, request.comment());
 
         taskRepository.save(task);
+        eventPublisher.publish(task.getDomainEvents());
+        task.clearDomainEvents();
         return taskApplicationMapper.toResponse(task);
     }
 

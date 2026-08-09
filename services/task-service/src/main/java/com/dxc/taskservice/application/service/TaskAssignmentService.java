@@ -13,6 +13,7 @@ import com.dxc.taskservice.domain.model.aggregate.Task;
 import com.dxc.taskservice.domain.model.entity.TaskAssignment;
 import com.dxc.taskservice.domain.model.valueobject.TaskAssignmentStatus;
 import com.dxc.taskservice.infrastructure.config.TenantContextHolder;
+import com.dxc.taskservice.application.port.out.DomainEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class TaskAssignmentService implements TaskAssignmentUseCase {
     private final UserFeignPort userFeignPort;
     private final TenantGuard tenantGuard;
     private final TaskAssignmentApplicationMapper assignmentMapper;
+    private final DomainEventPublisher eventPublisher;
 
     @Override
     public TaskAssignmentResponse assignUser(UUID taskId, AssignUserRequest request) {
@@ -43,6 +45,8 @@ public class TaskAssignmentService implements TaskAssignmentUseCase {
         Task task = loadTask(taskId, tenantId);
         task.assignUser(request.userId(), request.role(), request.allocationPercentage(), actionBy);
         taskRepository.save(task);
+        eventPublisher.publish(task.getDomainEvents());
+        task.clearDomainEvents();
 
         // Return the newly created assignment
         TaskAssignment created = task.getAssignments().stream()
@@ -63,6 +67,8 @@ public class TaskAssignmentService implements TaskAssignmentUseCase {
         Task task = loadTask(taskId, tenantId);
         task.updateAssignment(userId, request.role(), request.allocationPercentage(), actionBy);
         taskRepository.save(task);
+        eventPublisher.publish(task.getDomainEvents());
+        task.clearDomainEvents();
 
         TaskAssignment updated = task.getAssignments().stream()
                 .filter(a -> a.getUserId().equals(userId) && a.getStatus() == TaskAssignmentStatus.ACTIVE)
@@ -80,6 +86,8 @@ public class TaskAssignmentService implements TaskAssignmentUseCase {
         Task task = loadTask(taskId, tenantId);
         task.unassignUser(userId, actionBy);
         taskRepository.save(task);
+        eventPublisher.publish(task.getDomainEvents());
+        task.clearDomainEvents();
     }
 
     @Override

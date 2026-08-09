@@ -24,8 +24,8 @@
             <!-- Logo -->
             <div class="logo-container">
                 <div class="logo-lockup">
-                    <div class="logo-icon">
-                        <img src="${url.resourcesPath}/img/prolance-logo-blue.png" width="50" height="50" alt="Prolance">
+                    <div class="">
+                        <img src="${url.resourcesPath}/img/logo.svg.webp" width="150" alt="Prolance">
                     </div>
                     <span class="logo-text">Prolance</span>
                 </div>

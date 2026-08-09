@@ -58,6 +58,12 @@ public class ProjectController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @GetMapping("/{id}/activities")
+    public ResponseEntity<ApiResponse<List<com.dxc.projectservice.application.dto.project.ProjectActivityDto>>> getProjectActivities(@PathVariable("id") UUID id) {
+        List<com.dxc.projectservice.application.dto.project.ProjectActivityDto> response = projectUseCase.getProjectActivities(id);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ProjectResponse>> updateProject(
             @PathVariable("id") UUID id,

@@ -59,13 +59,16 @@ public class Milestone {
         if (progress < 0 || progress > 100) {
             throw new ValidationException("Progress percentage must be between 0 and 100");
         }
-        this.progressPercentage = progress;
+        this.progressPercentage = Math.round(progress * 10.0f) / 10.0f;
 
         touch();
 
         if (progress >= 100 && this.status != MilestoneStatus.COMPLETED) {
             complete();
-        } else if (progress > 0 && this.status == MilestoneStatus.ACTIVE) {
+        } else if (progress < 100 && this.status == MilestoneStatus.COMPLETED) {
+            this.status = MilestoneStatus.IN_PROGRESS;
+            this.completedAt = null;
+        } else if (progress > 0 && progress < 100 && this.status == MilestoneStatus.ACTIVE) {
             this.status = MilestoneStatus.IN_PROGRESS;
         }
     }

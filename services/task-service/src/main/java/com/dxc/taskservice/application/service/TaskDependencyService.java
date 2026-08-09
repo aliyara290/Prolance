@@ -10,6 +10,7 @@ import com.dxc.taskservice.domain.exception.RecordNotFoundException;
 import com.dxc.taskservice.domain.model.aggregate.Task;
 import com.dxc.taskservice.domain.model.entity.TaskDependency;
 import com.dxc.taskservice.infrastructure.config.TenantContextHolder;
+import com.dxc.taskservice.application.port.out.DomainEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class TaskDependencyService implements TaskDependencyUseCase {
     private final TaskRepository taskRepository;
     private final TenantGuard tenantGuard;
     private final TaskDependencyApplicationMapper dependencyMapper;
+    private final DomainEventPublisher eventPublisher;
 
     @Override
     public TaskDependencyResponse addDependency(UUID taskId, AddDependencyRequest request) {
@@ -39,6 +41,8 @@ public class TaskDependencyService implements TaskDependencyUseCase {
         Task task = loadTask(taskId, tenantId);
         task.addDependency(request.dependOnTaskId(), request.type(), actionBy);
         taskRepository.save(task);
+        eventPublisher.publish(task.getDomainEvents());
+        task.clearDomainEvents();
 
         // Return the newly created dependency (last one added)
         TaskDependency created = task.getDependencies().get(task.getDependencies().size() - 1);
@@ -53,6 +57,8 @@ public class TaskDependencyService implements TaskDependencyUseCase {
         Task task = loadTask(taskId, tenantId);
         task.removeDependency(dependencyId, actionBy);
         taskRepository.save(task);
+        eventPublisher.publish(task.getDomainEvents());
+        task.clearDomainEvents();
     }
 
     @Override

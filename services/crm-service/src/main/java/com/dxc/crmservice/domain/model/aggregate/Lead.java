@@ -161,7 +161,7 @@ public class Lead {
             Integer numberOfEmployees,
             Address address) {
 
-        ensureNotClosed();
+//        ensureNotClosed();
 
         this.title = validateTitle(title);
         this.description = description;
@@ -180,7 +180,7 @@ public class Lead {
     }
 
     public void updateScore(int newScore) {
-        ensureNotClosed();
+//        ensureNotClosed();
 
         if (newScore < 0) {
             throw new ValidationException("Score cannot be negative");
@@ -191,14 +191,13 @@ public class Lead {
     }
 
     public void assignTo(UUID userId) {
-        ensureNotClosed();
+//        ensureNotClosed();
 
         this.assignedTo = requireNonNull(userId, "assignedTo");
         touch();
     }
 
     public void markAsContacted() {
-        ensureStatus(LeadStatus.NEW);
 
         this.status = LeadStatus.CONTACTED;
         this.firstContactedAt = LocalDateTime.now();
@@ -208,14 +207,13 @@ public class Lead {
     }
 
     public void qualify() {
-        ensureStatus(LeadStatus.CONTACTED);
 
         this.status = LeadStatus.QUALIFIED;
         touch();
     }
 
     public void markAsUnqualified(String reason) {
-        ensureNotClosed();
+//        ensureNotClosed();
 
         if (reason == null || reason.trim().isEmpty()) {
             throw new ValidationException("Unqualified reason is required");
@@ -227,14 +225,14 @@ public class Lead {
     }
 
     public void assignClient(UUID clientId) {
-        ensureNotClosed();
+//        ensureNotClosed();
 
         this.clientId = requireNonNull(clientId, "clientId");
         touch();
     }
 
     public void addContact(UUID contactId) {
-        ensureNotClosed();
+//        ensureNotClosed();
         this.contactId = requireNonNull(contactId, "contactId");
         touch();
     }
