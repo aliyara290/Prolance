@@ -36,6 +36,18 @@ public class GatewayConfig {
                                 .rewritePath("/tasks/(?<segment>.*)", "/${segment}")
                         )
                         .uri("lb://TASK-SERVICE"))
+                .route("notification-service", r -> r
+                        .path("/notification/**")
+                        .filters(f -> f
+                                .rewritePath("/notification/(?<segment>.*)", "/${segment}")
+                        )
+                        .uri("lb://NOTIFICATION-SERVICE"))
+                .route("attachments-service", r -> r
+                        .path("/attachments/**")
+                        .filters(f -> f
+                                .rewritePath("/attachments/(?<segment>.*)", "/${segment}")
+                        )
+                        .uri("lb://ATTACHMENT-SERVICE"))
                 .build();
     }
 }
