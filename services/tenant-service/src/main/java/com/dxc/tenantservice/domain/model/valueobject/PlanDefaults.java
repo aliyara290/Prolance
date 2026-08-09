@@ -9,7 +9,7 @@ public record PlanDefaults(
 ) {
     public static PlanDefaults from(PlanType plan) {
         return switch (plan) {
-            case FREE -> new PlanDefaults(5, 10, 100);
+            case FREE -> new PlanDefaults(25, 20, 100);
             case PRO -> new PlanDefaults(50, 100, 1000);
             case ENTERPRISE -> new PlanDefaults(1000, 10000, 10000);
         };
