@@ -10,12 +10,12 @@ This project is a **multi-tenant SaaS platform** for managing clients, projects,
 
 The system is built using:
 
-* Microservices architecture
-* Hexagonal architecture (Ports & Adapters)
-* Spring Boot (Web MVC for services)
-* Spring Cloud Gateway (WebFlux)
-* Keycloak (authentication & authorization)
-* PostgreSQL (per service database)
+- Microservices architecture
+- Hexagonal architecture (Ports & Adapters)
+- Spring Boot (Web MVC for services)
+- Spring Cloud Gateway (WebFlux)
+- Keycloak (authentication & authorization)
+- PostgreSQL (per service database)
 
 ---
 
@@ -23,21 +23,20 @@ The system is built using:
 
 ### 1. Multi-Tenancy (CRITICAL)
 
-* Every entity MUST include `tenant_id` (tenant identifier)
-* Tenant is extracted from JWT (Keycloak)
-* No cross-tenant data access is allowed
-* All queries MUST be tenant-scoped
+- Every entity MUST include `tenant_id` (tenant identifier)
+- Tenant is extracted from JWT (Keycloak)
+- No cross-tenant data access is allowed
+- All queries MUST be tenant-scoped
 
 ---
 
 ### 2. Service Independence
 
-* Each service has its own database
-* No direct database sharing between services
-* Communication via:
-
-  * REST APIs (Feign Client)
-  * Events (Kafka)
+- Each service has its own database
+- No direct database sharing between services
+- Communication via:
+  - REST APIs (Feign Client)
+  - Events (Kafka)
 
 ---
 
@@ -83,28 +82,28 @@ Each service must follow:
 
 Rules:
 
-* `domain` → pure business logic (NO framework)
-* `application` → use cases
-* `infrastructure` → DB, REST clients, Keycloak integration
+- `domain` → pure business logic (NO framework)
+- `application` → use cases
+- `infrastructure` → DB, REST clients, Keycloak integration
 
 ---
 
 ### 4. Shared Modules
 
-* `common-dto` → ONLY for API contracts and events
-* No business logic in shared modules
-* Versioned as a Maven dependency
+- `common-dto` → ONLY for API contracts and events
+- No business logic in shared modules
+- Versioned as a Maven dependency
 
 ---
 
 ### 5. Security
 
-* Authentication handled by Keycloak
-* Services only validate JWT
-* Authorization handled at each service
-* Extract the `tenantId` from jwt tokenand store it in ThreadLocal in each service
-* Extract roles from keycloak jwt token and store it in the GrantedAuthority to use with `@PreAuthorize`
-* 
+- Authentication handled by Keycloak
+- Services only validate JWT
+- Authorization handled at each service
+- Extract the `tenantId` from jwt tokenand store it in ThreadLocal in each service
+- Extract roles from keycloak jwt token and store it in the GrantedAuthority to use with `@PreAuthorize`
+-
 
 ---
 
@@ -112,18 +111,18 @@ Rules:
 
 ### Tech:
 
-* Spring Cloud Gateway (WebFlux)
+- Spring Cloud Gateway (WebFlux)
 
 ### Responsibilities:
 
-* Route requests to services
-* Validate JWT tokens
-* Centralized logging & monitoring
+- Route requests to services
+- Validate JWT tokens
+- Centralized logging & monitoring
 
 ### Must NOT:
 
-* Contain business logic
-* Access databases
+- Contain business logic
+- Access databases
 
 ---
 
@@ -135,27 +134,26 @@ Manages tenant (companies) and their users.
 
 ### Responsibilities:
 
-* Company registration
-* User invitation (keycloak creation)
-* Role management
-* Mapping users to Keycloak
+- Company registration
+- User invitation (keycloak creation)
+- Role management
+- Mapping users to Keycloak
 
 ### Domain:
 
-* Aggregate Root: `Tenant`
-* Entities:
-
-  * TenantUser
-  * UserPreference
-  * TenantLog
-  * Role
-  * TenantSettings
+- Aggregate Root: `Tenant`
+- Entities:
+  - TenantUser
+  - UserPreference
+  - TenantLog
+  - Role
+  - TenantSettings
 
 ### Rules:
 
-* A user belongs to ONE tenant
-* Email must be unique per tenant
-* Cannot exceed tenant plan limits
+- A user belongs to ONE tenant
+- Email must be unique per tenant
+- Cannot exceed tenant plan limits
 
 ---
 
@@ -167,9 +165,9 @@ Manages client relationships before projects exist.
 
 ### Responsibilities:
 
-* Clients (companies you work with)
-* Contacts (people inside clients)
-* Leads & Opportunities
+- Clients (companies you work with)
+- Contacts (people inside clients)
+- Leads & Opportunities
 
 ### Flow:
 
@@ -177,9 +175,9 @@ Lead -> (Qualify) → Opportunity → Won → Project creation
 
 ### Rules:
 
-* Only Qualify leads can create opportunity
-* Only “WON” opportunities can create projects
-* Opportunities must belong to a client
+- Only Qualify leads can create opportunity
+- Only “WON” opportunities can create projects
+- Opportunities must belong to a client
 
 ---
 
@@ -191,15 +189,15 @@ Manages projects lifecycle.
 
 ### Responsibilities:
 
-* Create project (manual or from opportunity)
-* Manage milestones
-* Track project status
+- Create project (manual or from opportunity)
+- Manage milestones
+- Track project status
 
 ### Rules:
 
-* Project belongs to a company
-* Project must have start date
-* Cannot exceed company limits
+- Project belongs to a company
+- Project must have start date
+- Cannot exceed company limits
 
 ---
 
@@ -211,9 +209,9 @@ Handles execution layer.
 
 ### Responsibilities:
 
-* Tasks & Subtasks
-* Assign users
-* Manage status workflow
+- Tasks & Subtasks
+- Assign users
+- Manage status workflow
 
 ### Workflow:
 
@@ -221,9 +219,9 @@ To Do → In Progress → Done -> ..
 
 ### Rules:
 
-* Task must belong to a project
-* Assigned user must belong to same company
-* Task dependencies must not create cycles
+- Task must belong to a project
+- Assigned user must belong to same company
+- Task dependencies must not create cycles
 
 ---
 
@@ -235,13 +233,13 @@ Tracks work effort.
 
 ### Responsibilities:
 
-* Log time per task
-* Track user activity
+- Log time per task
+- Track user activity
 
 ### Rules:
 
-* Time must be linked to a task
-* No negative or overlapping time entries
+- Time must be linked to a task
+- No negative or overlapping time entries
 
 ---
 
@@ -253,13 +251,12 @@ Handles system notifications.
 
 ### Responsibilities:
 
-* Notify on:
+- Notify on:
+  - task assignment
+  - status change
 
-  * task assignment
-  * status change
-* Can use:
-
-  * polling OR WebSocket
+- Can use:
+  - polling OR WebSocket
 
 ---
 
@@ -271,17 +268,16 @@ Handles invoicing (no payments).
 
 ### Responsibilities:
 
-* Generate invoices
-* Track invoice status
-* Calculate totals
+- Generate invoices
+- Track invoice status
+- Calculate totals
 
 ### Rules:
 
-* Invoice linked to project
-* Supports:
-
-  * fixed price
-  * hourly billing (via time tracking)
+- Invoice linked to project
+- Supports:
+  - fixed price
+  - hourly billing (via time tracking)
 
 ---
 
@@ -289,36 +285,37 @@ Handles invoicing (no payments).
 
 ### Synchronous:
 
-* REST (Feign/WebClient)
+- REST (Feign/WebClient)
 
 ### Asynchronous (optional):
 
-* Kafka / RabbitMQ
+- Kafka / RabbitMQ
 
 Events must be:
 
-* immutable
-* versioned
+- immutable
+- versioned
 
 ---
 
 ## 🧪 Development Rules
 
-* No business logic in controllers
-* No direct entity exposure in APIs
-* Use DTOs for communication
-* Validate input at application layer
-* Log important actions (audit)
+- DO NOT ADD A LOT OF COMMENTS, JUST LITTLE IF IT NESSECARY
+- No business logic in controllers
+- No direct entity exposure in APIs
+- Use DTOs for communication
+- Validate input at application layer
+- Log important actions (audit)
 
 ---
 
 ## 💣 Anti-Patterns (STRICTLY FORBIDDEN)
 
-* Sharing databases between services
-* Using `@Data` in domain models
-* Putting business logic in DTOs
-* Skipping tenant validation
-* Tight coupling between services
+- Sharing databases between services
+- Using `@Data` in domain models
+- Putting business logic in DTOs
+- Skipping tenant validation
+- Tight coupling between services
 
 ---
 

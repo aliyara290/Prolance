@@ -247,15 +247,35 @@ services:
     environment:
       <<: *spring-app-env
       DB_URL: jdbc:postgresql://attachments-db:5432/attachments_db
-      AWS_REGION: us-east-1
-      AWS_ACCESS_KEY_ID: dummy
-      AWS_SECRET_ACCESS_KEY: dummy
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION:-eu-north-1}
     depends_on:
       eureka-server:
         condition: service_healthy
       config-server:
         condition: service_healthy
       attachments-db:
+        condition: service_healthy
+
+  billing-service:
+    <<: *spring-common
+    build:
+      context: ../../
+      dockerfile: services/billing-service/Dockerfile
+    container_name: billing-service
+    profiles: ["all", "billing"]
+    ports:
+      - "8088:8080"
+    environment:
+      <<: *spring-app-env
+      DB_URL: jdbc:postgresql://billing-db:5432/billing_db
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      billing-db:
         condition: service_healthy
 
   tenant-db:
@@ -329,6 +349,18 @@ services:
       - "5438:5432"
     volumes:
       - attachments-data:/var/lib/postgresql/data
+
+  billing-db:
+    <<: *postgres-common
+    container_name: billing-db
+    profiles: ["default", "all", "billing"]
+    environment:
+      <<: *postgres-env
+      POSTGRES_DB: billing_db
+    ports:
+      - "5439:5432"
+    volumes:
+      - billing-data:/var/lib/postgresql/data
 
   keycloak-db:
     <<: *postgres-common
@@ -440,4 +472,5 @@ volumes:
   task-data:
   notification-data:
   attachments-data:
+  billing-data:
   pgadmin-data:
