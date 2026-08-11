@@ -11,6 +11,7 @@ COPY services/project-service/pom.xml services/project-service/
 COPY services/task-service/pom.xml services/task-service/
 COPY services/notification-service/pom.xml services/notification-service/
 COPY services/attachment-service/pom.xml services/attachment-service/
+COPY services/billing-service/pom.xml services/billing-service/
 
 RUN --mount=type=cache,target=/root/.m2 \
     mvn dependency:go-offline -pl services/crm-service -am -B

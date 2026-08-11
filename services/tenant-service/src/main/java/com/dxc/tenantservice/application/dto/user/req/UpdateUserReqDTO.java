@@ -2,8 +2,12 @@ package com.dxc.tenantservice.application.dto.user.req;
 
 import com.dxc.tenantservice.domain.model.valueobject.Language;
 import com.dxc.tenantservice.domain.model.valueobject.Theme;
+import com.dxc.tenantservice.domain.model.valueobject.SeniorityLevel;
+import com.dxc.tenantservice.domain.model.valueobject.EducationLevel;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -23,4 +27,10 @@ public class UpdateUserReqDTO {
 
     @Size(max = 100, message = "Department must not exceed 100 characters")
     private String department;
+
+    private SeniorityLevel seniorityLevel;
+    private EducationLevel educationLevel;
+
+    @PositiveOrZero(message = "Base hourly salary must be zero or positive")
+    private BigDecimal baseHourlySalary;
 }

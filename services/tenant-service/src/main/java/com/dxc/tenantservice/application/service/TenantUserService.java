@@ -77,7 +77,16 @@ public class TenantUserService implements TenantUserUseCase {
         try {
             // Assign all roles in Keycloak
             UUID keycloakUserId = UUID.fromString(keycloakUserIdStr);
-            TenantUser user = TenantUser.create(tenantId, dto.getEmail(), dto.getUsername(), dto.getFirstName(), dto.getLastName());
+            TenantUser user = TenantUser.create(
+                    tenantId, 
+                    dto.getEmail(), 
+                    dto.getUsername(), 
+                    dto.getFirstName(), 
+                    dto.getLastName(),
+                    dto.getSeniorityLevel(),
+                    dto.getEducationLevel(),
+                    dto.getBaseHourlySalary() != null ? dto.getBaseHourlySalary() : java.math.BigDecimal.ZERO
+            );
             user.assignKeycloakUser(keycloakUserId);
 
             for (UserRole role : dto.getRoles()) {
@@ -85,9 +94,17 @@ public class TenantUserService implements TenantUserUseCase {
                 user.addRoleGroup(roleGroupId);
             }
 
-            // Set optional profile fields if exit in the DTO
+            // Set optional profile fields if exist in the DTO
             if (dto.getJobTitle() != null || dto.getDepartment() != null) {
-                user.updateProfile(dto.getFirstName(), dto.getLastName(), dto.getJobTitle(), dto.getDepartment());
+                user.updateProfile(
+                        dto.getFirstName(), 
+                        dto.getLastName(), 
+                        dto.getJobTitle(), 
+                        dto.getDepartment(),
+                        dto.getSeniorityLevel(),
+                        dto.getEducationLevel(),
+                        dto.getBaseHourlySalary() != null ? dto.getBaseHourlySalary() : java.math.BigDecimal.ZERO
+                );
             }
 
             // Create default user preferences from tenant settings
@@ -122,7 +139,15 @@ public class TenantUserService implements TenantUserUseCase {
 
         TenantUser user = findUserByIdAndTenant(userId, tenantId);
 
-        user.updateProfile(dto.getFirstName(), dto.getLastName(), dto.getJobTitle(), dto.getDepartment());
+        user.updateProfile(
+                dto.getFirstName(), 
+                dto.getLastName(), 
+                dto.getJobTitle(), 
+                dto.getDepartment(),
+                dto.getSeniorityLevel(),
+                dto.getEducationLevel(),
+                dto.getBaseHourlySalary()
+        );
 
         TenantUser saved = tenantUserRepository.save(user);
         return userDtoMapper.toDto(saved);

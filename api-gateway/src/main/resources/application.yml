@@ -12,7 +12,6 @@ spring:
     config:
       uri: http://localhost:8888
 
-#test: 1230
 logging:
   level:
     root: INFO

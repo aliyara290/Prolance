@@ -7,5 +7,6 @@ public enum EntityType {
     COMMENT,
     COMPANY,
     USER,
+    INVOICE,
     OTHER
 }

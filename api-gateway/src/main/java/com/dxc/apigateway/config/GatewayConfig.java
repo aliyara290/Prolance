@@ -48,6 +48,12 @@ public class GatewayConfig {
                                 .rewritePath("/attachments/(?<segment>.*)", "/${segment}")
                         )
                         .uri("lb://ATTACHMENT-SERVICE"))
+                .route("billing-service", r -> r
+                        .path("/billing/**")
+                        .filters(f -> f
+                                .rewritePath("/billing/(?<segment>.*)", "/${segment}")
+                        )
+                        .uri("lb://BILLING-SERVICE"))
                 .build();
     }
 }
