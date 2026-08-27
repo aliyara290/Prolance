@@ -1,5 +1,8 @@
 # Prolance — Plateforme SaaS Multi-Tenant de Gestion de Projets
 
+## Frontend Repository: https://github.com/aliyara290/Prolance-Frontend-Angular
+## Config Server Repository: https://github.com/aliyara290/Prolance-Config-Repo
+
 ## Présentation
 
 **Prolance** est une plateforme SaaS multi-tenant conçue pour permettre aux entreprises de gérer efficacement leurs clients, projets, tâches, équipes et facturation dans un environnement centralisé, sécurisé et évolutif.
