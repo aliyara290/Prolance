@@ -1,5 +1,6 @@
 # Prolance — Plateforme SaaS Multi-Tenant de Gestion de Projets
 
+## AWS Infrastrecture & CD Repository: https://github.com/aliyara290/prolance-aws-infra
 ## Frontend Repository: https://github.com/aliyara290/Prolance-Frontend-Angular
 ## Config Server Repository: https://github.com/aliyara290/Prolance-Config-Repo
 
