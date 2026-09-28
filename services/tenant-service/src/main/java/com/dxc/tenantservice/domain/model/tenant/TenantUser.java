@@ -3,9 +3,12 @@ package com.dxc.tenantservice.domain.model.tenant;
 import com.dxc.tenantservice.domain.exception.UserStateException;
 import com.dxc.tenantservice.domain.exception.UserValidationException;
 import com.dxc.tenantservice.domain.model.valueobject.UserStatus;
+import com.dxc.tenantservice.domain.model.valueobject.SeniorityLevel;
+import com.dxc.tenantservice.domain.model.valueobject.EducationLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,6 +32,10 @@ public class TenantUser {
     private String jobTitle;
     private String department;
 
+    private SeniorityLevel seniorityLevel;
+    private EducationLevel educationLevel;
+    private BigDecimal baseHourlySalary;
+
     private UserStatus status;
 
     private LocalDateTime lastLoginAt;
@@ -47,6 +54,9 @@ public class TenantUser {
             String lastName,
             String jobTitle,
             String department,
+            SeniorityLevel seniorityLevel,
+            EducationLevel educationLevel,
+            BigDecimal baseHourlySalary,
             UserStatus status,
             LocalDateTime lastLoginAt,
             UserPreference userPreference
@@ -62,6 +72,9 @@ public class TenantUser {
         this.lastName = lastName;
         this.jobTitle = jobTitle;
         this.department = department;
+        this.seniorityLevel = seniorityLevel;
+        this.educationLevel = educationLevel;
+        this.baseHourlySalary = baseHourlySalary;
         this.keycloakRoleGroupIds = keycloakRoleGroupIds != null ? new HashSet<>(keycloakRoleGroupIds) : new HashSet<>();
         this.status = status != null ? status : UserStatus.ACTIVE;
         this.lastLoginAt = lastLoginAt;
@@ -73,9 +86,12 @@ public class TenantUser {
             String email,
             String username,
             String firstName,
-            String lastName
+            String lastName,
+            SeniorityLevel seniorityLevel,
+            EducationLevel educationLevel,
+            BigDecimal baseHourlySalary
     ) {
-        return createWithId(UUID.randomUUID(), tenantId, email, username, firstName, lastName);
+        return createWithId(UUID.randomUUID(), tenantId, email, username, firstName, lastName, seniorityLevel, educationLevel, baseHourlySalary);
     }
 
     public static TenantUser createWithId(
@@ -84,7 +100,10 @@ public class TenantUser {
             String email,
             String username,
             String firstName,
-            String lastName
+            String lastName,
+            SeniorityLevel seniorityLevel,
+            EducationLevel educationLevel,
+            BigDecimal baseHourlySalary
     ) {
         log.info("user email |||||-----: {}", email);
         return new TenantUser(
@@ -98,6 +117,9 @@ public class TenantUser {
                 lastName,
                 null, // jobTitle
                 null, // department
+                seniorityLevel,
+                educationLevel,
+                baseHourlySalary,
                 UserStatus.ACTIVE,
                 null, // lastLoginAt
                 null  // userPreference
@@ -182,7 +204,10 @@ public class TenantUser {
             String firstName,
             String lastName,
             String jobTitle,
-            String department
+            String department,
+            SeniorityLevel seniorityLevel,
+            EducationLevel educationLevel,
+            BigDecimal baseHourlySalary
     ) {
         if (firstName == null || firstName.isBlank()) {
             throw new UserValidationException("First name is required");
@@ -192,6 +217,9 @@ public class TenantUser {
         this.lastName = lastName;
         this.jobTitle = jobTitle;
         this.department = department;
+        this.seniorityLevel = seniorityLevel;
+        this.educationLevel = educationLevel;
+        this.baseHourlySalary = baseHourlySalary;
     }
 
     public void recordLogin() {

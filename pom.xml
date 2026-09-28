@@ -20,6 +20,7 @@
         <module>services/task-service</module>
         <module>services/notification-service</module>
         <module>services/attachment-service</module>
+        <module>services/billing-service</module>
     </modules>
 
     <properties>

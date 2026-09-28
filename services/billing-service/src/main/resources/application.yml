@@ -1,0 +1,18 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: billing-service
+  profiles:
+    active: dev
+  config:
+    import: "optional:configserver:http://config-server.prolance.local:8888"
+  cloud:
+    config:
+      uri: http://config-server.prolance.local:8888
+      fail-fast: true
+      retry:
+        initial-interval: 2000
+        max-interval: 10000
+        max-attempts: 10

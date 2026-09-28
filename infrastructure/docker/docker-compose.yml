@@ -21,9 +21,9 @@ x-spring-app-env: &spring-app-env
   KEYCLOAK_BASE_URL: "http://keycloak:8080"
   KEYCLOAK_ISSUER_URL: "http://keycloak:8080/realms/prolance"
   APP_KEYCLOAK_URL: "http://keycloak:8080/realms/prolance"
-  KEYCLOAK_ADMIN_CLIENT_SECRET: "**********"
-  DB_USERNAME: "aliyara29"
-  DB_PASSWORD: "Yara2001"
+  DB_USERNAME: ${POSTGRES_USER}
+  DB_PASSWORD: ${POSTGRES_PASSWORD}
+  KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
 
 x-spring-common: &spring-common
   restart: unless-stopped
@@ -31,13 +31,6 @@ x-spring-common: &spring-common
     - prolance-network
   mem_limit: 512m
   cpus: 0.75
-  healthcheck:
-    test:
-      ["CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health"]
-    interval: 30s
-    timeout: 5s
-    retries: 5
-    start_period: 60s
   environment:
     SPRING_PROFILES_ACTIVE: docker
     JAVA_TOOL_OPTIONS: >
@@ -71,6 +64,7 @@ x-postgres-common: &postgres-common
 services:
   eureka-server:
     <<: *spring-common
+    image: eureka-server
     build:
       context: ../../
       dockerfile: infrastructure/discovery-service/Dockerfile
@@ -93,6 +87,7 @@ services:
 
   config-server:
     <<: *spring-common
+    image: config-server
     build:
       context: ../../
       dockerfile: infrastructure/config-server/Dockerfile
@@ -118,6 +113,7 @@ services:
 
   api-gateway:
     <<: *spring-common
+    image: api-gateway
     build:
       context: ../../
       dockerfile: api-gateway/Dockerfile
@@ -137,6 +133,7 @@ services:
 
   tenant-service:
     <<: *spring-common
+    image: tenant-service
     build:
       context: ../../
       dockerfile: services/tenant-service/Dockerfile
@@ -157,6 +154,7 @@ services:
 
   crm-service:
     <<: *spring-common
+    image: crm-service
     build:
       context: ../../
       dockerfile: services/crm-service/Dockerfile
@@ -177,6 +175,7 @@ services:
 
   project-service:
     <<: *spring-common
+    image: project-service
     build:
       context: ../../
       dockerfile: services/project-service/Dockerfile
@@ -197,6 +196,7 @@ services:
 
   task-service:
     <<: *spring-common
+    image: task-service
     build:
       context: ../../
       dockerfile: services/task-service/Dockerfile
@@ -217,6 +217,7 @@ services:
 
   notification-service:
     <<: *spring-common
+    image: notification-service
     build:
       context: ../../
       dockerfile: services/notification-service/Dockerfile
@@ -237,6 +238,7 @@ services:
 
   attachment-service:
     <<: *spring-common
+    image: attachment-service
     build:
       context: ../../
       dockerfile: services/attachment-service/Dockerfile
@@ -247,15 +249,36 @@ services:
     environment:
       <<: *spring-app-env
       DB_URL: jdbc:postgresql://attachments-db:5432/attachments_db
-      AWS_REGION: us-east-1
-      AWS_ACCESS_KEY_ID: dummy
-      AWS_SECRET_ACCESS_KEY: dummy
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
     depends_on:
       eureka-server:
         condition: service_healthy
       config-server:
         condition: service_healthy
       attachments-db:
+        condition: service_healthy
+
+  billing-service:
+    <<: *spring-common
+    image: billing-service
+    build:
+      context: ../../
+      dockerfile: services/billing-service/Dockerfile
+    container_name: billing-service
+    profiles: ["all", "billing"]
+    ports:
+      - "8088:8080"
+    environment:
+      <<: *spring-app-env
+      DB_URL: jdbc:postgresql://billing-db:5432/billing_db
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      billing-db:
         condition: service_healthy
 
   tenant-db:
@@ -329,6 +352,18 @@ services:
       - "5438:5432"
     volumes:
       - attachments-data:/var/lib/postgresql/data
+
+  billing-db:
+    <<: *postgres-common
+    container_name: billing-db
+    profiles: ["default", "all", "billing"]
+    environment:
+      <<: *postgres-env
+      POSTGRES_DB: billing_db
+    ports:
+      - "5439:5432"
+    volumes:
+      - billing-data:/var/lib/postgresql/data
 
   keycloak-db:
     <<: *postgres-common
@@ -440,4 +475,5 @@ volumes:
   task-data:
   notification-data:
   attachments-data:
+  billing-data:
   pgadmin-data:

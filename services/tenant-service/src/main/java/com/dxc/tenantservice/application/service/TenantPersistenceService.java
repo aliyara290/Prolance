@@ -38,7 +38,7 @@ public class TenantPersistenceService {
             tenantRepository.save(tenant);
 
             // Persist Tenant Admin user
-            TenantUser user = TenantUser.createWithId(userId, tenantId, keycloakUserResDTO.getEmail(), keycloakUserResDTO.getUsername(), keycloakUserResDTO.getFirstName(), keycloakUserResDTO.getLastName());
+            TenantUser user = TenantUser.createWithId(userId, tenantId, keycloakUserResDTO.getEmail(), keycloakUserResDTO.getUsername(), keycloakUserResDTO.getFirstName(), keycloakUserResDTO.getLastName(), null, null, null);
             user.assignKeycloakUser(keycloakUserId);
             user.addRoleGroup(roleGroupId);
             UserPreference userPreference = UserPreference.createDefault(tenantId, user.getId(), tenantSettings);

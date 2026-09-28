@@ -1,5 +1,7 @@
 package com.dxc.tenantservice.infrastructure.adapter.out.persistence.entity;
 
+import com.dxc.tenantservice.domain.model.valueobject.EducationLevel;
+import com.dxc.tenantservice.domain.model.valueobject.SeniorityLevel;
 import com.dxc.tenantservice.domain.model.valueobject.UserStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,6 +12,7 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -59,6 +62,17 @@ public class TenantUserEntity extends BaseAuditingEntity {
     private String jobTitle;
 
     private String department;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "seniority_level")
+    private SeniorityLevel seniorityLevel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "education_level")
+    private EducationLevel educationLevel;
+
+    @Column(name = "base_hourly_salary", precision = 10, scale = 2)
+    private BigDecimal baseHourlySalary;
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;
