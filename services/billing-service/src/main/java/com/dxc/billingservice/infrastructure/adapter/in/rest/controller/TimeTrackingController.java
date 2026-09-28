@@ -29,23 +29,23 @@ public class TimeTrackingController {
 
     @PutMapping("/{id}")
     public ResponseEntity<TimeEntryResponse> updateTimeEntry(
-            @PathVariable UUID id,
+            @PathVariable("id") UUID id,
             @Valid @RequestBody LogTimeRequest request) {
         TimeEntryResponse response = timeTrackingUseCase.updateTimeEntry(id, request);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTimeEntry(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteTimeEntry(@PathVariable("id") UUID id) {
         timeTrackingUseCase.deleteTimeEntry(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/project/{projectId}")
     public ResponseEntity<List<TimeEntryResponse>> getProjectTimeEntries(
-            @PathVariable UUID projectId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+            @PathVariable("projectId") UUID projectId,
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
         
         List<TimeEntryResponse> responses = timeTrackingUseCase.getProjectTimeEntries(projectId, start, end);
         return ResponseEntity.ok(responses);

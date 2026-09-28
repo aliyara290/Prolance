@@ -41,7 +41,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/{invoiceId}")
-    public ResponseEntity<ApiResponse<InvoiceResponse>> getInvoice(@PathVariable UUID invoiceId) {
+    public ResponseEntity<ApiResponse<InvoiceResponse>> getInvoice(@PathVariable("invoiceId") UUID invoiceId) {
         InvoiceResponse response = invoiceUseCase.getInvoice(invoiceId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
@@ -54,35 +54,35 @@ public class InvoiceController {
 
     @GetMapping("/project/{projectId}")
     public ResponseEntity<ApiResponse<Page<InvoiceSummaryResponse>>> getInvoicesByProject(
-            @PathVariable UUID projectId, Pageable pageable) {
+            @PathVariable("projectId") UUID projectId, Pageable pageable) {
         Page<InvoiceSummaryResponse> response = invoiceUseCase.getInvoicesByProject(projectId, pageable);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @GetMapping("/client/{clientId}")
     public ResponseEntity<ApiResponse<Page<InvoiceSummaryResponse>>> getInvoicesByClient(
-            @PathVariable UUID clientId, Pageable pageable) {
+            @PathVariable("clientId") UUID clientId, Pageable pageable) {
         Page<InvoiceSummaryResponse> response = invoiceUseCase.getInvoicesByClient(clientId, pageable);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PutMapping("/{invoiceId}")
     public ResponseEntity<ApiResponse<InvoiceResponse>> updateInvoice(
-            @PathVariable UUID invoiceId, @Valid @RequestBody UpdateInvoiceRequest request) {
+            @PathVariable("invoiceId") UUID invoiceId, @Valid @RequestBody UpdateInvoiceRequest request) {
         InvoiceResponse response = invoiceUseCase.updateInvoice(invoiceId, request);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PostMapping("/{invoiceId}/line-items")
     public ResponseEntity<ApiResponse<InvoiceResponse>> addLineItem(
-            @PathVariable UUID invoiceId, @Valid @RequestBody AddLineItemRequest request) {
+            @PathVariable("invoiceId") UUID invoiceId, @Valid @RequestBody AddLineItemRequest request) {
         InvoiceResponse response = invoiceUseCase.addLineItem(invoiceId, request);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PutMapping("/{invoiceId}/line-items/{lineItemId}")
     public ResponseEntity<ApiResponse<InvoiceResponse>> updateLineItem(
-            @PathVariable UUID invoiceId, @PathVariable UUID lineItemId,
+            @PathVariable("invoiceId") UUID invoiceId, @PathVariable("lineItemId") UUID lineItemId,
             @Valid @RequestBody UpdateLineItemRequest request) {
         InvoiceResponse response = invoiceUseCase.updateLineItem(invoiceId, lineItemId, request);
         return ResponseEntity.ok(ApiResponse.success(response));
@@ -90,46 +90,46 @@ public class InvoiceController {
 
     @DeleteMapping("/{invoiceId}/line-items/{lineItemId}")
     public ResponseEntity<ApiResponse<InvoiceResponse>> removeLineItem(
-            @PathVariable UUID invoiceId, @PathVariable UUID lineItemId) {
+            @PathVariable("invoiceId") UUID invoiceId, @PathVariable("lineItemId") UUID lineItemId) {
         InvoiceResponse response = invoiceUseCase.removeLineItem(invoiceId, lineItemId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PostMapping("/{invoiceId}/send")
-    public ResponseEntity<ApiResponse<InvoiceResponse>> sendInvoice(@PathVariable UUID invoiceId) {
+    public ResponseEntity<ApiResponse<InvoiceResponse>> sendInvoice(@PathVariable("invoiceId") UUID invoiceId) {
         InvoiceResponse response = invoiceUseCase.sendInvoice(invoiceId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PostMapping("/{invoiceId}/pay")
     public ResponseEntity<ApiResponse<InvoiceResponse>> markPaid(
-            @PathVariable UUID invoiceId, @RequestParam(required = false) String comment) {
+            @PathVariable("invoiceId") UUID invoiceId, @RequestParam(required = false) String comment) {
         InvoiceResponse response = invoiceUseCase.markPaid(invoiceId, comment);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PostMapping("/{invoiceId}/partial-pay")
     public ResponseEntity<ApiResponse<InvoiceResponse>> markPartiallyPaid(
-            @PathVariable UUID invoiceId, @RequestParam(required = false) String comment) {
+            @PathVariable("invoiceId") UUID invoiceId, @RequestParam(required = false) String comment) {
         InvoiceResponse response = invoiceUseCase.markPartiallyPaid(invoiceId, comment);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PostMapping("/{invoiceId}/cancel")
     public ResponseEntity<ApiResponse<InvoiceResponse>> cancelInvoice(
-            @PathVariable UUID invoiceId, @RequestParam(required = false) String reason) {
+            @PathVariable("invoiceId") UUID invoiceId, @RequestParam(required = false) String reason) {
         InvoiceResponse response = invoiceUseCase.cancelInvoice(invoiceId, reason);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PostMapping("/{invoiceId}/pdf")
-    public ResponseEntity<ApiResponse<InvoiceResponse>> generatePdf(@PathVariable UUID invoiceId) {
+    public ResponseEntity<ApiResponse<InvoiceResponse>> generatePdf(@PathVariable("invoiceId") UUID invoiceId) {
         InvoiceResponse response = invoiceUseCase.generateAndAttachPdf(invoiceId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @DeleteMapping("/{invoiceId}")
-    public ResponseEntity<Void> deleteInvoice(@PathVariable UUID invoiceId) {
+    public ResponseEntity<Void> deleteInvoice(@PathVariable("invoiceId") UUID invoiceId) {
         invoiceUseCase.deleteInvoice(invoiceId);
         return ResponseEntity.noContent().build();
     }

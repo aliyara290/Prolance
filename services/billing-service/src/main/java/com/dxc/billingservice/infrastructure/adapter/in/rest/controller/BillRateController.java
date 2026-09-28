@@ -31,33 +31,33 @@ public class BillRateController {
     }
 
     @GetMapping("/{billRateId}")
-    public ResponseEntity<ApiResponse<BillRateResponse>> getBillRate(@PathVariable UUID billRateId) {
+    public ResponseEntity<ApiResponse<BillRateResponse>> getBillRate(@PathVariable("billRateId") UUID billRateId) {
         BillRateResponse response = billRateUseCase.getBillRate(billRateId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<ApiResponse<List<BillRateResponse>>> getBillRatesByProject(@PathVariable UUID projectId) {
+    public ResponseEntity<ApiResponse<List<BillRateResponse>>> getBillRatesByProject(@PathVariable("projectId") UUID projectId) {
         List<BillRateResponse> response = billRateUseCase.getBillRatesByProject(projectId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @GetMapping("/project/{projectId}/user/{userId}")
     public ResponseEntity<ApiResponse<BillRateResponse>> getBillRateByProjectAndUser(
-            @PathVariable UUID projectId, @PathVariable UUID userId) {
+            @PathVariable("projectId") UUID projectId, @PathVariable("userId") UUID userId) {
         BillRateResponse response = billRateUseCase.getBillRateByProjectAndUser(projectId, userId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PutMapping("/{billRateId}")
     public ResponseEntity<ApiResponse<BillRateResponse>> updateBillRate(
-            @PathVariable UUID billRateId, @Valid @RequestBody UpdateBillRateRequest request) {
+            @PathVariable("billRateId") UUID billRateId, @Valid @RequestBody UpdateBillRateRequest request) {
         BillRateResponse response = billRateUseCase.updateBillRate(billRateId, request);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @DeleteMapping("/{billRateId}")
-    public ResponseEntity<Void> deleteBillRate(@PathVariable UUID billRateId) {
+    public ResponseEntity<Void> deleteBillRate(@PathVariable("billRateId") UUID billRateId) {
         billRateUseCase.deleteBillRate(billRateId);
         return ResponseEntity.noContent().build();
     }
