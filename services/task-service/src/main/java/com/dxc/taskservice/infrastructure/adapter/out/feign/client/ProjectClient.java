@@ -11,12 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.UUID;
 
 @FeignClient(
-        name = "projectClient",
-        url = "${services.project-service.url}projects",
+        name = "project-service",
         configuration = FeignConfig.class
 )
 public interface ProjectClient {
-    @PostMapping("/{projectId}/task-creation-validation")
+    @PostMapping("/projects/{projectId}/task-creation-validation")
     ProjectValidationResponse canCreateTaskInProject(@PathVariable("projectId") UUID projectId, @RequestBody CanCreateTaskRequest request);
 //    ProjectValidationResponse isProjectActive(UUID projectId);
 //    ProjectValidationResponse isUserMemberInProject(UUID projectId, UUID userId);
