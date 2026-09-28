@@ -8,13 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 import org.springframework.web.multipart.MultipartFile;
+import com.dxc.billingservice.infrastructure.adapter.in.rest.response.ApiResponse;
 import com.dxc.billingservice.infrastructure.config.FeignFormConfig;
 
 @FeignClient(name = "attachment-service", path = "/api/v1/attachments", configuration = FeignFormConfig.class)
 public interface AttachmentFeignClient {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    AttachmentFeignPort.AttachmentResponseDTO uploadFile(
+    ApiResponse<AttachmentFeignPort.AttachmentResponseDTO> uploadFile(
             @RequestPart("file") MultipartFile file,
             @RequestParam("fileName") String fileName,
             @RequestParam("contentType") String contentType,

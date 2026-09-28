@@ -10,7 +10,7 @@ import java.util.UUID;
 @FeignClient(name = "tenant-service", path = "/api/v1/tenants")
 public interface TenantFeignClient {
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/users/{userId}/keycloak")
     ApiResponse<UserResponseDTO> getUser(@PathVariable("userId") UUID userId);
 
     record UserResponseDTO(

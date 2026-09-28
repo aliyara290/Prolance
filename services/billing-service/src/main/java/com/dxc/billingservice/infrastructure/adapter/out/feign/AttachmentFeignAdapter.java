@@ -25,7 +25,7 @@ public class AttachmentFeignAdapter implements AttachmentFeignPort {
                 contentType,
                 fileBytes
         );
-        return attachmentFeignClient.uploadFile(multipartFile, fileName, contentType, entityType, entityId);
+        return attachmentFeignClient.uploadFile(multipartFile, fileName, contentType, entityType, entityId).getData();
     }
 
     @Override
