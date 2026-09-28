@@ -64,8 +64,8 @@ public class TenantService implements TenantUseCase {
             userKeycloakReq.setLastName(userKeycloakRes.getLastName());
             userKeycloakReq.setEmail(userKeycloakRes.getEmail());
             userKeycloakReq.setAttributes(Map.of(
-                    "tenantId", List.of(tenantId.toString()),
-                    "userId", List.of(userId.toString())
+                    "tenant_id", List.of(tenantId.toString()),
+                    "user_id", List.of(userId.toString())
             ));
             keycloakPort.updateUser(userKeycloakRes.getId(), userKeycloakReq);
             saga.register(() -> keycloakPort.updateUser(userKeycloakRes.getId(), userKeycloakRes));
@@ -81,6 +81,9 @@ public class TenantService implements TenantUseCase {
             log.error("Registration failed for tenant: {}. Initiating rollback...", reqDTO.getName(), ex);
             // rollback if any step failed
             saga.rollback();
+            if (ex instanceof RuntimeException) {
+                throw (RuntimeException) ex;
+            }
             throw new RuntimeException("Failed to register tenant", ex);
         }
     }
