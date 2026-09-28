@@ -29,6 +29,9 @@ public class TenantUserPersistenceMapper {
                 .lastName(domain.getLastName())
                 .jobTitle(domain.getJobTitle())
                 .department(domain.getDepartment())
+                .seniorityLevel(domain.getSeniorityLevel())
+                .educationLevel(domain.getEducationLevel())
+                .baseHourlySalary(domain.getBaseHourlySalary())
                 .status(domain.getStatus())
                 .lastLoginAt(domain.getLastLoginAt())
                 .userPreference(preferenceMapper.domainToEntity(domain.getUserPreference()))
@@ -55,6 +58,9 @@ public class TenantUserPersistenceMapper {
                 entity.getLastName(),
                 entity.getJobTitle(),
                 entity.getDepartment(),
+                entity.getSeniorityLevel(),
+                entity.getEducationLevel(),
+                entity.getBaseHourlySalary(),
                 entity.getStatus(),
                 entity.getLastLoginAt(),
                 preferenceMapper.entityToDomain(entity.getUserPreference())

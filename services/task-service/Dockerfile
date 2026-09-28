@@ -11,13 +11,14 @@ COPY services/project-service/pom.xml services/project-service/
 COPY services/task-service/pom.xml services/task-service/
 COPY services/notification-service/pom.xml services/notification-service/
 COPY services/attachment-service/pom.xml services/attachment-service/
+COPY services/billing-service/pom.xml services/billing-service/
 
-RUN --mount=type=cache,target=/root/.m2 \
+RUN \
     mvn dependency:go-offline -pl services/task-service -am -B
 
 COPY services/task-service/src ./services/task-service/src
 
-RUN --mount=type=cache,target=/root/.m2 \
+RUN \
     mvn package -pl services/task-service -am -Dmaven.test.skip=true -B
 
 FROM eclipse-temurin:17-jre-alpine

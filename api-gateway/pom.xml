@@ -55,6 +55,12 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+                <!-- Spring Cloud LoadBalancer  -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

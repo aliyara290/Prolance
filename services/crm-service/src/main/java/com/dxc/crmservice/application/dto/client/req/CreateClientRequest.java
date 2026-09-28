@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
-public record CreateClientRequest(
+public record   CreateClientRequest(
         @NotBlank(message = "Client name is required")
         @Size(min = 2, max = 200)
         String name,

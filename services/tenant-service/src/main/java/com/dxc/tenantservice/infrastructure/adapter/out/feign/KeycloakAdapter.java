@@ -72,18 +72,23 @@ public class KeycloakAdapter implements KeycloakPort {
         tenantGroup.setName(tenantGroupName);
 
         log.debug("Creating parent group: {}", tenantGroupName);
-        ResponseEntity<Void> response = groupClient.createGroup(tenantGroup);
+        try {
+            ResponseEntity<Void> response = groupClient.createGroup(tenantGroup);
 
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            log.error("Failed to create parent group with status: {}", response.getStatusCode());
-            throw new KeycloakIntegrationException("Failed to create parent group: " + response.getStatusCode());
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                log.error("Failed to create parent group with status: {}", response.getStatusCode());
+                throw new KeycloakIntegrationException("Failed to create parent group: " + response.getStatusCode());
+            }
+
+            String location = response.getHeaders().getLocation().getPath();
+            String tenantGroupId = location.substring(location.lastIndexOf('/') + 1);
+            log.info("Parent group created: tenantGroupId={}", tenantGroupId);
+
+            return UUID.fromString(tenantGroupId);
+        } catch (feign.FeignException e) {
+            log.error("Keycloak returned error creating group {}: status={}, body={}", tenantGroupName, e.status(), e.contentUTF8());
+            throw new KeycloakIntegrationException("Failed to create group in Keycloak: " + e.status() + " - " + e.contentUTF8(), e);
         }
-
-        String location = response.getHeaders().getLocation().getPath();
-        String tenantGroupId = location.substring(location.lastIndexOf('/') + 1);
-        log.info("Parent group created: tenantGroupId={}", tenantGroupId);
-
-        return UUID.fromString(tenantGroupId);
     }
 
     @Override
@@ -91,21 +96,26 @@ public class KeycloakAdapter implements KeycloakPort {
         log.info("Creating role subgroup: {}", subGroupName);
         CreateKeycloakGroupReqDTO roleGroup = new CreateKeycloakGroupReqDTO();
         roleGroup.setName(subGroupName);
-        ResponseEntity<Void> subgroupResponse = groupClient.createSubgroup(parentGroupId, roleGroup);
-        String subgroupLocation = subgroupResponse.getHeaders().getLocation().toString();
-        String subgroupId = subgroupLocation.substring(subgroupLocation.lastIndexOf("/") + 1);
+        try {
+            ResponseEntity<Void> subgroupResponse = groupClient.createSubgroup(parentGroupId, roleGroup);
+            String subgroupLocation = subgroupResponse.getHeaders().getLocation().toString();
+            String subgroupId = subgroupLocation.substring(subgroupLocation.lastIndexOf("/") + 1);
 
-        if (subgroupResponse.getStatusCode().is2xxSuccessful()) {
-            log.info("Subgroup created successfully: {}", subGroupName);
-            KeycloakRoleResDTO getRealmRole = groupClient.getRealmRole(subGroupName);
-            log.debug("keycloak real role: {}", getRealmRole);
-            KeycloakRoleReqDTO attachingBody = new KeycloakRoleReqDTO();
-            attachingBody.setId(getRealmRole.getId());
-            attachingBody.setName(getRealmRole.getName());
-            groupClient.attachRoleToGroup(subgroupId, List.of(attachingBody));
-        } else {
-            log.error("Failed to create subgroup {} with status: {}", subGroupName, subgroupResponse.getStatusCode());
-            throw new KeycloakIntegrationException("Failed to create subgroup: " + subGroupName);
+            if (subgroupResponse.getStatusCode().is2xxSuccessful()) {
+                log.info("Subgroup created successfully: {}", subGroupName);
+                KeycloakRoleResDTO getRealmRole = groupClient.getRealmRole(subGroupName);
+                log.debug("keycloak real role: {}", getRealmRole);
+                KeycloakRoleReqDTO attachingBody = new KeycloakRoleReqDTO();
+                attachingBody.setId(getRealmRole.getId());
+                attachingBody.setName(getRealmRole.getName());
+                groupClient.attachRoleToGroup(subgroupId, List.of(attachingBody));
+            } else {
+                log.error("Failed to create subgroup {} with status: {}", subGroupName, subgroupResponse.getStatusCode());
+                throw new KeycloakIntegrationException("Failed to create subgroup: " + subGroupName);
+            }
+        } catch (feign.FeignException e) {
+            log.error("Keycloak returned error creating subgroup {}: status={}, body={}", subGroupName, e.status(), e.contentUTF8());
+            throw new KeycloakIntegrationException("Failed to create subgroup in Keycloak: " + e.status() + " - " + e.contentUTF8(), e);
         }
     }
 

@@ -5,6 +5,9 @@ import lombok.*;
 
 import java.util.Set;
 import com.dxc.tenantservice.domain.model.valueobject.UserRole;
+import com.dxc.tenantservice.domain.model.valueobject.SeniorityLevel;
+import com.dxc.tenantservice.domain.model.valueobject.EducationLevel;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -42,4 +45,10 @@ public class CreateUserReqDTO {
 
     @Size(max = 100, message = "Department must not exceed 100 characters")
     private String department;
+
+    private SeniorityLevel seniorityLevel;
+    private EducationLevel educationLevel;
+
+    @PositiveOrZero(message = "Base hourly salary must be zero or positive")
+    private BigDecimal baseHourlySalary;
 }
