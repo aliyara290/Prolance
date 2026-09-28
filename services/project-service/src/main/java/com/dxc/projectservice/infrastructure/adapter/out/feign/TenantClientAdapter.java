@@ -2,7 +2,7 @@ package com.dxc.projectservice.infrastructure.adapter.out.feign;
 
 import com.dxc.projectservice.application.port.out.feign.TenantFeignPort;
 import com.dxc.projectservice.domain.exception.RecordNotFoundException;
-import com.dxc.projectservice.infrastructure.adapter.out.feign.client.TenantClient;
+import com.dxc.projectservice.infrastructure.adapter.out.feign.client.TenantServiceClient;
 import com.dxc.projectservice.infrastructure.adapter.out.feign.dto.ResponseWrapper;
 import com.dxc.projectservice.infrastructure.adapter.out.feign.dto.TenantStatusResponseDTO;
 import feign.FeignException;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class TenantClientAdapter implements TenantFeignPort {
-    private final TenantClient tenantClient;
+    private final TenantServiceClient tenantClient;
 
     @Override
     @Cacheable(value = "tenant-status", key = "#p0")
