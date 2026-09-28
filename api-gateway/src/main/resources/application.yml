@@ -7,10 +7,10 @@ spring:
   application:
     name: api-gateway
   config:
-    import: "optional:configserver:http://localhost:8888"
+    import: "optional:configserver:http://config-server.prolance.local:8888"
   cloud:
     config:
-      uri: http://localhost:8888
+      uri: http://config-server.prolance.local:8888
 
 logging:
   level:
