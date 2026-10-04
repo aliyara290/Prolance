@@ -35,7 +35,6 @@ public class TenantContextFilter extends OncePerRequestFilter {
                 if (tenantId != null) {
                     TenantContextHolder.setTenantId(tenantId);
                 }
-
             }
 
             filterChain.doFilter(request, response);
