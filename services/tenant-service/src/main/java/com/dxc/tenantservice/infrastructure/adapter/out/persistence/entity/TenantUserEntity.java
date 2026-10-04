@@ -79,6 +79,9 @@ public class TenantUserEntity extends BaseAuditingEntity {
 
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
+    
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_preference_id")
