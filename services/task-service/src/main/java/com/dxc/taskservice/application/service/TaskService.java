@@ -43,10 +43,10 @@ public class TaskService implements TaskUseCase {
     public TaskResponse createTask(CreateTaskRequest request) {
         UUID tenantId = getTenantIdAndVerify();
         UUID userId = TenantContextHolder.getUserId();
-        ProjectValidationResponse response = projectFeignPort.canCreateTaskInProject(request.projectId(), userId);
-        if (!response.allowed()) {
-            throw new IllegalArgumentException(response.message());
-        }
+        // ProjectValidationResponse response = projectFeignPort.canCreateTaskInProject(request.projectId(), userId);
+        // if (!response.allowed()) {
+        //     throw new IllegalArgumentException(response.message());
+        // }
 
         if (request.reporterId() != null && !request.reporterId().equals(userId)) {
             verifyUserExists(request.reporterId());

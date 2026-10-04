@@ -67,11 +67,20 @@ public class TenantUserController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-//    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER', 'MEMBER', 'VIEWER', 'ACCOUNTANT', 'SALES')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER', 'MEMBER', 'VIEWER', 'ACCOUNTANT', 'SALES')")
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<UserResDTO>> getUser(@PathVariable("userId") UUID userId) {
         log.info("GET /api/v1/tenants/users/{}", userId);
         UserResDTO response = tenantUserUseCase.getUser(userId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+    
+    @PostMapping(value = "/{userId}/profile-photo", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<UserResDTO>> uploadProfilePhoto(
+            @PathVariable("userId") UUID userId,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        log.info("POST /api/v1/tenants/users/{}/profile-photo", userId);
+        UserResDTO response = tenantUserUseCase.uploadProfilePhoto(userId, file);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

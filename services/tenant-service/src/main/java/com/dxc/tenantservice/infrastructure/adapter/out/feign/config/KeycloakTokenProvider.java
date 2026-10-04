@@ -1,6 +1,5 @@
 package com.dxc.tenantservice.infrastructure.adapter.out.feign.config;
 
-
 import com.dxc.tenantservice.infrastructure.adapter.out.feign.client.KeycloakTokenClient;
 import com.dxc.tenantservice.infrastructure.adapter.out.feign.dto.keycloak.KeycloakTokenResDTO;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,7 @@ import java.time.Instant;
 @RequiredArgsConstructor
 @Slf4j
 public class KeycloakTokenProvider {
-
+    
     @Value("${keycloak.realm}")
     private String realm;
 
@@ -28,7 +27,6 @@ public class KeycloakTokenProvider {
 
     private String cachedToken;
     private Instant tokenExpiryTime;
-
 
     public synchronized String getValidToken() {
         if (cachedToken == null || tokenExpiryTime == null || Instant.now().isAfter(tokenExpiryTime)) {
@@ -45,8 +43,7 @@ public class KeycloakTokenProvider {
                     realm,
                     "client_credentials",
                     clientId,
-                    clientSecret
-            );
+                    clientSecret);
 
             this.cachedToken = response.getAccessToken();
             this.tokenExpiryTime = Instant.now().plusSeconds(response.getExpiresIn() - 60);

@@ -16,10 +16,3 @@ spring:
         initial-interval: 2000
         max-interval: 10000
         max-attempts: 10
-
-aws:
-  s3:
-    bucket-name: ${AWS_S3_BUCKET:prolance-attachment}
-    access-key: ${AWS_ACCESS_KEY_ID:}
-    secret-key: ${AWS_SECRET_ACCESS_KEY:}
-    region: ${AWS_REGION:eu-north-1}

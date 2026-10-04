@@ -129,7 +129,7 @@ public class NotificationTemplateSeeder implements CommandLineRunner {
                 "New Comment",
                 "comment-added",
                 "message-square",
-                "/app/projects/all/${projectId}/tasks?taskId=${taskId}#comments",
+                "/app/projects/all/${projectId}/tasks?taskId=${taskId}?tap=comments",
                 NotificationCategory.TASK.name(),
                 NotificationPriority.LOW.name()
         );
