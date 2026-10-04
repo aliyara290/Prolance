@@ -35,6 +35,8 @@ public class TenantUser {
     private SeniorityLevel seniorityLevel;
     private EducationLevel educationLevel;
     private BigDecimal baseHourlySalary;
+    
+    private String avatarUrl;
 
     private UserStatus status;
 
@@ -59,7 +61,8 @@ public class TenantUser {
             BigDecimal baseHourlySalary,
             UserStatus status,
             LocalDateTime lastLoginAt,
-            UserPreference userPreference
+            UserPreference userPreference,
+            String avatarUrl
     ) {
         validate(tenantId, email, firstName);
 
@@ -79,6 +82,7 @@ public class TenantUser {
         this.status = status != null ? status : UserStatus.ACTIVE;
         this.lastLoginAt = lastLoginAt;
         this.userPreference = userPreference;
+        this.avatarUrl = avatarUrl;
     }
 
     public static TenantUser create(
@@ -122,7 +126,8 @@ public class TenantUser {
                 baseHourlySalary,
                 UserStatus.ACTIVE,
                 null, // lastLoginAt
-                null  // userPreference
+                null, // userPreference
+                null  // avatarUrl
         );
     }
 
@@ -224,6 +229,10 @@ public class TenantUser {
 
     public void recordLogin() {
         this.lastLoginAt = LocalDateTime.now();
+    }
+    
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     private void validate(UUID tenantId, String email, String firstName) {

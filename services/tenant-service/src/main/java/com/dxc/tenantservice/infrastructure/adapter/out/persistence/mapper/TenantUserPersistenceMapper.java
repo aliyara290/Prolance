@@ -35,6 +35,7 @@ public class TenantUserPersistenceMapper {
                 .status(domain.getStatus())
                 .lastLoginAt(domain.getLastLoginAt())
                 .userPreference(preferenceMapper.domainToEntity(domain.getUserPreference()))
+                .avatarUrl(domain.getAvatarUrl())
                 .build();
 
         if (entity.getUserPreference() != null) {
@@ -63,7 +64,8 @@ public class TenantUserPersistenceMapper {
                 entity.getBaseHourlySalary(),
                 entity.getStatus(),
                 entity.getLastLoginAt(),
-                preferenceMapper.entityToDomain(entity.getUserPreference())
+                preferenceMapper.entityToDomain(entity.getUserPreference()),
+                entity.getAvatarUrl()
         );
     }
 }

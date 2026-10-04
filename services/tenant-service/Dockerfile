@@ -13,13 +13,11 @@ COPY services/notification-service/pom.xml services/notification-service/
 COPY services/attachment-service/pom.xml services/attachment-service/
 COPY services/billing-service/pom.xml services/billing-service/
 
-RUN --mount=type=cache,target=/root/.m2 \
-    mvn dependency:go-offline -pl services/tenant-service -am -B
+RUN mvn dependency:go-offline -pl services/tenant-service -am -B
 
 COPY services/tenant-service/src ./services/tenant-service/src
 
-RUN --mount=type=cache,target=/root/.m2 \
-    mvn package -pl services/tenant-service -am -Dmaven.test.skip=true -B
+RUN mvn package -pl services/tenant-service -am -Dmaven.test.skip=true -B
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app

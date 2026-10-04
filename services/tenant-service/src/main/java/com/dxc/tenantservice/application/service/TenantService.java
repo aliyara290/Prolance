@@ -67,6 +67,7 @@ public class TenantService implements TenantUseCase {
                     "tenant_id", List.of(tenantId.toString()),
                     "user_id", List.of(userId.toString())
             ));
+            
             keycloakPort.updateUser(userKeycloakRes.getId(), userKeycloakReq);
             saga.register(() -> keycloakPort.updateUser(userKeycloakRes.getId(), userKeycloakRes));
 

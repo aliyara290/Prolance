@@ -26,6 +26,7 @@ public record UserResDTO(
         BigDecimal baseHourlySalary,
         UserStatus status,
         LocalDateTime lastLoginAt,
-        Set<UUID> keycloakRoleGroupIds
+        Set<UUID> keycloakRoleGroupIds,
+        String avatarUrl
 ) {
 }
