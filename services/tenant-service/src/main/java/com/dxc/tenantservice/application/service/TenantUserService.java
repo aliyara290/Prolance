@@ -13,6 +13,10 @@ import com.dxc.tenantservice.domain.exception.TenantStateException;
 import com.dxc.tenantservice.domain.exception.UserStateException;
 import com.dxc.tenantservice.domain.exception.UserValidationException;
 import com.dxc.tenantservice.domain.model.tenant.Tenant;
+import com.dxc.tenantservice.infrastructure.adapter.out.feign.client.AttachmentClient;
+import org.springframework.web.multipart.MultipartFile;
+import com.dxc.tenantservice.infrastructure.adapter.in.rest.response.ApiResponse;
+import com.dxc.tenantservice.domain.model.tenant.Tenant;
 import com.dxc.tenantservice.domain.model.tenant.TenantSettings;
 import com.dxc.tenantservice.domain.model.tenant.TenantUser;
 import com.dxc.tenantservice.domain.model.tenant.UserPreference;
@@ -41,6 +45,7 @@ public class TenantUserService implements TenantUserUseCase {
     private final TenantRepository tenantRepository;
     private final KeycloakPort keycloakPort;
     private final TenantUserDtoMapper userDtoMapper;
+    private final AttachmentClient attachmentClient;
 
     @Override
     @Transactional
@@ -290,6 +295,39 @@ public class TenantUserService implements TenantUserUseCase {
         keycloakPort.logOutUser(user.getKeycloakUserId());
         return userDtoMapper.toDto(saved);
     }
+    
+    @Override
+    @Transactional
+    public UserResDTO uploadProfilePhoto(UUID userId, MultipartFile file) {
+        UUID tenantId = resolveTenantId();
+        log.info("Uploading profile photo for user: userId={}, tenantId={}", userId, tenantId);
+        
+        TenantUser user = findUserByIdAndTenant(userId, tenantId);
+        
+        try {
+            ApiResponse<Map<String, Object>> uploadResponse = attachmentClient.uploadAttachment(file, "USER", userId);
+            
+            if (uploadResponse.success() && uploadResponse.data() != null) {
+                Map<String, Object> data = uploadResponse.data();
+                String fileUrl = (String) data.get("fileUrl"); // Assumes attachment-service returns fileUrl
+                if (fileUrl != null) {
+                    user.setAvatarUrl(fileUrl);
+                } else {
+                    // if attachment service does not return fileUrl but returns an ID, we can construct the download URL
+                    String attachmentId = (String) data.get("id");
+                    user.setAvatarUrl("/api/v1/attachments/" + attachmentId + "/download");
+                }
+            } else {
+                throw new UserStateException("Failed to upload profile photo via attachment service");
+            }
+        } catch (Exception ex) {
+            log.error("Failed to upload profile photo for user: {}", userId, ex);
+            throw new UserStateException("Failed to upload profile photo: " + ex.getMessage());
+        }
+        
+        TenantUser saved = tenantUserRepository.save(user);
+        return userDtoMapper.toDto(saved);
+    }
 
     // Helpers
 
@@ -311,6 +349,6 @@ public class TenantUserService implements TenantUserUseCase {
     }
 
     private KeycloakUserReqDTO buildKeycloakUser(CreateUserReqDTO dto, UUID tenantId) {
-        return KeycloakUserReqDTO.builder().username(dto.getEmail()).email(dto.getEmail()).firstName(dto.getFirstName()).lastName(dto.getLastName()).enabled(true).emailVerified(false).attributes(Map.of("tenantId", List.of(tenantId.toString()))).credentials(List.of(new KeycloakUserReqDTO.KeycloakCredentialRepresentation("password", dto.getPassword(), true))).build();
+        return KeycloakUserReqDTO.builder().username(dto.getEmail()).email(dto.getEmail()).firstName(dto.getFirstName()).lastName(dto.getLastName()).enabled(true).emailVerified(false).attributes(Map.of("tenant_id", List.of(tenantId.toString()))).credentials(List.of(new KeycloakUserReqDTO.KeycloakCredentialRepresentation("password", dto.getPassword(), true))).build();
     }
 }

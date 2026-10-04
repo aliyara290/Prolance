@@ -20,4 +20,5 @@ public interface TenantUserUseCase {
     Page<UserResDTO> getAllUsers(Pageable pageable);
     UserResDTO addUserRole(UUID userId, ChangeUserRoleReqDTO changeUserRoleReqDTO);
     UserResDTO removeUserRole(UUID userId, ChangeUserRoleReqDTO changeUserRoleReqDTO);
+    UserResDTO uploadProfilePhoto(UUID userId, org.springframework.web.multipart.MultipartFile file);
 }
